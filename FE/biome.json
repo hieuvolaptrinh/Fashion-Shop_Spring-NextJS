@@ -1,0 +1,135 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.0/schema.json",
+  "files": {
+    "ignore": [".next/*", "node_modules/*"]
+  },
+  "formatter": {
+    "enabled": true,
+    "useEditorconfig": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 80,
+    "attributePosition": "auto",
+    "bracketSpacing": true
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "all": true,
+      "complexity": {
+        "noStaticOnlyClass": "off"
+      },
+      "correctness": {
+        "noUndeclaredDependencies": "off",
+        "useImportExtensions": "off"
+      },
+      "nursery": {
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "paths": {
+              "lodash": "Using lodash is not encouraged",
+              "underscore": "Using underscore is not encouraged"
+            }
+          }
+        }
+      },
+      "style": {
+        "noDefaultExport": "off",
+        "noImplicitBoolean": "off",
+        "noNamespaceImport": "off",
+        "noNonNullAssertion": "off",
+        "useBlockStatements": "off",
+        "useExplicitLengthCheck": "off",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["camelCase", "kebab-case", "export", "PascalCase"]
+          }
+        },
+        "useNamingConvention": {
+          "level": "error",
+          "fix": "unsafe",
+          "options": {
+            "strictCase": false,
+            "requireAscii": true,
+            "conventions": [
+              {
+                "selector": {
+                  "kind": "variable"
+                },
+                "formats": ["camelCase", "PascalCase", "CONSTANT_CASE"]
+              },
+              {
+                "selector": {
+                  "kind": "const",
+                  "scope": "global"
+                },
+                "formats": ["CONSTANT_CASE"]
+              },
+              {
+                "selector": {
+                  "kind": "interface"
+                },
+                "formats": ["PascalCase", "CONSTANT_CASE"]
+              },
+              {
+                "selector": {
+                  "kind": "enum"
+                },
+                "formats": ["PascalCase"]
+              },
+              {
+                "selector": {
+                  "kind": "objectLiteralProperty"
+                },
+                "match": ".*"
+              },
+              {
+                "selector": {
+                  "kind": "functionParameter"
+                },
+                "match": "_(.*)|([a-zA-Z].*)",
+                "formats": ["camelCase", "snake_case", "PascalCase"]
+              },
+              {
+                "match": ".*",
+                "formats": [
+                  "camelCase",
+                  "snake_case",
+                  "PascalCase",
+                  "CONSTANT_CASE"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "suspicious": {
+        "noConsole": "off",
+        "noReactSpecificProps": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "always",
+      "bracketSameLine": false,
+      "enabled": true,
+      "indentStyle": "space",
+      "quoteStyle": "single",
+      "attributePosition": "auto",
+      "bracketSpacing": true
+    },
+    "linter": { "enabled": true }
+  }
+}

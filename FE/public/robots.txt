@@ -1,0 +1,25 @@
+# Robots.txt for lanchuyenhangsale.com
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /oauth2/
+Disallow: /private/
+
+# Specific rules for Facebook crawler
+User-agent: facebookexternalhit/1.1
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /oauth2/
+
+# Block API subdomain
+User-agent: *
+Disallow: https://api.lanchuyenhangsale.com/
+
+Sitemap: https://lanchuyenhangsale.com/sitemap.xml
+
+# Host directive to ensure canonical domain
+Host: https://lanchuyenhangsale.com
