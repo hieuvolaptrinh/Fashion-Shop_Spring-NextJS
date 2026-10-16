@@ -1,55 +1,31 @@
-import Delete from "@mui/icons-material/Delete";
-import Edit from "@mui/icons-material/Edit";
-import LocalOffer from "@mui/icons-material/LocalOffer";
-import Visibility from "@mui/icons-material/Visibility";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
-import IconButton from "@mui/material/IconButton";
-import Paper from "@mui/material/Paper";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
+"use client";
+
+import React, { useMemo } from "react";
+import { Eye, Pencil, Trash2, Package, Layers } from "lucide-react";
+import { Badge } from "@/core/components/ui/badge";
+import { Button } from "@/core/components/ui/button";
 import {
-  DataGrid,
-  GridColDef,
-  GridPaginationModel,
-  GridSortModel,
-} from "@mui/x-data-grid";
-
-// Types
-interface ListImages {
-  imageId: string;
-  link: string;
-}
-
-interface ListTypes {
-  typeId: string;
-  typeName: string;
-}
-
-interface Product {
-  productId: string;
-  productName: string;
-  originalPrice: number;
-  usageInstructions: string;
-  description: string;
-  ingredients: string;
-  salePrice: number;
-  quantity: number;
-  manufactureDate: Date;
-  listImages: ListImages[];
-  listTypes: ListTypes[];
-  listCombo?: any[];
-}
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/core/components/ui/tooltip";
+import { IMAGES } from "@/core/constants";
+import AdminDataTable, {
+  TableColumn,
+  PaginationModel,
+} from "@/core/components/feature/admin/common/AdminDataTable";
+import { formatCurrency } from "@/core/lib/utils";
+import type { Product } from "@/core/lib/type";
 
 interface ProductsDataGridProps {
   products: Product[];
   loading: boolean;
-  paginationModel: GridPaginationModel;
+  paginationModel: PaginationModel;
   totalRows: number;
-  sortModel: GridSortModel;
-  onPaginationModelChange: (newModel: GridPaginationModel) => void;
-  onSortModelChange: (newModel: GridSortModel) => void;
+  sortModel?: unknown;
+  onPaginationModelChange: (newModel: PaginationModel) => void;
+  onSortModelChange?: (newModel: unknown) => void;
   onView: (product: Product) => void;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
@@ -60,259 +36,219 @@ const ProductsDataGrid = ({
   loading,
   paginationModel,
   totalRows,
-  sortModel,
   onPaginationModelChange,
-  onSortModelChange,
   onView,
   onEdit,
   onDelete,
 }: ProductsDataGridProps) => {
-  // Define columns
-  const columns: GridColDef[] = [
-    {
-      field: "listImages",
-      headerName: "Hình ảnh",
-      width: 80,
-      sortable: false,
-      renderCell: (params) => (
-        <Avatar
-          src={params.value?.[0]?.link || ""}
-          variant="rounded"
-          sx={{ width: 50, height: 50 }}
-        />
-      ),
-    },
-    {
-      field: "productName",
-      headerName: "Tên sản phẩm",
-      width: 250,
-      renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{
-            fontWeight: 500,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            maxWidth: 230,
-          }}
-        >
-          {params.value}
-        </Typography>
-      ),
-    },
-    {
-      field: "originalPrice",
-      headerName: "Giá gốc",
-      width: 120,
-      type: "number",
-      renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{
-            textDecoration: "line-through",
-            color: "text.secondary",
-          }}
-        >
-          {params.value.toLocaleString("vi-VN")}₫
-        </Typography>
-      ),
-    },
-    {
-      field: "salePrice",
-      headerName: "Giá bán",
-      width: 120,
-      type: "number",
-      renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{
-            fontWeight: 600,
-            color: "error.main",
-          }}
-        >
-          {params.value.toLocaleString("vi-VN")}₫
-        </Typography>
-      ),
-    },
-    {
-      field: "quantity",
-      headerName: "Số lượng",
-      width: 100,
-      type: "number",
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          size="small"
-          color={
-            params.value > 50
-              ? "success"
-              : params.value > 10
-                ? "warning"
-                : "error"
-          }
-          variant="outlined"
-        />
-      ),
-    },
-    {
-      field: "listTypes",
-      headerName: "Loại sản phẩm",
-      width: 200,
-      sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-          {params.value.slice(0, 2).map((type: ListTypes) => (
-            <Chip
-              key={type.typeId}
-              label={type.typeName}
-              size="small"
-              variant="outlined"
-              sx={{ fontSize: "0.75rem" }}
-            />
-          ))}
-          {params.value.length > 2 && (
-            <Chip
-              label={`+${params.value.length - 2}`}
-              size="small"
-              variant="outlined"
-              sx={{ fontSize: "0.75rem" }}
-            />
-          )}
-        </Box>
-      ),
-    },
-    {
-      field: "listCombo",
-      headerName: "Combo",
-      width: 100,
-      sortable: false,
-      renderCell: (params) => (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {params.value && params.value.length > 0 ? (
-            <Tooltip
-              title={`${params.value.length} combo${params.value.length > 1 ? "s" : ""} khả dụng`}
-            >
-              <Chip
-                icon={<LocalOffer />}
-                label={params.value.length}
-                size="small"
-                color="secondary"
-                variant="outlined"
+  const getQuantityBadge = (qty: number) => {
+    if (qty > 50) {
+      return (
+        <Badge className="bg-success/15 text-success hover:bg-success/25 border-success/30 font-medium">
+          Còn {qty}
+        </Badge>
+      );
+    }
+    if (qty > 10) {
+      return (
+        <Badge className="bg-warning/15 text-warning hover:bg-warning/25 border-warning/30 font-medium">
+          Còn {qty}
+        </Badge>
+      );
+    }
+    return (
+      <Badge className="bg-destructive/15 text-destructive hover:bg-destructive/25 border-destructive/30 font-bold">
+        Sắp hết ({qty})
+      </Badge>
+    );
+  };
+
+  const columns: TableColumn<Product>[] = useMemo(
+    () => [
+      {
+        key: "image",
+        header: "Ảnh",
+        headClassName: "w-[80px]",
+        render: (item: Product) => {
+          const imgUrl = item.listImages?.[0]?.link || IMAGES.FALLBACK_PRODUCT;
+          return (
+            <div className="relative h-12 w-12 rounded-xl overflow-hidden border border-border/60 bg-muted/30 shrink-0">
+              <img
+                src={imgUrl}
+                alt={item.productName}
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = IMAGES.FALLBACK_PRODUCT;
+                }}
               />
-            </Tooltip>
+            </div>
+          );
+        },
+      },
+      {
+        key: "productName",
+        header: "Tên sản phẩm",
+        headClassName: "min-w-[200px]",
+        render: (item: Product) => (
+          <div className="flex flex-col max-w-[280px]">
+            <span className="font-semibold text-foreground text-sm line-clamp-2 leading-snug">
+              {item.productName}
+            </span>
+            <span className="text-[11px] text-muted-foreground font-mono mt-0.5">
+              ID: #{item.productId}
+            </span>
+          </div>
+        ),
+      },
+      {
+        key: "originalPrice",
+        header: "Giá gốc",
+        headClassName: "w-[120px]",
+        render: (item: Product) => (
+          <span className="text-xs text-muted-foreground line-through">
+            {formatCurrency(item.originalPrice || 0)}
+          </span>
+        ),
+      },
+      {
+        key: "salePrice",
+        header: "Giá bán",
+        headClassName: "w-[130px]",
+        render: (item: Product) => (
+          <span className="text-sm font-bold text-primary">
+            {formatCurrency(item.salePrice || 0)}
+          </span>
+        ),
+      },
+      {
+        key: "quantity",
+        header: "Tồn kho",
+        headClassName: "w-[110px]",
+        render: (item: Product) => getQuantityBadge(item.quantity || 0),
+      },
+      {
+        key: "categories",
+        header: "Danh mục",
+        headClassName: "min-w-[150px]",
+        render: (item: Product) => (
+          <div className="flex flex-wrap gap-1 max-w-[220px]">
+            {item.listTypes && item.listTypes.length > 0 ? (
+              <>
+                {item.listTypes.slice(0, 2).map((type) => (
+                  <Badge
+                    key={type.typeId}
+                    variant="secondary"
+                    className="text-[10px] font-normal px-2 py-0.5"
+                  >
+                    {type.typeName}
+                  </Badge>
+                ))}
+                {item.listTypes.length > 2 && (
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] px-1.5 py-0.5 text-muted-foreground"
+                  >
+                    +{item.listTypes.length - 2}
+                  </Badge>
+                )}
+              </>
+            ) : (
+              <span className="text-xs text-muted-foreground">-</span>
+            )}
+          </div>
+        ),
+      },
+      {
+        key: "combo",
+        header: "Combo",
+        headClassName: "w-[90px] text-center",
+        className: "text-center",
+        render: (item: Product) =>
+          item.listCombo && item.listCombo.length > 0 ? (
+            <Badge
+              variant="outline"
+              className="border-primary/40 text-primary gap-1 text-[11px]"
+            >
+              <Layers className="h-3 w-3" />
+              <span>{item.listCombo.length}</span>
+            </Badge>
           ) : (
-            <Typography variant="body2" color="text.disabled">
-              -
-            </Typography>
-          )}
-        </Box>
-      ),
-    },
-    {
-      field: "actions",
-      headerName: "Thao tác",
-      width: 150,
-      sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 0.5 }}>
-          <Tooltip title="Xem chi tiết">
-            <IconButton
-              size="small"
-              color="info"
-              onClick={() => onView(params.row)}
-            >
-              <Visibility fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Chỉnh sửa">
-            <IconButton
-              size="small"
-              color="primary"
-              onClick={() => onEdit(params.row)}
-            >
-              <Edit fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Xóa">
-            <IconButton
-              size="small"
-              color="error"
-              onClick={() => onDelete(params.row)}
-            >
-              <Delete fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      ),
-    },
-  ];
+            <span className="text-xs text-muted-foreground">-</span>
+          ),
+      },
+      {
+        key: "actions",
+        header: "Thao tác",
+        headClassName: "w-[130px] text-right",
+        className: "text-right",
+        render: (item: Product) => (
+          <TooltipProvider delayDuration={100}>
+            <div className="flex items-center justify-end gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onView(item)}
+                    className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span className="sr-only">Xem chi tiết</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Xem chi tiết</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(item)}
+                    className="h-8 w-8 rounded-lg text-primary hover:text-primary hover:bg-primary/10"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    <span className="sr-only">Chỉnh sửa</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Chỉnh sửa</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onDelete(item)}
+                    className="h-8 w-8 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Xóa</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Xóa sản phẩm</TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
+        ),
+      },
+    ],
+    [onView, onEdit, onDelete]
+  );
 
   return (
-    <Paper
-      sx={{
-        borderRadius: 2,
-        overflow: "hidden",
-        height: "calc(100vh - 200px)", // Fixed height container
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <DataGrid
-        rows={products}
-        columns={columns}
-        getRowId={(row) => row.productId}
-        loading={loading}
-        paginationMode="server"
-        sortingMode="client"
-        // Pagination
-        paginationModel={paginationModel}
-        onPaginationModelChange={onPaginationModelChange}
-        rowCount={totalRows}
-        pageSizeOptions={[5, 10, 25, 50]}
-        // Sorting
-        sortModel={sortModel}
-        onSortModelChange={onSortModelChange}
-        // Styling
-        sx={{
-          border: "none",
-          height: "100%", // Take full height of container
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "1px solid rgba(224, 224, 224, 1)",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "rgba(0, 0, 0, 0.02)",
-            borderBottom: "2px solid rgba(224, 224, 224, 1)",
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: 600,
-          },
-          "& .MuiDataGrid-row:hover": {
-            backgroundColor: "rgba(0, 0, 0, 0.02)",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            overflowY: "auto", // Enable vertical scroll
-          },
-        }}
-        // Other props
-        disableRowSelectionOnClick
-        localeText={{
-          noRowsLabel: "Chưa có sản phẩm nào",
-          footerRowSelected: (count) => `${count} sản phẩm được chọn`,
-        }}
-      />
-    </Paper>
+    <AdminDataTable<Product>
+      data={products}
+      columns={columns}
+      keyExtractor={(item) => item.productId}
+      loading={loading}
+      totalRows={totalRows}
+      paginationModel={paginationModel}
+      onPaginationModelChange={onPaginationModelChange}
+      itemName="sản phẩm"
+      emptyMessage="Không tìm thấy sản phẩm nào phù hợp."
+      emptyIcon={<Package className="h-10 w-10 opacity-40 text-muted-foreground" />}
+    />
   );
 };
 

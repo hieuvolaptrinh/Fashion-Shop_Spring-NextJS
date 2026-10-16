@@ -1,15 +1,20 @@
-import { Combo } from "@/core/lib/type";
-import { Add, Remove } from "@mui/icons-material";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
-import IconButton from "@mui/material/IconButton";
-import InputAdornment from "@mui/material/InputAdornment";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+"use client";
+
 import React from "react";
+import type { Combo } from "@/core/lib/type";
+import { Plus, Trash2, Tag, Percent } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/core/components/ui/card";
+import { Button } from "@/core/components/ui/button";
+import { Input } from "@/core/components/ui/input";
+import { Label } from "@/core/components/ui/label";
+import { Textarea } from "@/core/components/ui/textarea";
+import { formatCurrency } from "@/core/lib/utils";
 
 interface ComboSectionProps {
   combos: Combo[];
@@ -33,173 +38,166 @@ const ComboSection: React.FC<ComboSectionProps> = ({
   if (isViewing && combos.length === 0) return null;
 
   return (
-    <Card sx={{ mt: 2, borderRadius: 2 }}>
-      <CardHeader
-        title="Tùy chọn Combo"
-        subheader={
-          isViewing
-            ? "Các gói combo hiện có"
-            : "Thêm các gói combo với giá ưu đãi khi mua số lượng lớn"
-        }
-        action={
-          !isViewing && (
-            <Button
-              variant="outlined"
-              startIcon={<Add />}
-              onClick={onAddCombo}
-              size="small"
-              sx={{ borderRadius: 2 }}
-            >
-              Thêm Combo
-            </Button>
-          )
-        }
-      />
+    <Card className="rounded-2xl border shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <div>
+          <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
+            <Tag className="h-4 w-4 text-primary" />
+            <span>Tùy chọn Gói Combo</span>
+          </CardTitle>
+          <CardDescription className="text-xs mt-0.5">
+            {isViewing
+              ? "Các gói ưu đãi combo hiện có của sản phẩm"
+              : "Thêm các gói combo với giá ưu đãi khi khách hàng mua số lượng lớn"}
+          </CardDescription>
+        </div>
+        {!isViewing && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onAddCombo}
+            className="rounded-xl gap-1 text-xs h-8"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Thêm Combo</span>
+          </Button>
+        )}
+      </CardHeader>
       <CardContent>
         {combos.length === 0 ? (
-          <Typography color="text.secondary" textAlign="center" py={2}>
-            Chưa có combo nào. Nhấn "Thêm Combo" để tạo gói ưu đãi.
-          </Typography>
+          <div className="py-6 text-center text-xs text-muted-foreground border border-dashed rounded-xl">
+            Chưa có combo nào. Nhấn "Thêm Combo" để tạo gói giá ưu đãi.
+          </div>
         ) : (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {combos.map((combo, index) => (
-              <Card key={index} variant="outlined" sx={{ borderRadius: 2 }}>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="h6" color="primary">
-                      Combo {index + 1}
-                    </Typography>
+          <div className="space-y-4">
+            {combos.map((combo, index) => {
+              const qtyErr = errors[`combo_${index}_quantity`];
+              const priceErr = errors[`combo_${index}_price`];
+              const singleTotal = salePrice * combo.quantityInCombo;
+              const savings = singleTotal - combo.comboPrice;
+              const savingPercent =
+                singleTotal > 0 ? ((savings / singleTotal) * 100).toFixed(1) : "0";
+
+              return (
+                <div
+                  key={index}
+                  className="rounded-xl border bg-card p-4 space-y-3 relative group transition-all"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                      Combo #{index + 1}
+                    </span>
                     {!isViewing && (
-                      <IconButton
-                        color="error"
-                        size="small"
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={() => onRemoveCombo(index)}
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
                       >
-                        <Remove />
-                      </IconButton>
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span className="sr-only">Xóa combo</span>
+                      </Button>
                     )}
-                  </Box>
+                  </div>
 
-                  <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-                    <TextField
-                      label="Số lượng"
-                      type="number"
-                      value={combo.quantityInCombo}
-                      onChange={(e) =>
-                        onUpdateCombo(
-                          index,
-                          "quantityInCombo",
-                          Number(e.target.value),
-                        )
-                      }
-                      error={!!errors[`combo_${index}_quantity`]}
-                      helperText={errors[`combo_${index}_quantity`]}
-                      InputProps={{
-                        inputProps: { min: 1, step: 1 },
-                      }}
-                      fullWidth
-                      disabled={isViewing}
-                      sx={{
-                        bgcolor: isViewing
-                          ? "action.disabledBackground"
-                          : "inherit",
-                      }}
-                    />
-                    <TextField
-                      label="Giá combo"
-                      type="number"
-                      value={combo.comboPrice}
-                      onChange={(e) =>
-                        onUpdateCombo(
-                          index,
-                          "comboPrice",
-                          Number(e.target.value),
-                        )
-                      }
-                      error={!!errors[`combo_${index}_price`]}
-                      helperText={errors[`combo_${index}_price`]}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">₫</InputAdornment>
-                        ),
-                        inputProps: { min: 0, step: 1000 },
-                      }}
-                      fullWidth
-                      disabled={isViewing}
-                      sx={{
-                        bgcolor: isViewing
-                          ? "action.disabledBackground"
-                          : "inherit",
-                      }}
-                    />
-                  </Box>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs font-medium">
+                        Số lượng trong gói <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        step={1}
+                        disabled={isViewing}
+                        value={combo.quantityInCombo}
+                        onChange={(e) =>
+                          onUpdateCombo(
+                            index,
+                            "quantityInCombo",
+                            Number(e.target.value)
+                          )
+                        }
+                        className={`h-9 text-xs rounded-xl ${
+                          qtyErr ? "border-destructive focus-visible:ring-destructive/20" : ""
+                        }`}
+                      />
+                      {qtyErr && (
+                        <p className="text-[11px] text-destructive font-medium">
+                          {qtyErr}
+                        </p>
+                      )}
+                    </div>
 
-                  <TextField
-                    label="Mô tả combo (tùy chọn)"
-                    value={combo.comboDescription || ""}
-                    onChange={(e) =>
-                      onUpdateCombo(index, "comboDescription", e.target.value)
-                    }
-                    placeholder="Ví dụ: Mua 3 tặng 1, Giảm 20% khi mua từ 5 sản phẩm..."
-                    fullWidth
-                    multiline
-                    rows={2}
-                    disabled={isViewing}
-                    sx={{
-                      bgcolor: isViewing
-                        ? "action.disabledBackground"
-                        : "inherit",
-                    }}
-                  />
+                    <div className="space-y-1">
+                      <Label className="text-xs font-medium">
+                        Giá gói combo (VNĐ) <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        step={1000}
+                        disabled={isViewing}
+                        value={combo.comboPrice}
+                        onChange={(e) =>
+                          onUpdateCombo(
+                            index,
+                            "comboPrice",
+                            Number(e.target.value)
+                          )
+                        }
+                        className={`h-9 text-xs rounded-xl ${
+                          priceErr ? "border-destructive focus-visible:ring-destructive/20" : ""
+                        }`}
+                      />
+                      {priceErr && (
+                        <p className="text-[11px] text-destructive font-medium">
+                          {priceErr}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium">
+                      Mô tả combo (Tùy chọn)
+                    </Label>
+                    <Textarea
+                      rows={2}
+                      disabled={isViewing}
+                      value={combo.comboDescription || ""}
+                      onChange={(e) =>
+                        onUpdateCombo(index, "comboDescription", e.target.value)
+                      }
+                      placeholder="Ví dụ: Mua 3 tặng 1, Giảm 15% khi mua từ 2 sản phẩm..."
+                      className="text-xs rounded-xl min-h-[60px]"
+                    />
+                  </div>
 
                   {combo.quantityInCombo > 0 &&
                     combo.comboPrice > 0 &&
                     salePrice > 0 && (
-                      <Box
-                        sx={{
-                          mt: 2,
-                          p: 2,
-                          bgcolor: "success.light",
-                          borderRadius: 1,
-                        }}
-                      >
-                        <Typography variant="body2" color="success.dark">
-                          <strong>Tiết kiệm:</strong>{" "}
-                          {(
-                            salePrice * combo.quantityInCombo -
-                            combo.comboPrice
-                          ).toLocaleString("vi-VN")}
-                          ₫ (
-                          {(
-                            ((salePrice * combo.quantityInCombo -
-                              combo.comboPrice) /
-                              (salePrice * combo.quantityInCombo)) *
-                            100
-                          ).toFixed(1)}
-                          %)
-                        </Typography>
-                        <Typography variant="body2" color="success.dark">
-                          <strong>Giá lẻ:</strong>{" "}
-                          {(salePrice * combo.quantityInCombo).toLocaleString(
-                            "vi-VN",
-                          )}
-                          ₫{" → "}
-                          <strong>Giá combo:</strong>{" "}
-                          {combo.comboPrice.toLocaleString("vi-VN")}₫
-                        </Typography>
-                      </Box>
+                      <div className="rounded-xl bg-success/15 border border-success/30 p-2.5 text-xs text-success space-y-1">
+                        <div className="flex items-center gap-1 font-semibold">
+                          <Percent className="h-3.5 w-3.5" />
+                          <span>
+                            Tiết kiệm: {formatCurrency(savings)} ({savingPercent}%)
+                          </span>
+                        </div>
+                        <div className="text-[11px] opacity-90">
+                          Giá bán lẻ: {formatCurrency(singleTotal)} → Giá combo:{" "}
+                          <span className="font-bold">
+                            {formatCurrency(combo.comboPrice)}
+                          </span>
+                        </div>
+                      </div>
                     )}
-                </CardContent>
-              </Card>
-            ))}
-          </Box>
+                </div>
+              );
+            })}
+          </div>
         )}
       </CardContent>
     </Card>

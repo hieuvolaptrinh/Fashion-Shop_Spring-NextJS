@@ -1,14 +1,16 @@
+"use client";
+
 import type { Product } from "@/core/lib/type";
-import Warning from "@mui/icons-material/Warning";
-import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Typography from "@mui/material/Typography";
+import { AlertTriangle, Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/core/components/ui/dialog";
+import { Button } from "@/core/components/ui/button";
 
 interface ConfirmDeleteProps {
   open: boolean;
@@ -26,83 +28,65 @@ const ConfirmDelete = ({
   loading = false,
 }: ConfirmDeleteProps) => {
   return (
-    <Dialog
-      open={open}
-      onClose={onCancel}
-      maxWidth="sm"
-      fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: 3,
-          p: 1,
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-          pb: 2,
-        }}
-      >
-        <Warning color="warning" fontSize="large" />
-        <Typography variant="h6" component="span" fontWeight={600}>
-          Xác nhận xóa sản phẩm
-        </Typography>
-      </DialogTitle>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
+      <DialogContent className="sm:max-w-md rounded-2xl">
+        <DialogHeader className="gap-2">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+            <AlertTriangle className="h-6 w-6" />
+          </div>
+          <div>
+            <DialogTitle className="text-lg font-bold text-foreground">
+              Xác nhận xóa sản phẩm
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground mt-1">
+              Hành động này không thể hoàn tác sau khi xác nhận.
+            </DialogDescription>
+          </div>
+        </DialogHeader>
 
-      <DialogContent>
-        <Alert severity="warning" sx={{ mb: 2 }}>
-          <Typography variant="body2" fontWeight={500}>
-            Cảnh báo: Hành động này không thể hoàn tác!
-          </Typography>
-        </Alert>
-
-        <DialogContentText component="div">
-          <Typography variant="body1" color="text.primary" mb={1}>
-            Bạn có chắc muốn xóa sản phẩm:
-          </Typography>
-          <Box
-            sx={{
-              p: 2,
-              bgcolor: "grey.50",
-              borderRadius: 2,
-              border: "1px solid",
-              borderColor: "grey.200",
-              mb: 2,
-            }}
-          >
-            <Typography variant="subtitle1" fontWeight={600} color="primary">
+        <div className="space-y-3 py-2">
+          <div className="rounded-xl border bg-slate-50 dark:bg-slate-900/50 p-3.5">
+            <p className="text-xs text-muted-foreground mb-1">
+              Bạn có chắc chắn muốn xóa sản phẩm:
+            </p>
+            <p className="font-semibold text-sm text-foreground">
               "{product?.productName}"
-            </Typography>
-          </Box>
-          <Typography variant="body2" color="error.main" fontWeight={500}>
-            ⚠️ Việc xóa sản phẩm này sẽ xóa đi tất cả các đơn hàng liên quan!
-          </Typography>
-        </DialogContentText>
-      </DialogContent>
+            </p>
+          </div>
 
-      <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
-        <Button
-          onClick={onCancel}
-          variant="outlined"
-          color="inherit"
-          disabled={loading}
-          sx={{ borderRadius: 2, minWidth: 100 }}
-        >
-          Hủy bỏ
-        </Button>
-        <Button
-          onClick={onConfirm}
-          variant="contained"
-          color="error"
-          disabled={loading}
-          sx={{ borderRadius: 2, minWidth: 100 }}
-        >
-          {loading ? "Đang xóa..." : "Xác nhận xóa"}
-        </Button>
-      </DialogActions>
+          <p className="text-xs font-medium text-destructive">
+            Cảnh báo: Việc xóa sản phẩm này có thể ảnh hưởng đến lịch sử các đơn hàng liên quan trong hệ thống.
+          </p>
+        </div>
+
+        <DialogFooter className="flex sm:justify-end gap-2 pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={loading}
+            className="rounded-xl"
+          >
+            Hủy bỏ
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={loading}
+            className="rounded-xl gap-1.5"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Đang xóa...</span>
+              </>
+            ) : (
+              <span>Xác nhận xóa</span>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

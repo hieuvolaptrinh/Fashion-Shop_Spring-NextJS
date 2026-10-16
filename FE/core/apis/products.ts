@@ -1,30 +1,30 @@
-import axios from "axios";
+import apiClient, { http } from "@/core/lib/apiClient";
 import type { ProductRequest } from "../lib/type";
+import { API_ENDPOINTS } from "@/core/constants";
 
+/**
+ * Lấy danh sách danh mục / loại sản phẩm
+ */
 export const getCategories = async () => {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-    const response = await axios.get(`${API_URL}/api/v1/types`);
-    return response.data.data;
+    const res = await http.get<any>(API_ENDPOINTS.PRODUCTS.TYPES);
+    return res?.data ?? res;
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw error;
   }
 };
 
-// Updated to match backend API structure
+/**
+ * Lấy danh sách sản phẩm phân trang và có bộ lọc
+ */
 export const getProducts = async (filters: any = {}) => {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
-    // Build query parameters from filters object
     const params = new URLSearchParams();
 
-    // Add pagination
     params.append("page", (filters.page || 0).toString());
     params.append("size", (filters.size || 10).toString());
 
-    // Add filters if they exist and are not empty
     if (filters.productName?.trim()) {
       params.append("productName", filters.productName.trim());
     }
@@ -42,59 +42,52 @@ export const getProducts = async (filters: any = {}) => {
       Array.isArray(filters.typeId) &&
       filters.typeId.length > 0
     ) {
-      // biome-ignore lint/complexity/noForEach: <explanation>
       filters.typeId.forEach((id: number) => {
         params.append("typeId", id.toString());
       });
     }
 
-    const response = await axios.get(
-      `${API_URL}/api/v1/products?${params.toString()}`,
-    );
-
-    // Return the full response structure for pagination info
-    return response.data.data;
+    const res = await http.get<any>(API_ENDPOINTS.PRODUCTS.BASE, { params });
+    return res?.data ?? res;
   } catch (error) {
     console.error("Error fetching products:", error);
     throw error;
   }
 };
 
-// update product
+/**
+ * Cập nhật thông tin sản phẩm và upload ảnh mới
+ */
 export const updateProduct = async (
   product: ProductRequest,
   files: File[] = [],
-  accessToken: string | null = null,
+  accessToken: string | null = null
 ) => {
   try {
-    const token = accessToken;
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
     const formData = new FormData();
 
-    // Include deletedImageIds in the product JSON since backend expects it in ProductRequest
     formData.append(
       "product",
       new Blob([JSON.stringify(product)], {
         type: "application/json",
-      }),
+      })
     );
 
     if (files && files.length > 0) {
-      files.forEach((file, _) => {
+      files.forEach((file) => {
         formData.append("images", file);
       });
     }
 
-    const response = await axios.put(
-      `${API_URL}/api/v1/products/${product.productId}`,
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    const response = await apiClient.put(
+      API_ENDPOINTS.PRODUCTS.BY_ID(product.productId),
       formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // Bỏ Content-Type để axios tự động set với boundary
-        },
-      },
+      { headers }
     );
 
     return response.data;
@@ -104,62 +97,67 @@ export const updateProduct = async (
   }
 };
 
-// create product
+/**
+ * Tạo mới sản phẩm kèm danh sách ảnh
+ */
 export const createProduct = async (
   product: Omit<ProductRequest, "productId">,
   files: File[] = [],
-  accessToken: string | null = null,
+  accessToken: string | null = null
 ) => {
   try {
-    const token = accessToken;
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
     const formData = new FormData();
     formData.append(
       "product",
-      new Blob([JSON.stringify(product)], { type: "application/json" }),
+      new Blob([JSON.stringify(product)], { type: "application/json" })
     );
 
     if (files && files.length > 0) {
-      files.forEach((file, _) => {
+      files.forEach((file) => {
         formData.append("images", file);
       });
     }
 
-    const response = await axios.post(`${API_URL}/api/v1/products`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    const response = await apiClient.post(
+      API_ENDPOINTS.PRODUCTS.BASE,
+      formData,
+      { headers }
+    );
 
     return response.data;
   } catch (error) {
     console.error("Full error:", error);
-
     throw error;
   }
 };
+
+/**
+ * Lấy chi tiết sản phẩm theo ID
+ */
 export const getProductById = async (productId: number) => {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-    const response = await axios.get(`${API_URL}/api/v1/products/${productId}`);
-    return response.data.data;
+    const res = await http.get<any>(API_ENDPOINTS.PRODUCTS.BY_ID(productId));
+    return res?.data ?? res;
   } catch (error) {
     console.error("Error fetching product by id:", error);
     throw error;
   }
 };
 
+/**
+ * Xóa sản phẩm theo ID
+ */
 export const deleteProduct = async (productID: number) => {
   try {
-    const token = localStorage.getItem("accessToken");
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    await axios.delete(`${API_URL}/api/v1/products/${productID}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        // Bỏ Content-Type để axios tự động set với boundary
-      },
-    });
+    const response = await apiClient.delete(
+      API_ENDPOINTS.PRODUCTS.BY_ID(productID)
+    );
+    return response.data;
   } catch (error) {
     console.error("Error deleting product:", error);
     throw error;
