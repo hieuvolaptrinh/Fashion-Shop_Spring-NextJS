@@ -1,79 +1,46 @@
 "use client";
 
+import type { ReactNode } from "react";
 import AdminHeader from "@/core/components/feature/admin/layout/AdminHeader";
 import AdminSidebar from "@/core/components/feature/admin/layout/AdminSidebar";
-import { Box } from "@mui/material";
-import { jwtDecode } from "jwt-decode";
-import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
-
-type MyTokenPayload = {
-  sub: string;
-  roles: string[];
-  exp: number;
-};
+import { AdminLayoutProvider } from "@/core/context/AdminLayoutContext";
+import { Loader2 } from "lucide-react";
+import { useAdminAuth } from "@/core/hooks/useAdminAuth";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  const router = useRouter();
+  const { isAdmin, isLoading } = useAdminAuth();
 
-  const [isAdmin, setIsAdmin] = useState<boolean>(true);
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      const decoded = jwtDecode<MyTokenPayload>(accessToken);
-      const isAdminCheck = decoded.roles.includes("ADMIN");
-      setIsAdmin(() => isAdminCheck);
-
-      if (decoded.exp * 1000 < Date.now()) {
-        setIsAdmin(false);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
-        router.replace("/login");
-      }
-
-      if (!isAdmin) {
-        router.replace("/");
-      }
-    } else {
-      router.replace("/login");
-    }
-  }, [isAdmin, router]);
-
-  if (isAdmin) {
+  if (isLoading) {
     return (
-      <>
-        <Box
-          sx={{
-            display: "flex",
-            bgcolor: "#fafbfc",
-            minHeight: "100vh",
-          }}
-        >
-          <AdminSidebar />
-
-          <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-            <AdminHeader />
-
-            {/* Main Content */}
-            <Box
-              component="main"
-              sx={{
-                flexGrow: 1,
-                p: { xs: 2, sm: 3 },
-                bgcolor: "#fafbfc",
-                minHeight: "calc(100vh - 64px)",
-                overflow: "auto",
-              }}
-            >
-              {children}
-            </Box>
-          </Box>
-        </Box>
-      </>
+      <div className="flex min-h-screen w-full items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm font-medium text-muted-foreground">
+            Đang xác thực quyền truy cập quản trị...
+          </p>
+        </div>
+      </div>
     );
   }
 
-  return <div>Đang kiểm tra quyền truy cập...</div>;
+  if (!isAdmin) {
+    return null;
+  }
+
+  return (
+    <AdminLayoutProvider>
+      <div className="flex min-h-screen w-full bg-slate-50/70 dark:bg-slate-950">
+        {/* Sidebar */}
+        <AdminSidebar />
+
+        {/* Content Wrapper */}
+        <div className="flex flex-1 flex-col min-w-0 transition-all duration-300">
+          <AdminHeader />
+          <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
+            <div className="mx-auto max-w-7xl">{children}</div>
+          </main>
+        </div>
+      </div>
+    </AdminLayoutProvider>
+  );
 }

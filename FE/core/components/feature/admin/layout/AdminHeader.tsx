@@ -1,185 +1,202 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import {
-  AppBar,
-  Badge,
-  Box,
-  IconButton,
-  InputAdornment,
-  Menu,
-  MenuItem,
-  TextField,
-  Toolbar,
-  Typography,
-} from "@mui/material";
-import { Bell, LogOut, Search, Settings, User } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+  Bell,
+  LogOut,
+  Search,
+  ExternalLink,
+  LayoutDashboard,
+  ChevronRight,
+  PanelLeft,
+} from "lucide-react";
+import { useAdminLayout } from "@/core/context/AdminLayoutContext";
+import { Input } from "@/core/components/ui/input";
+import { Button } from "@/core/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/core/components/ui/tooltip";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/core/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/core/components/ui/dropdown-menu";
+import { ROUTES } from "@/core/constants";
+import { clearAuth, getStoredUser } from "@/core/lib/authUtils";
 
 export default function AdminHeader() {
   const router = useRouter();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const pathname = usePathname();
+  const { isCollapsed, toggleSidebar, setIsMobileOpen } = useAdminLayout();
+  const [userName, setUserName] = useState<string>("Admin");
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  useEffect(() => {
+    try {
+      const userStr = getStoredUser();
+      if (userStr) {
+        const u = JSON.parse(userStr);
+        if (u.fullName) setUserName(u.fullName);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    router.push("/login");
-    handleMenuClose();
+    clearAuth();
+    router.push(ROUTES.AUTH.LOGIN);
+  };
+
+  // Tạo breadcrumb động dựa trên pathname
+  const getBreadcrumbTitle = () => {
+    if (pathname === ROUTES.ADMIN.DASHBOARD) return "Tổng quan";
+    if (pathname.startsWith(ROUTES.ADMIN.PRODUCTS)) return "Quản lý Sản phẩm";
+    if (pathname.startsWith(ROUTES.ADMIN.ORDERS)) return "Quản lý Đơn hàng";
+    return "Quản trị";
   };
 
   return (
-    <AppBar
-      position="static"
-      elevation={1}
-      sx={{
-        bgcolor: "background.paper",
-        color: "text.primary",
-        borderBottom: 1,
-        borderColor: "divider",
-        boxShadow: 1,
-      }}
-    >
-      <Toolbar sx={{ px: { xs: 2, sm: 3 }, py: 1 }}>
-        {/* Logo & Title */}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            color: "primary.main",
-            mr: { xs: 2, sm: 4 },
-            fontSize: { xs: "1rem", sm: "1.25rem" },
-            display: { xs: "none", sm: "block" },
-          }}
-        >
-          Lan Chuyên Hàng Sales
-        </Typography>
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/80 px-4 backdrop-blur-md md:px-6">
+      {/* Left: Sidebar Toggle & Breadcrumb */}
+      <div className="flex items-center gap-3">
+        <TooltipProvider delayDuration={150}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground"
+                onClick={() => {
+                  if (typeof window !== "undefined" && window.innerWidth < 768) {
+                    setIsMobileOpen(true);
+                  } else {
+                    toggleSidebar();
+                  }
+                }}
+              >
+                <PanelLeft className="h-5 w-5" />
+                <span className="sr-only">Đóng/Mở thanh bên</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              {isCollapsed ? "Mở rộng thanh bên" : "Thu gọn thanh bên"}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
-        {/* Search Bar */}
-        <Box
-          sx={{
-            flexGrow: 1,
-            maxWidth: { xs: "100%", sm: 480 },
-            mx: { xs: 0, sm: 4 },
-          }}
-        >
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="Tìm kiếm..."
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search size={18} color="#9e9e9e" />
-                </InputAdornment>
-              ),
-              sx: {
-                borderRadius: 2,
-                bgcolor: "grey.50",
-                fontSize: { xs: "0.875rem", sm: "1rem" },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  border: "1px solid",
-                  borderColor: "divider",
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "primary.main",
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "primary.main",
-                },
-              },
-            }}
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
+          <Link
+            href={ROUTES.ADMIN.DASHBOARD}
+            className="hover:text-foreground font-medium transition-colors"
+          >
+            Admin
+          </Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="font-semibold text-foreground">
+            {getBreadcrumbTitle()}
+          </span>
+        </nav>
+      </div>
+
+      {/* Center: Search Bar */}
+      <div className="hidden md:flex flex-1 max-w-md mx-6">
+        <div className="relative w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Tìm kiếm sản phẩm, đơn hàng, khách hàng..."
+            className="pl-9 h-9 bg-slate-50 dark:bg-slate-900/60 rounded-xl border-muted-foreground/20 focus-visible:ring-primary/20 text-xs md:text-sm"
           />
-        </Box>
+        </div>
+      </div>
 
-        {/* Right Actions */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: { xs: 0.5, sm: 1 },
-          }}
+      {/* Right: Actions & User Avatar */}
+      <div className="flex items-center gap-2">
+        {/* Notification button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground"
         >
-          {/* Notifications */}
-          <IconButton
-            size="large"
-            sx={{
-              color: "text.secondary",
-              p: { xs: 1, sm: 1.5 },
-              "&:hover": {
-                bgcolor: "action.hover",
-              },
-            }}
-          >
-            <Badge badgeContent={3} color="error">
-              <Bell size={20} />
-            </Badge>
-          </IconButton>
+          <Bell className="h-4 w-4" />
+          <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+          </span>
+          <span className="sr-only">Notifications</span>
+        </Button>
 
-          {/* User Menu */}
-          <IconButton
-            onClick={handleMenuClick}
-            size="large"
-            sx={{
-              color: "text.secondary",
-              p: { xs: 1, sm: 1.5 },
-              "&:hover": {
-                bgcolor: "action.hover",
-              },
-            }}
-          >
-            <User size={20} />
-          </IconButton>
+        {/* User Profile Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="relative flex items-center gap-2 h-10 px-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <Avatar className="h-8 w-8 border border-border/60">
+                <AvatarImage src="" alt={userName} />
+                <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+                  {userName.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="hidden lg:flex flex-col text-left">
+                <span className="text-xs font-semibold leading-none text-foreground truncate max-w-[120px]">
+                  {userName}
+                </span>
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
 
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleMenuClose}
-            onClick={handleMenuClose}
-            PaperProps={{
-              elevation: 3,
-              sx: {
-                mt: 1.5,
-                minWidth: 200,
-                borderRadius: 2,
-                "& .MuiMenuItem-root": {
-                  px: 2,
-                  py: 1.5,
-                  gap: 1.5,
-                  borderRadius: 1,
-                  mx: 1,
-                  "&:hover": {
-                    bgcolor: "action.hover",
-                  },
-                },
-              },
-            }}
-            transformOrigin={{ horizontal: "right", vertical: "top" }}
-            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-          >
-            <MenuItem>
-              <User size={16} />
-              <Typography variant="body2">Hồ sơ</Typography>
-            </MenuItem>
-            <MenuItem>
-              <Settings size={16} />
-              <Typography variant="body2">Cài đặt</Typography>
-            </MenuItem>
-            <Box sx={{ borderTop: 1, borderColor: "divider", my: 1 }} />
-            <MenuItem onClick={handleLogout}>
-              <LogOut size={16} />
-              <Typography variant="body2">Đăng xuất</Typography>
-            </MenuItem>
-          </Menu>
-        </Box>
-      </Toolbar>
-    </AppBar>
+          <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-semibold leading-none">{userName}</p>
+                <p className="text-xs leading-none text-muted-foreground">
+                  Quản trị viên hệ thống
+                </p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem asChild>
+                <Link href={ROUTES.ADMIN.DASHBOARD} className="cursor-pointer">
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Admin Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={ROUTES.USER.HOME} target="_blank" className="cursor-pointer">
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  <span>Xem trang bán hàng</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="cursor-pointer text-rose-600 focus:text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-950/30"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Đăng xuất</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
   );
 }
