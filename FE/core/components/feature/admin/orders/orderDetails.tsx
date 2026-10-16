@@ -1,291 +1,236 @@
-import AttachMoney from "@mui/icons-material/AttachMoney";
-import CalendarToday from "@mui/icons-material/CalendarToday";
-import Close from "@mui/icons-material/Close";
-import LocationOn from "@mui/icons-material/LocationOn";
-import Phone from "@mui/icons-material/Phone";
-import Print from "@mui/icons-material/Print";
-import Receipt from "@mui/icons-material/Receipt";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemText from "@mui/material/ListItemText";
-import Typography from "@mui/material/Typography";
-import axios from "axios";
+"use client";
+
+import React, { useState } from "react";
+import {
+  Calendar,
+  Phone,
+  MapPin,
+  Printer,
+  FileCheck,
+  FileClock,
+  DollarSign,
+  Loader2,
+  Package,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/core/components/ui/dialog";
+import { Button } from "@/core/components/ui/button";
+import { Badge } from "@/core/components/ui/badge";
+import { Card, CardContent } from "@/core/components/ui/card";
+import { toast } from "sonner";
+import { IMAGES } from "@/core/constants";
+import { formatCurrency, formatDate } from "@/core/lib/utils";
+import { exportMultipleBills } from "@/core/apis/bill";
+import { printPdfBlob } from "@/core/lib/printUtils";
+import type { Order, OrderItem } from "@/core/lib/type";
 
 interface OrderDetailsProps {
   open: boolean;
   onClose: () => void;
-  order: any | null;
+  order: Order | null;
 }
 
 const OrderDetails = ({ open, onClose, order }: OrderDetailsProps) => {
+  const [printing, setPrinting] = useState(false);
+
   if (!order) return null;
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatPrice = (price: number) => {
-    return price.toLocaleString("vi-VN") + "₫";
-  };
-
   const handlePrintedBill = async (orderId: number) => {
-    const localStorageToken = localStorage.getItem("accessToken");
-    if (!localStorageToken) {
-      throw new Error("No access token provided");
+    try {
+      setPrinting(true);
+      const pdfBlob = await exportMultipleBills([orderId]);
+      printPdfBlob(pdfBlob);
+      toast.success(`Đang mở hóa đơn đơn hàng #${orderId} để in...`);
+    } catch (error) {
+      console.error("Lỗi khi in hóa đơn:", error);
+      toast.error("Không thể xuất file hóa đơn. Vui lòng kiểm tra lại dịch vụ Backend!");
+    } finally {
+      setPrinting(false);
     }
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-    const res = await axios.post(
-      `${API_URL}/api/v1/bills/export-multiple`,
-      [orderId],
-      {
-        responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${localStorageToken}`,
-          Accept: "application/pdf",
-          "Content-Type": "application/json",
-        },
-      },
-    );
-
-    const pdfBlob = new Blob([res.data], { type: "application/pdf" });
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-
-    iframe.onload = () => {
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-    };
-    document.body.appendChild(iframe);
   };
+
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-      PaperProps={{
-        sx: { borderRadius: 3 },
-      }}
-    >
-      <DialogTitle sx={{ m: 0, p: 3, bgcolor: "primary.main", color: "white" }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="h5" component="div" fontWeight={600}>
-            Chi tiết đơn hàng #{order.orderId}
-          </Typography>
-          <IconButton
-            aria-label="close"
-            onClick={onClose}
-            sx={{ color: "white" }}
-          >
-            <Close />
-          </IconButton>
-        </Box>
-      </DialogTitle>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl p-6">
+        <DialogHeader className="pb-3 border-b">
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle className="text-lg font-bold text-foreground">
+                Chi Tiết Đơn Hàng #{order.orderId}
+              </DialogTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Xem toàn bộ thông tin thanh toán, địa chỉ nhận và danh sách mặt hàng
+              </p>
+            </div>
+            <Badge
+              variant="outline"
+              className={
+                order.bill
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200 gap-1 text-xs"
+                  : "bg-amber-50 text-amber-700 border-amber-200 gap-1 text-xs"
+              }
+            >
+              {order.bill ? (
+                <>
+                  <FileCheck className="h-3 w-3" />
+                  <span>Đã in bill</span>
+                </>
+              ) : (
+                <>
+                  <FileClock className="h-3 w-3" />
+                  <span>Chưa in bill</span>
+                </>
+              )}
+            </Badge>
+          </div>
+        </DialogHeader>
 
-      <DialogContent sx={{ p: 0 }}>
-        <Box sx={{ p: 3 }}>
-          {/* Order Status and Basic Info */}
-          <Grid container spacing={3}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Card sx={{ borderRadius: 2, border: 1, borderColor: "divider" }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom fontWeight={600}>
-                    Thông tin đơn hàng
-                  </Typography>
-                  <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <CalendarToday fontSize="small" color="action" />
-                      <Typography variant="body2">
-                        <strong>Ngày tạo:</strong> {formatDate(order.createAt)}
-                      </Typography>
-                    </Box>
+        <div className="space-y-5 py-4">
+          {/* Thông tin đơn hàng & giao nhận */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Thông tin đơn */}
+            <Card className="rounded-xl border shadow-xs bg-slate-50/50 dark:bg-slate-900/40">
+              <CardContent className="p-4 space-y-2.5">
+                <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                  Thông tin đơn hàng
+                </p>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Calendar className="h-4 w-4 shrink-0 text-primary" />
+                  <span>
+                    Ngày đặt: <strong className="text-foreground">{formatDate(order.createAt)}</strong>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <DollarSign className="h-4 w-4 shrink-0 text-primary" />
+                  <span>
+                    Tổng tiền:{" "}
+                    <strong className="text-base font-bold text-primary">
+                      {formatCurrency(order.totalPrice)}
+                    </strong>
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
 
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <AttachMoney fontSize="small" color="action" />
-                      <Typography variant="body2">
-                        <strong>Tổng tiền:</strong>
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        fontWeight={600}
-                        color="error.main"
-                      >
-                        {formatPrice(order.totalPrice)}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
+            {/* Thông tin khách hàng */}
+            <Card className="rounded-xl border shadow-xs bg-slate-50/50 dark:bg-slate-900/40">
+              <CardContent className="p-4 space-y-2.5">
+                <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                  Thông tin giao hàng
+                </p>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Phone className="h-4 w-4 shrink-0 text-primary" />
+                  <span>
+                    Số điện thoại: <strong className="text-foreground">{order.phoneNumber || "Chưa cập nhật"}</strong>
+                  </span>
+                </div>
+                <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <MapPin className="h-4 w-4 shrink-0 text-primary mt-0.5" />
+                  <span className="leading-snug">
+                    Địa chỉ: <strong className="text-foreground">{order.shippingAddress || "Chưa cập nhật"}</strong>
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Card sx={{ borderRadius: 2, border: 1, borderColor: "divider" }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom fontWeight={600}>
-                    Thông tin khách hàng
-                  </Typography>
-                  <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Phone fontSize="small" color="action" />
-                      <Typography variant="body2">
-                        <strong>Số điện thoại:</strong> {order.phoneNumber}
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
+          {/* Danh sách mặt hàng */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
+              Mặt hàng đã đặt ({order.items?.length || 0} sản phẩm)
+            </p>
+
+            <div className="rounded-xl border overflow-hidden divide-y divide-border">
+              {order.items && order.items.length > 0 ? (
+                order.items.map((item: OrderItem, idx: number) => {
+                  const imgUrl =
+                    item.product?.listImages?.[0]?.link || IMAGES.FALLBACK_PRODUCT;
+                  const itemTotal = (item.price || 0) * (item.quantity || 1);
+
+                  return (
+                    <div
+                      key={item.orderDetailId || idx}
+                      className="flex items-center gap-3.5 p-3.5 hover:bg-muted/30 transition-colors"
                     >
-                      <LocationOn
-                        fontSize="small"
-                        color="action"
-                        sx={{ mt: 0.5 }}
-                      />
-                      <Box>
-                        <Typography variant="body2">
-                          <strong>Địa chỉ giao hàng:</strong>
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {order.shippingAddress}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
+                      <div className="relative h-14 w-14 rounded-lg overflow-hidden border border-border/60 bg-muted/30 shrink-0">
+                        <img
+                          src={imgUrl}
+                          alt={item.product?.productName || "Product"}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = IMAGES.FALLBACK_PRODUCT;
+                          }}
+                        />
+                      </div>
 
-          {/* Payment and Bill Status */}
-          <Grid container spacing={3} sx={{ mt: 1 }}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Card sx={{ borderRadius: 2, border: 1, borderColor: "divider" }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom fontWeight={600}>
-                    Trạng thái in bill
-                  </Typography>
-                  <Chip
-                    icon={order.bill ? <Receipt /> : <Print />}
-                    label={order.bill ? "Đã in bill" : "Chưa in bill"}
-                    color={order.bill ? "success" : "warning"}
-                    variant="outlined"
-                    sx={{ fontSize: "0.875rem" }}
-                  />
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-foreground line-clamp-1">
+                          {item.product?.productName || "Sản phẩm thời trang"}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1 text-[11px] text-muted-foreground">
+                          <span>
+                            Đơn giá: {formatCurrency(item.price)}
+                          </span>
+                          <span>×</span>
+                          <span className="font-semibold text-foreground">
+                            {item.quantity} cái
+                          </span>
+                        </div>
+                      </div>
 
-          {/* Products List */}
-          <Card
-            sx={{ borderRadius: 2, border: 1, borderColor: "divider", mt: 3 }}
+                      <div className="text-right shrink-0">
+                        <span className="text-xs font-bold text-primary">
+                          {formatCurrency(itemTotal)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="py-8 text-center text-xs text-muted-foreground">
+                  <Package className="h-8 w-8 mx-auto opacity-30 mb-1" />
+                  Không có thông tin chi tiết sản phẩm cho đơn hàng này.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="rounded-xl"
           >
-            <CardContent>
-              <Typography variant="h6" gutterBottom fontWeight={600}>
-                Danh sách sản phẩm ({order.items?.length || 0} sản phẩm)
-              </Typography>
-              <Divider sx={{ my: 2 }} />
-              <List sx={{ p: 0 }}>
-                {order.items?.map((item: any, index: number) => (
-                  <ListItem
-                    key={item.orderDetailId || index}
-                    sx={{
-                      border: 1,
-                      borderColor: "divider",
-                      borderRadius: 2,
-                      mb: 2,
-                      "&:last-child": { mb: 0 },
-                    }}
-                  >
-                    <ListItemAvatar>
-                      <Avatar
-                        src={item.product?.listImages?.[0]?.link || ""}
-                        variant="rounded"
-                        sx={{ width: 60, height: 60 }}
-                      />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <Typography variant="subtitle1" fontWeight={500}>
-                          {item.product?.productName}
-                        </Typography>
-                      }
-                      secondary={
-                        <Box sx={{ mt: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
-                            Giá: {formatPrice(item.price)} x {item.quantity}
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            fontWeight={600}
-                            color="error.main"
-                          >
-                            Tổng: {formatPrice(item.price * item.quantity)}
-                          </Typography>
-                          {item.product?.listTypes?.map((type: any) => (
-                            <Chip
-                              key={type.typeId}
-                              label={type.typeName}
-                              size="small"
-                              variant="outlined"
-                              sx={{ mr: 0.5, mt: 0.5, fontSize: "0.75rem" }}
-                            />
-                          ))}
-                        </Box>
-                      }
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </CardContent>
-          </Card>
-        </Box>
-      </DialogContent>
+            Đóng
+          </Button>
 
-      <DialogActions sx={{ p: 3, bgcolor: "grey.50" }}>
-        <Button onClick={onClose} variant="outlined" sx={{ borderRadius: 2 }}>
-          Đóng
-        </Button>
-        <Button
-          variant="contained"
-          startIcon={<Print />}
-          sx={{ borderRadius: 2 }}
-          onClick={() => handlePrintedBill(order.orderId)}
-        >
-          {order.bill ? "In lại bill" : "In bill"}
-        </Button>
-      </DialogActions>
+          <Button
+            type="button"
+            onClick={() => handlePrintedBill(order.orderId)}
+            disabled={printing}
+            className="rounded-xl gap-2 font-medium"
+          >
+            {printing ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Đang xử lý in...</span>
+              </>
+            ) : (
+              <>
+                <Printer className="h-4 w-4" />
+                <span>In hóa đơn đơn này</span>
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

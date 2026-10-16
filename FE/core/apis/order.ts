@@ -1,86 +1,71 @@
-import axios from "axios";
+import { http } from "@/core/lib/apiClient";
+import { API_ENDPOINTS } from "@/core/constants";
 
-type OrderItem = {
+export interface OrderItemPayload {
   shippingAddress: string;
   phoneNumber: string;
   selectedIds: number[];
+}
+
+export interface OrderFilterRequest {
+  status?: string[];
+  userId?: number;
+  isPay?: boolean;
+  isBill?: boolean;
+  minTotalPrice?: number;
+  maxTotalPrice?: number;
+  page?: number;
+  size?: number;
+}
+
+/**
+ * Tạo mới đơn hàng
+ */
+export const postOrder = async (data: OrderItemPayload, accessToken?: string) => {
+  const config = accessToken
+    ? { headers: { Authorization: `Bearer ${accessToken}` } }
+    : undefined;
+
+  return http.post(API_ENDPOINTS.ORDERS.BASE, data, config);
 };
 
-export const postOrder = async (data: OrderItem, accessToken: string) => {
-  if (!accessToken) {
-    throw new Error("No access token provided");
-  }
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
-  const response = await fetch(`${API_URL}/api/v1/orders`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to create order");
-  }
-
-  return response.json();
-};
-
-// get all orders with filter support
-export const getAllOrders = async (filters = {}, accessToken: string) => {
+/**
+ * Lấy danh sách đơn hàng cho Admin kèm bộ lọc tìm kiếm & phân trang
+ */
+export const getAllOrders = async (
+  filters: OrderFilterRequest = {},
+  accessToken?: string
+) => {
   try {
-    const token = accessToken;
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
-    // Build query parameters
     const params = new URLSearchParams();
 
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== "") {
         if (Array.isArray(value)) {
-          // For array values like status, add each value separately
-          value.forEach((v) => params.append(key, v));
+          value.forEach((v) => params.append(key, v.toString()));
         } else {
           params.append(key, value.toString());
         }
       }
     });
 
-    const queryString = params.toString();
-    const url = `${API_URL}/api/v1/orders/admin/filter${queryString ? `?${queryString}` : ""}`;
+    const config: any = { params };
+    if (accessToken) {
+      config.headers = { Authorization: `Bearer ${accessToken}` };
+    }
 
-    const response = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data.data;
+    const res = await http.get<any>(API_ENDPOINTS.ORDERS.ADMIN_FILTER, config);
+    return res?.data ?? res;
   } catch (error) {
     console.error("Error fetching orders:", error);
     throw error;
   }
 };
 
+/**
+ * Lấy danh sách đơn hàng của người dùng hiện tại
+ */
 export const getOrders = async () => {
-  const localStorageToken = localStorage.getItem("accessToken");
-  if (!localStorageToken) {
-    throw new Error("No access token provided");
-  }
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
-  const response = await fetch(`${API_URL}/api/v1/orders`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorageToken}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to get orders");
-  }
-
-  return response.json();
+  const res = await http.get<any>(API_ENDPOINTS.ORDERS.BASE);
+  return res;
 };

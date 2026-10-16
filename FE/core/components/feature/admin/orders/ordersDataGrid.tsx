@@ -1,55 +1,37 @@
-import Print from "@mui/icons-material/Print";
-import Receipt from "@mui/icons-material/Receipt";
-import Visibility from "@mui/icons-material/Visibility";
-import Checkbox from "@mui/material/Checkbox";
-import Chip from "@mui/material/Chip";
-import IconButton from "@mui/material/IconButton";
-import Paper from "@mui/material/Paper";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
+"use client";
+
+import React, { useMemo } from "react";
 import {
-  DataGrid,
-  GridColDef,
-  GridPaginationModel,
-  GridSortModel,
-} from "@mui/x-data-grid";
-
-// Types
-interface OrderItem {
-  orderDetailId: number;
-  product: {
-    productId: number;
-    productName: string;
-    originalPrice: number;
-    salePrice: number;
-    listImages: Array<{ imageId: number; link: string }>;
-  };
-  quantity: number;
-  price: number;
-}
-
-interface Order {
-  orderId: number;
-  createAt: string;
-  status: string;
-  totalPrice: number;
-  userId: number;
-  shippingAddress: string;
-  phoneNumber: string;
-  items: OrderItem[];
-  bill: boolean;
-  pay: boolean;
-}
+  Eye,
+  ShoppingBag,
+  FileCheck,
+  FileClock,
+} from "lucide-react";
+import { Badge } from "@/core/components/ui/badge";
+import { Button } from "@/core/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/core/components/ui/tooltip";
+import AdminDataTable, {
+  TableColumn,
+  PaginationModel,
+} from "@/core/components/feature/admin/common/AdminDataTable";
+import { formatCurrency, formatDate } from "@/core/lib/utils";
+import { OrderStatusBadge } from "@/core/components/feature/admin/common/OrderStatusBadge";
+import type { Order } from "@/core/lib/type";
 
 interface OrdersDataGridProps {
   orders: Order[];
   loading: boolean;
   selectedOrders: number[];
-  paginationModel: GridPaginationModel;
+  paginationModel: PaginationModel;
   totalRows: number;
-  sortModel: GridSortModel;
-  onPaginationModelChange: (newModel: GridPaginationModel) => void;
-  onSortModelChange: (newModel: GridSortModel) => void;
+  sortModel?: any;
+  onPaginationModelChange: (newModel: PaginationModel) => void;
+  onSortModelChange?: (newModel: any) => void;
   onOrderSelection: (orderId: number, checked: boolean) => void;
   onSelectAll: (checked: boolean) => void;
   onOrderDetailsOpen: (order: Order) => void;
@@ -61,197 +43,171 @@ const OrdersDataGrid = ({
   selectedOrders,
   paginationModel,
   totalRows,
-  sortModel,
   onPaginationModelChange,
-  onSortModelChange,
   onOrderSelection,
   onSelectAll,
   onOrderDetailsOpen,
 }: OrdersDataGridProps) => {
-  // Define columns (removed items and pay columns)
-  const columns: GridColDef[] = [
-    {
-      field: "select",
-      headerName: "",
-      width: 50,
-      sortable: false,
-      renderHeader: () => (
-        <Tooltip title="Chọn tất cả (bao gồm cả bill đã in)" arrow>
-          <Checkbox
-            checked={
-              selectedOrders.length > 0 &&
-              selectedOrders.length === orders.length
-            }
-            indeterminate={
-              selectedOrders.length > 0 && selectedOrders.length < orders.length
-            }
+  const isAllSelected =
+    orders.length > 0 && selectedOrders.length === orders.length;
+
+
+
+  const columns: TableColumn<Order>[] = useMemo(
+    () => [
+      {
+        key: "select",
+        header: (
+          <input
+            type="checkbox"
+            checked={isAllSelected}
             onChange={(e) => onSelectAll(e.target.checked)}
             disabled={orders.length === 0}
-            size="small"
+            className="h-4 w-4 rounded-sm border-gray-300 text-primary focus:ring-primary cursor-pointer accent-primary"
+            aria-label="Chọn tất cả đơn hàng"
           />
-        </Tooltip>
-      ),
-      renderCell: (params) => (
-        <Checkbox
-          checked={selectedOrders.includes(params.row.orderId)}
-          onChange={(e) =>
-            onOrderSelection(params.row.orderId, e.target.checked)
-          }
-          size="small"
-        />
-      ),
-    },
-    {
-      field: "orderId",
-      headerName: "Mã đơn hàng",
-      width: 120,
-      renderCell: (params) => (
-        <Typography variant="body2" fontWeight={600} color="primary">
-          #{params.value}
-        </Typography>
-      ),
-    },
-    {
-      field: "createAt",
-      headerName: "Ngày tạo",
-      width: 120,
-      renderCell: (params) => (
-        <Typography variant="body2">
-          {new Date(params.value).toLocaleDateString("vi-VN")}
-        </Typography>
-      ),
-    },
-    {
-      field: "phoneNumber",
-      headerName: "Số điện thoại",
-      width: 130,
-      renderCell: (params) => (
-        <Typography variant="body2" fontWeight={500}>
-          {params.value}
-        </Typography>
-      ),
-    },
-    {
-      field: "totalPrice",
-      headerName: "Tổng tiền",
-      width: 130,
-      type: "number",
-      renderCell: (params) => (
-        <Typography variant="body2" fontWeight={600} color="error.main">
-          {params.value.toLocaleString("vi-VN")}₫
-        </Typography>
-      ),
-    },
-    {
-      field: "shippingAddress",
-      headerName: "Địa chỉ giao hàng",
-      width: 300,
-      renderCell: (params) => (
-        <Typography
-          variant="body2"
-          sx={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            maxWidth: 280,
-          }}
-        >
-          {params.value}
-        </Typography>
-      ),
-    },
-    {
-      field: "bill",
-      headerName: "In bill",
-      width: 100,
-      renderCell: (params) => (
-        <Tooltip
-          title={params.value ? "Đã in bill - có thể in lại" : "Chưa in bill"}
-          arrow
-        >
-          <Chip
-            icon={params.value ? <Receipt /> : <Print />}
-            label={params.value ? "Đã in" : "Chưa in"}
-            color={params.value ? "success" : "warning"}
-            size="small"
-            variant="outlined"
+        ),
+        headClassName: "w-[48px] text-center",
+        className: "text-center",
+        render: (order: Order) => (
+          <input
+            type="checkbox"
+            checked={selectedOrders.includes(order.orderId)}
+            onChange={(e) => onOrderSelection(order.orderId, e.target.checked)}
+            className="h-4 w-4 rounded-sm border-gray-300 text-primary focus:ring-primary cursor-pointer accent-primary"
+            aria-label={`Chọn đơn hàng #${order.orderId}`}
           />
-        </Tooltip>
-      ),
-    },
-    {
-      field: "actions",
-      headerName: "Thao tác",
-      width: 100,
-      sortable: false,
-      renderCell: (params) => (
-        <Tooltip title="Xem chi tiết">
-          <IconButton
-            size="small"
-            color="info"
-            onClick={() => onOrderDetailsOpen(params.row)}
+        ),
+      },
+      {
+        key: "orderId",
+        header: "Mã đơn",
+        headClassName: "w-[100px]",
+        render: (order: Order) => (
+          <span className="font-bold text-primary font-mono text-xs">
+            #{order.orderId}
+          </span>
+        ),
+      },
+      {
+        key: "createAt",
+        header: "Ngày tạo",
+        headClassName: "w-[110px]",
+        render: (order: Order) => (
+          <span className="text-xs text-muted-foreground">
+            {formatDate(order.createAt)}
+          </span>
+        ),
+      },
+      {
+        key: "phoneNumber",
+        header: "Số điện thoại",
+        headClassName: "w-[130px]",
+        render: (order: Order) => (
+          <span className="text-xs font-medium text-foreground">
+            {order.phoneNumber || "—"}
+          </span>
+        ),
+      },
+      {
+        key: "shippingAddress",
+        header: "Địa chỉ giao hàng",
+        headClassName: "min-w-[200px]",
+        render: (order: Order) => (
+          <span
+            className="text-xs text-muted-foreground line-clamp-1 max-w-[260px]"
+            title={order.shippingAddress}
           >
-            <Visibility fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      ),
-    },
-  ];
+            {order.shippingAddress || "Chưa cập nhật"}
+          </span>
+        ),
+      },
+      {
+        key: "totalPrice",
+        header: "Tổng tiền",
+        headClassName: "w-[130px]",
+        render: (order: Order) => (
+          <span className="text-xs font-bold text-foreground">
+            {formatCurrency(order.totalPrice)}
+          </span>
+        ),
+      },
+      {
+        key: "bill",
+        header: "In bill",
+        headClassName: "w-[110px] text-center",
+        className: "text-center",
+        render: (order: Order) => (
+          <Badge
+            variant="outline"
+            className={
+              order.bill
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200 gap-1 text-[11px]"
+                : "bg-amber-50 text-amber-700 border-amber-200 gap-1 text-[11px]"
+            }
+          >
+            {order.bill ? (
+              <>
+                <FileCheck className="h-3 w-3" />
+                <span>Đã in</span>
+              </>
+            ) : (
+              <>
+                <FileClock className="h-3 w-3" />
+                <span>Chưa in</span>
+              </>
+            )}
+          </Badge>
+        ),
+      },
+      {
+        key: "status",
+        header: "Trạng thái",
+        headClassName: "w-[120px] text-center",
+        className: "text-center",
+        render: (order: Order) => <OrderStatusBadge status={order.status} />,
+      },
+      {
+        key: "actions",
+        header: "Chi tiết",
+        headClassName: "w-[90px] text-right",
+        className: "text-right",
+        render: (order: Order) => (
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onOrderDetailsOpen(order)}
+                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
+                >
+                  <Eye className="h-4 w-4" />
+                  <span className="sr-only">Xem chi tiết</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Xem chi tiết</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ),
+      },
+    ],
+    [isAllSelected, orders.length, selectedOrders, onSelectAll, onOrderSelection, onOrderDetailsOpen]
+  );
 
   return (
-    <Paper
-      sx={{
-        borderRadius: 2,
-        overflow: "hidden",
-        height: "calc(100vh - 200px)", // Fixed height container
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <DataGrid
-        rows={orders}
-        columns={columns}
-        getRowId={(row) => row.orderId}
-        loading={loading}
-        paginationMode="server"
-        sortingMode="client"
-        // Pagination
-        paginationModel={paginationModel}
-        onPaginationModelChange={onPaginationModelChange}
-        rowCount={totalRows}
-        pageSizeOptions={[5, 10, 25, 50]}
-        // Sorting
-        sortModel={sortModel}
-        onSortModelChange={onSortModelChange}
-        // Styling
-        sx={{
-          border: "none",
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "1px solid rgba(224, 224, 224, 1)",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "rgba(0, 0, 0, 0.02)",
-            borderBottom: "2px solid rgba(224, 224, 224, 1)",
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: 600,
-          },
-          "& .MuiDataGrid-row:hover": {
-            backgroundColor: "rgba(0, 0, 0, 0.02)",
-          },
-        }}
-        // Other props
-        autoHeight
-        disableRowSelectionOnClick
-        localeText={{
-          noRowsLabel: "Chưa có đơn hàng nào",
-          footerRowSelected: (count) => `${count} đơn hàng được chọn`,
-        }}
-      />
-    </Paper>
+    <AdminDataTable<Order>
+      data={orders}
+      columns={columns}
+      keyExtractor={(item) => item.orderId}
+      loading={loading}
+      totalRows={totalRows}
+      paginationModel={paginationModel}
+      onPaginationModelChange={onPaginationModelChange}
+      itemName="đơn hàng"
+      emptyMessage="Chưa có đơn hàng nào phù hợp với bộ lọc hiện tại."
+      emptyIcon={<ShoppingBag className="h-10 w-10 opacity-40 text-muted-foreground" />}
+    />
   );
 };
 
