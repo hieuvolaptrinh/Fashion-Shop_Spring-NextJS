@@ -69,8 +69,9 @@ private final ComboRepository comboRepo;
                     .orElse(null);
         } else {
             // Combo
-            Combo combo = comboRepo.findById(req.getComboId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Combo not found: " + req.getComboId()));
+            if (!comboRepo.existsById(req.getComboId())) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Combo not found: " + req.getComboId());
+            }
             existingDetail = cart.getListCartDetails().stream()
                     .filter(detail -> detail.getCombo() != null && detail.getCombo().getComboId() == req.getComboId())
                     .findFirst()

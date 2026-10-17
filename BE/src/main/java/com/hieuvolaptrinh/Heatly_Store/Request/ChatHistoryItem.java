@@ -1,14 +1,10 @@
 package com.hieuvolaptrinh.Heatly_Store.Request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ChatHistoryItem {
     /**
      * Vai trò trong lượt hội thoại: "user" hoặc "model"
@@ -19,4 +15,12 @@ public class ChatHistoryItem {
      * Nội dung câu thoại
      */
     private String text;
+
+    public ChatHistoryItem() {
+    }
+
+    public ChatHistoryItem(String role, String text) {
+        this.role = role;
+        this.text = text;
+    }
 }

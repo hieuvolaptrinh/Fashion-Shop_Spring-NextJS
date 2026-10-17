@@ -1,15 +1,19 @@
 package com.hieuvolaptrinh.Heatly_Store.Request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class TypeRequest {
     private int typeId;
     private String typeName;
+
+    public TypeRequest() {
+    }
+
+    public TypeRequest(int typeId, String typeName) {
+        this.typeId = typeId;
+        this.typeName = typeName;
+    }
 }

@@ -4,7 +4,6 @@ import com.hieuvolaptrinh.Heatly_Store.Request.CreateCommentRequest;
 import com.hieuvolaptrinh.Heatly_Store.Request.UpdateCommentRequest;
 import com.hieuvolaptrinh.Heatly_Store.Response.CommentResponse;
 import com.hieuvolaptrinh.Heatly_Store.Service.CommentService;
-import com.hieuvolaptrinh.Heatly_Store.Service.UserService;
 import com.hieuvolaptrinh.Heatly_Store.Util.ApiMessage;
 
 import jakarta.validation.Valid;
@@ -20,7 +19,6 @@ import java.util.List;
 @RequestMapping("/api/v1/comments")
 public class CommentController {
     private final CommentService svc;
-    // private final UserService userService;
 
     public CommentController(CommentService svc) {
         this.svc = svc;

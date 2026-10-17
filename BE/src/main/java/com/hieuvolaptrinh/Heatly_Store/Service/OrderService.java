@@ -29,20 +29,17 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepository orderRepo;
     private final UserRepository userRepo;
-    private final AddressRepository addressRepo;
     private final CartDetailRepository cartDetailRepo;
     private final ProductRepository productRepo;
     private final ProductService productService;
 
     public OrderService(OrderRepository orderRepo,
                         UserRepository userRepo,
-                        AddressRepository addressRepo,
                         CartDetailRepository cartDetailRepo,
                         ProductRepository productRepo,
                         ProductService productService) {
         this.orderRepo = orderRepo;
         this.userRepo = userRepo;
-        this.addressRepo = addressRepo;
         this.cartDetailRepo = cartDetailRepo;
         this.productRepo = productRepo;
         this.productService = productService;

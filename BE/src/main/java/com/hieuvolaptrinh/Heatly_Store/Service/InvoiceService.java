@@ -1,8 +1,6 @@
 package com.hieuvolaptrinh.Heatly_Store.Service;
 
-import com.hieuvolaptrinh.Heatly_Store.Model.Address;
 import com.hieuvolaptrinh.Heatly_Store.Model.Order;
-import com.hieuvolaptrinh.Heatly_Store.Repository.AddressRepository;
 import com.hieuvolaptrinh.Heatly_Store.Repository.OrderRepository;
 import com.hieuvolaptrinh.Heatly_Store.Response.InvoiceItemResponse;
 import com.hieuvolaptrinh.Heatly_Store.Response.InvoiceResponse;
@@ -31,11 +29,9 @@ import java.util.stream.Collectors;
 @Service
 public class InvoiceService {
     private final OrderRepository orderRepo;
-    private final AddressRepository addRepo;
 
-    public InvoiceService(OrderRepository orderRepo, AddressRepository addRepo) {
+    public InvoiceService(OrderRepository orderRepo) {
         this.orderRepo = orderRepo;
-        this.addRepo = addRepo;
     }
 
     /**
@@ -576,10 +572,6 @@ public class InvoiceService {
         }
         orders.forEach(o -> o.setBill(true));
         orderRepo.saveAll(orders);
-    }
-
-    private String formatAddress(Address a) {
-        return a.getStreetName() + ", " + a.getProvinceName() + ", " + a.getDistrictName();
     }
 
     // helper method vẽ giao diện hóa đơn

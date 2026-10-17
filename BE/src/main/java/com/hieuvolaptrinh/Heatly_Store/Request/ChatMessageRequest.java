@@ -2,9 +2,7 @@ package com.hieuvolaptrinh.Heatly_Store.Request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -12,8 +10,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ChatMessageRequest {
 
     @NotBlank(message = "Nội dung câu hỏi không được để trống")
@@ -23,5 +19,14 @@ public class ChatMessageRequest {
     /**
      * Lịch sử hội thoại 4-6 câu gần nhất để AI duy trì ngữ cảnh
      */
-    private List<ChatHistoryItem> history = new ArrayList<>();
+    private List<ChatHistoryItem> history;
+
+    public ChatMessageRequest() {
+        this.history = new ArrayList<>();
+    }
+
+    public ChatMessageRequest(String message, List<ChatHistoryItem> history) {
+        this.message = message;
+        this.history = history != null ? history : new ArrayList<>();
+    }
 }

@@ -1,6 +1,5 @@
 package com.hieuvolaptrinh.Heatly_Store.Request;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;

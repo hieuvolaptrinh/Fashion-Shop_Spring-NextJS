@@ -1,16 +1,19 @@
 package com.hieuvolaptrinh.Heatly_Store.Response;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class TypeResponse {
     private int typeId;
     private String typeName;
 
+    public TypeResponse() {
+    }
+
+    public TypeResponse(int typeId, String typeName) {
+        this.typeId = typeId;
+        this.typeName = typeName;
+    }
 }
