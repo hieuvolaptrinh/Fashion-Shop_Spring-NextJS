@@ -1,5 +1,6 @@
 import { http } from "@/core/lib/apiClient";
 import { API_ENDPOINTS } from "@/core/constants";
+import type { OrderResponse, ApiResponse } from "@/core/lib/type";
 
 export interface OrderItemPayload {
   shippingAddress: string;
@@ -26,7 +27,7 @@ export const postOrder = async (data: OrderItemPayload, accessToken?: string) =>
     ? { headers: { Authorization: `Bearer ${accessToken}` } }
     : undefined;
 
-  return http.post(API_ENDPOINTS.ORDERS.BASE, data, config);
+  return http.post<ApiResponse<OrderResponse>>(API_ENDPOINTS.ORDERS.BASE, data, config);
 };
 
 /**

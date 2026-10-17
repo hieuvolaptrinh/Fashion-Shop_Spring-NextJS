@@ -1,4 +1,4 @@
-import ShoppingCart from "core/components/feature/shopping-cart/shoppingCartPage";
+import ShoppingCart from "@/core/components/feature/shopping-cart/ShoppingCartPage";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

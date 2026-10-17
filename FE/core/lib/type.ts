@@ -119,6 +119,17 @@ export type AddressResponse = {
   districtName: string;
   provinceName: string;
   wardName: string;
+  provinceCode?: string;
+  wardCode?: string;
+};
+
+export type AddressRequest = {
+  addressName: string;
+  districtName?: string;
+  provinceName: string;
+  wardName: string;
+  provinceCode?: string;
+  wardCode?: string;
 };
 
 export type JwtTokenPayload = {
@@ -128,4 +139,37 @@ export type JwtTokenPayload = {
   iat?: number;
   [key: string]: any;
 };
+
+export interface CartItem {
+  cartDetailId: number;
+  quantity: number;
+  price: number;
+  product: Product;
+  combo?: Combo;
+}
+
+export interface Province {
+  code: string;
+  name_with_type: string;
+}
+
+export interface ProvinceProps {
+  _id: string;
+  name: string;
+  slug: string;
+  type: string;
+  name_with_type: string;
+  code: string;
+  isDeleted: boolean;
+}
+
+/**
+ * Cấu trúc phản hồi chuẩn từ Backend Spring Boot (FormatRestResponse)
+ */
+export interface ApiResponse<T = any> {
+  statusCode: number;
+  error?: string | null;
+  message?: string;
+  data: T;
+}
 

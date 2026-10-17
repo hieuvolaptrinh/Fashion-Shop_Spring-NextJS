@@ -1,81 +1,41 @@
-import axios from "axios";
+import { http } from "@/core/lib/apiClient";
+import { API_ENDPOINTS } from "@/core/constants";
 
-type ShoppingCartProps = {
+export interface ShoppingCartProps {
   productId: number;
   quantity: number;
   comboId?: number;
-};
-type UpdateCartProps = {
+}
+
+export interface UpdateCartProps {
   cartDetailId: number;
   quantity: number;
-};
+}
+
+/**
+ * Thêm sản phẩm vào giỏ hàng
+ */
 export const postShoppingCart = async (data: ShoppingCartProps) => {
-  const localStorageToken = localStorage.getItem("accessToken");
-  if (!localStorageToken) {
-    throw new Error("No access token provided");
-  }
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-  const response = await axios.post(`${API_URL}/api/v1/carts/items`, data, {
-    headers: {
-      Authorization: `Bearer ${localStorageToken}`,
-    },
-  });
-  if (response.status !== 201) {
-    throw new Error("Failed to add item to shopping cart hi hi");
-  }
-  return response.data;
+  return http.post(API_ENDPOINTS.CARTS.ITEMS, data);
 };
 
+/**
+ * Cập nhật số lượng sản phẩm trong giỏ hàng
+ */
 export const putShoppingCart = async (data: UpdateCartProps) => {
-  const localStorageToken = localStorage.getItem("accessToken");
-  if (!localStorageToken) {
-    throw new Error("No access token provided");
-  }
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
-  const response = await axios.put(`${API_URL}/api/v1/carts/items`, data, {
-    headers: {
-      Authorization: `Bearer ${localStorageToken}`,
-    },
-  });
-  if (response.status !== 200) {
-    throw new Error("Failed to update shopping cart item");
-  }
-  return response.data;
+  return http.put(API_ENDPOINTS.CARTS.ITEMS, data);
 };
 
+/**
+ * Xóa một sản phẩm khỏi giỏ hàng
+ */
 export const deleteShoppingCart = async (id: number) => {
-  const localStorageToken = localStorage.getItem("accessToken");
-  if (!localStorageToken) {
-    throw new Error("No access token provided");
-  }
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
-  const response = await axios.delete(`${API_URL}/api/v1/carts/items/${id}`, {
-    headers: {
-      Authorization: `Bearer ${localStorageToken}`,
-    },
-  });
-  if (response.status !== 200) {
-    throw new Error("Failed to delete shopping cart item");
-  }
-  return response.data;
+  return http.delete(API_ENDPOINTS.CARTS.ITEM_BY_ID(id));
 };
 
+/**
+ * Lấy toàn bộ sản phẩm trong giỏ hàng của người dùng hiện tại
+ */
 export const getShoppingCart = async () => {
-  const localStorageToken = localStorage.getItem("accessToken");
-  if (!localStorageToken) {
-    throw new Error("No access token provided");
-  }
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-
-  const response = await axios.get(`${API_URL}/api/v1/carts`, {
-    headers: {
-      Authorization: `Bearer ${localStorageToken}`,
-    },
-  });
-  if (response.status !== 200) {
-    throw new Error("Failed to fetch shopping cart items");
-  }
-  return response.data;
+  return http.get(API_ENDPOINTS.CARTS.BASE);
 };
