@@ -1,4 +1,5 @@
 import { cn } from "@/core/lib/utils";
+import { AlertCircle, X } from "lucide-react";
 
 interface OutOfStockProps {
   size?: "sm" | "md" | "lg";
@@ -48,7 +49,7 @@ export default function OutOfStock({
   return (
     <div
       className={cn(
-        "relative w-full overflow-hidden border border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100 text-center",
+        "relative w-full overflow-hidden border border-border/80 bg-muted/40 text-center",
         variant.container,
         className,
       )}
@@ -57,45 +58,23 @@ export default function OutOfStock({
         <div className="relative">
           <div
             className={cn(
-              "flex items-center justify-center rounded-full bg-gray-300",
+              "flex items-center justify-center rounded-full bg-muted",
               variant.iconMain,
             )}
           >
-            <svg
-              className={cn("text-gray-500", variant.iconInner)}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+            <AlertCircle className={cn("text-muted-foreground", variant.iconInner)} />
           </div>
           <div
             className={cn(
-              "absolute flex items-center justify-center rounded-full bg-red-500",
+              "absolute flex items-center justify-center rounded-full bg-destructive text-destructive-foreground",
               variant.iconBadge,
             )}
           >
-            <svg
-              className={cn("text-white", variant.iconBadgeInner)}
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <X className={variant.iconBadgeInner} />
           </div>
         </div>
         {showMessage && (
-          <span className={cn("font-medium text-gray-600", variant.text)}>
+          <span className={cn("font-medium text-muted-foreground", variant.text)}>
             {message}
           </span>
         )}

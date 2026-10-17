@@ -66,7 +66,6 @@ export function DashboardQuickActions() {
             </p>
           </div>
         </div>
-        <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-sky-600 transition-colors" />
       </Link>
     </div>
   );

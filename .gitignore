@@ -1,0 +1,12 @@
+# Documentation
+docs/
+
+# Local SQL init scripts
+BE/init.sql
+*.sql
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+.agents/

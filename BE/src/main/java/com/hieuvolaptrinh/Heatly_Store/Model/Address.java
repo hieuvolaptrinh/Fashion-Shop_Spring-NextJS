@@ -21,9 +21,7 @@ public class Address {
     @Column(columnDefinition = "NVARCHAR(256)")
     private String streetName;
 
-    @NotBlank(message = "Tên quận/huyện không được để trống")
-    @Size(min = 2, max = 256, message = "Tên quận/huyện phải có độ dài từ 2 đến 256 ký tự")
-    @Column(columnDefinition = "NVARCHAR(256)")
+    @Column(columnDefinition = "NVARCHAR(256)", nullable = true)
     private String districtName;
 
     @NotBlank(message = "Tên phường xã không được để trống")
@@ -32,6 +30,12 @@ public class Address {
 
     @Column(columnDefinition = "NVARCHAR(256)")
     private String provinceName;
+
+    @Column(name = "province_code", length = 32)
+    private String provinceCode;
+
+    @Column(name = "ward_code", length = 32)
+    private String wardCode;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

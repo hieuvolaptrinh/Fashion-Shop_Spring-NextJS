@@ -9,7 +9,7 @@ import type {
   Product,
   ProductRequest,
 } from "@/core/lib/type";
-import { validateProductForm } from "@/core/lib/validators/productValidator";
+import { validateProductForm } from "@/core/validations";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 

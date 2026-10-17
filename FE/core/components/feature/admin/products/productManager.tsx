@@ -2,9 +2,9 @@
 
 import { RotateCcw, Plus } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
-import ConfirmDelete from "./confirm.delete";
-import ProductDetails from "./productDetails";
-import ProductsDataGrid from "./productsDataGrid";
+import ConfirmDelete from "./ConfirmDelete";
+import ProductDetails from "./ProductDetails";
+import ProductsDataGrid from "./ProductsDataGrid";
 import ProductFilterCard from "./ProductFilterCard";
 import { useProductManager } from "@/core/hooks/useProductManager";
 

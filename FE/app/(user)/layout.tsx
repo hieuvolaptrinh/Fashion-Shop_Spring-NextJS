@@ -1,5 +1,6 @@
 import Footer from "@/core/components/feature/Footer";
 import Header from "@/core/components/feature/Header";
+import { ChatFloatingWidget } from "@/core/components/feature/chat";
 import type { ReactNode } from "react";
 
 export default function UserLayout({ children }: { children: ReactNode }) {
@@ -8,6 +9,7 @@ export default function UserLayout({ children }: { children: ReactNode }) {
       <Header />
       {children}
       <Footer />
+      <ChatFloatingWidget />
     </>
   );
 }

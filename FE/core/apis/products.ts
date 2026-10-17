@@ -1,14 +1,23 @@
 import apiClient, { http } from "@/core/lib/apiClient";
-import type { ProductRequest } from "../lib/type";
+import type { Product, ProductRequest } from "../lib/type";
 import { API_ENDPOINTS } from "@/core/constants";
+
+export interface ProductQueryFilters {
+  page?: number;
+  size?: number;
+  productName?: string;
+  minSalePrice?: number;
+  maxSalePrice?: number;
+  typeId?: number[];
+}
 
 /**
  * Lấy danh sách danh mục / loại sản phẩm
  */
-export const getCategories = async () => {
+export const getCategories = async (): Promise<any> => {
   try {
     const res = await http.get<any>(API_ENDPOINTS.PRODUCTS.TYPES);
-    return res?.data ?? res;
+    return res?.data ?? res ?? [];
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw error;
@@ -18,7 +27,9 @@ export const getCategories = async () => {
 /**
  * Lấy danh sách sản phẩm phân trang và có bộ lọc
  */
-export const getProducts = async (filters: any = {}) => {
+export const getProducts = async (
+  filters: ProductQueryFilters = {}
+): Promise<any> => {
   try {
     const params = new URLSearchParams();
 
@@ -47,7 +58,10 @@ export const getProducts = async (filters: any = {}) => {
       });
     }
 
-    const res = await http.get<any>(API_ENDPOINTS.PRODUCTS.BASE, { params });
+    const res = await http.get<any>(
+      API_ENDPOINTS.PRODUCTS.BASE,
+      { params }
+    );
     return res?.data ?? res;
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -60,8 +74,7 @@ export const getProducts = async (filters: any = {}) => {
  */
 export const updateProduct = async (
   product: ProductRequest,
-  files: File[] = [],
-  accessToken: string | null = null
+  files: File[] = []
 ) => {
   try {
     const formData = new FormData();
@@ -79,15 +92,9 @@ export const updateProduct = async (
       });
     }
 
-    const headers: Record<string, string> = {};
-    if (accessToken) {
-      headers.Authorization = `Bearer ${accessToken}`;
-    }
-
     const response = await apiClient.put(
       API_ENDPOINTS.PRODUCTS.BY_ID(product.productId),
-      formData,
-      { headers }
+      formData
     );
 
     return response.data;
@@ -102,8 +109,7 @@ export const updateProduct = async (
  */
 export const createProduct = async (
   product: Omit<ProductRequest, "productId">,
-  files: File[] = [],
-  accessToken: string | null = null
+  files: File[] = []
 ) => {
   try {
     const formData = new FormData();
@@ -118,15 +124,9 @@ export const createProduct = async (
       });
     }
 
-    const headers: Record<string, string> = {};
-    if (accessToken) {
-      headers.Authorization = `Bearer ${accessToken}`;
-    }
-
     const response = await apiClient.post(
       API_ENDPOINTS.PRODUCTS.BASE,
-      formData,
-      { headers }
+      formData
     );
 
     return response.data;
@@ -139,7 +139,7 @@ export const createProduct = async (
 /**
  * Lấy chi tiết sản phẩm theo ID
  */
-export const getProductById = async (productId: number) => {
+export const getProductById = async (productId: number): Promise<Product> => {
   try {
     const res = await http.get<any>(API_ENDPOINTS.PRODUCTS.BY_ID(productId));
     return res?.data ?? res;

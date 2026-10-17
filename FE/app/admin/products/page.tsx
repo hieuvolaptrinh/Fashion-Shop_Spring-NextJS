@@ -1,4 +1,4 @@
-import ProductManager from '@/core/components/feature/admin/products/productManager';
+import ProductManager from "@/core/components/feature/admin/products/ProductManager";
 
 export default function ProductsPage() {
   return <ProductManager />;

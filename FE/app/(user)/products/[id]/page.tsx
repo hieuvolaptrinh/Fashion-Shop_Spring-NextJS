@@ -1,12 +1,13 @@
 import { getProductById } from "@/core/apis/products";
+import ProductDetailPage from "@/core/components/feature/products/detail/ProductDetailPage";
+import { IMAGES } from "@/core/constants";
 import { convertToSlugWithId } from "@/core/lib/convert";
+import type { ListTypes } from "@/core/lib/type";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import ProductDetail from "./_components/productDetailPage";
 
 type Props = {
   params: Promise<{ id: string }>;
-  // SEARCH PARAMS
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
@@ -23,7 +24,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   try {
-    // fetch
     const product = await getProductById(Number(id));
 
     if (!product) {
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         "giá rẻ",
         "chính hãng",
         "Lan chuyên hàng sale",
-        ...(product.listTypes?.map((type: any) => type.typeName) || []),
+        ...(product.listTypes?.map((type: ListTypes) => type.typeName) || []),
       ],
       openGraph: {
         title: `${product.productName} - Lan Chuyên Hàng Sale`,
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         type: "website",
         images: [
           {
-            url: product.listImages?.[0]?.link || "/productDemo1.jpg",
+            url: product.listImages?.[0]?.link || IMAGES.DEMO_PRODUCTS.DEMO_1,
             width: 1200,
             height: 630,
             alt: product.productName,
@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description:
           product.description ||
           `Mua ${product.productName} chính hãng với giá ưu đãi.`,
-        images: [product.listImages?.[0]?.link || "/productDemo1.jpg"],
+        images: [product.listImages?.[0]?.link || IMAGES.DEMO_PRODUCTS.DEMO_1],
       },
       alternates: {
         canonical: `https://lanchuyenhangsale.com/products/${url}`,
@@ -84,19 +84,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-// [slug]: dynamic route
-const ProductDetailPage = async ({ params }: Props) => {
+export default async function ProductDetailPageWrapper({ params }: Props) {
   const url = (await params).id;
   const id = convertToSlugWithId(url);
 
   if (!id) {
-    return <div>Sản phẩm không tồn tại</div>;
+    return (
+      <div className="container mx-auto py-24 text-center">
+        <h2 className="text-xl font-bold text-foreground">Sản phẩm không tồn tại</h2>
+      </div>
+    );
   }
 
   return (
-    <Suspense fallback={<p>Loading...</p>}>
-      <ProductDetail productId={id} />
+    <Suspense
+      fallback={
+        <div className="container mx-auto py-24 text-center text-sm text-muted-foreground">
+          Đang tải thông tin sản phẩm...
+        </div>
+      }
+    >
+      <ProductDetailPage productId={id} />
     </Suspense>
   );
-};
-export default ProductDetailPage;
+}

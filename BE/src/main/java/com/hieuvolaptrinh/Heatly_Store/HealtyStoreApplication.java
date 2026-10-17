@@ -25,6 +25,8 @@ public class HealtyStoreApplication {
                                 dotenv.get("FACEBOOK_CLIENT_SECRET"));
 
                 System.setProperty("BASE_API", dotenv.get("BASE_API"));
+                String urlFe = dotenv.get("URL_FE");
+                System.setProperty("URL_FE", urlFe != null ? urlFe : "http://localhost:3000");
                 System.setProperty("CLOUDINARY_API_KEY", dotenv.get("CLOUDINARY_API_KEY"));
                 System.setProperty("CLOUDINARY_API_SECRET",
                                 dotenv.get("CLOUDINARY_API_SECRET"));

@@ -25,7 +25,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   disabled = false,
   className = "",
 }) => {
-  if (totalPages <= 1) return null;
+  if (totalPages < 1) return null;
 
   const startItem = itemsPerPage ? (currentPage - 1) * itemsPerPage + 1 : undefined;
   const endItem =

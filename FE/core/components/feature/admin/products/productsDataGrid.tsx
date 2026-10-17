@@ -130,33 +130,41 @@ const ProductsDataGrid = ({
         key: "categories",
         header: "Danh mục",
         headClassName: "min-w-[150px]",
-        render: (item: Product) => (
-          <div className="flex flex-wrap gap-1 max-w-[220px]">
-            {item.listTypes && item.listTypes.length > 0 ? (
-              <>
-                {item.listTypes.slice(0, 2).map((type) => (
-                  <Badge
-                    key={type.typeId}
-                    variant="secondary"
-                    className="text-[10px] font-normal px-2 py-0.5"
-                  >
-                    {type.typeName}
-                  </Badge>
-                ))}
-                {item.listTypes.length > 2 && (
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] px-1.5 py-0.5 text-muted-foreground"
-                  >
-                    +{item.listTypes.length - 2}
-                  </Badge>
-                )}
-              </>
-            ) : (
-              <span className="text-xs text-muted-foreground">-</span>
-            )}
-          </div>
-        ),
+        render: (item: Product) => {
+          const uniqueTypes = item.listTypes
+            ? Array.from(
+                new Map(item.listTypes.map((t) => [String(t.typeId), t])).values()
+              )
+            : [];
+
+          return (
+            <div className="flex flex-wrap gap-1 max-w-[220px]">
+              {uniqueTypes.length > 0 ? (
+                <>
+                  {uniqueTypes.slice(0, 2).map((type, idx) => (
+                    <Badge
+                      key={`prod-${item.productId}-type-${type.typeId}-${idx}`}
+                      variant="secondary"
+                      className="text-[10px] font-normal px-2 py-0.5"
+                    >
+                      {type.typeName}
+                    </Badge>
+                  ))}
+                  {uniqueTypes.length > 2 && (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] px-1.5 py-0.5 text-muted-foreground"
+                    >
+                      +{uniqueTypes.length - 2}
+                    </Badge>
+                  )}
+                </>
+              ) : (
+                <span className="text-xs text-muted-foreground">-</span>
+              )}
+            </div>
+          );
+        },
       },
       {
         key: "combo",
@@ -240,7 +248,9 @@ const ProductsDataGrid = ({
     <AdminDataTable<Product>
       data={products}
       columns={columns}
-      keyExtractor={(item) => item.productId}
+      keyExtractor={(item, index) =>
+        item.productId ? `prod-${item.productId}-${index}` : `prod-${index}`
+      }
       loading={loading}
       totalRows={totalRows}
       paginationModel={paginationModel}

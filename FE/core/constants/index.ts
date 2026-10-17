@@ -6,3 +6,4 @@ export * from "./about";
 export * from "./contact";
 export * from "./cart";
 export * from "./regex";
+export * from "./product";

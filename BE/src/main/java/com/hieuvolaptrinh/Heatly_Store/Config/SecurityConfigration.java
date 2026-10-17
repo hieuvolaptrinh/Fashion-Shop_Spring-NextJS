@@ -31,15 +31,18 @@ public class SecurityConfigration {
     private final UserServiceImpl userService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
 
     public SecurityConfigration(@Lazy JwtFilter jwtAuthenticationFilter,
             @Lazy UserServiceImpl userService,
             @Lazy CustomOAuth2UserService customOAuth2UserService,
-            @Lazy OAuth2SuccessHandler oAuth2SuccessHandler) {
+            @Lazy OAuth2SuccessHandler oAuth2SuccessHandler,
+            @Lazy OAuth2FailureHandler oAuth2FailureHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userService = userService;
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+        this.oAuth2FailureHandler = oAuth2FailureHandler;
     }
 
     @Bean
@@ -73,7 +76,8 @@ public class SecurityConfigration {
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService))
-                        .successHandler(oAuth2SuccessHandler))
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers

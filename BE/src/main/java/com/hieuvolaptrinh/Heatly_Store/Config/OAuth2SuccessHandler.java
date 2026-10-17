@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -26,16 +27,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private static final Logger logger = LoggerFactory.getLogger(OAuth2SuccessHandler.class);
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-    private final static String frontendUrl = "https://lanchuyenhangsale.com"; // Default frontend URL
+
+    @Value("${frontend.url:http://localhost:3000}")
+    private String frontendUrl;
 
     public OAuth2SuccessHandler(JwtUtil jwtUtil, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
-
-        // Dotenv dotenv = Dotenv.load();
-        // this.frontendUrl = dotenv.get("URL_FE") == null ?
-        // "https://lanchuyenhangsale.com" : dotenv.get("URL_FE");
-
     }
 
     @Override
@@ -45,8 +43,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         if (!(authentication.getPrincipal() instanceof DefaultOAuth2User)) {
             logger.error("Authentication principal is not DefaultOAuth2User");
-            String errorRedirect = frontendUrl + "/oauth2/error?message=" +
-                    URLEncoder.encode("Invalid authentication type", StandardCharsets.UTF_8.toString());
+            String errorRedirect = frontendUrl + "/oauth2/redirect?error=" +
+                    URLEncoder.encode("Loại xác thực không hợp lệ (Invalid authentication type)", StandardCharsets.UTF_8.toString());
             getRedirectStrategy().sendRedirect(request, response, errorRedirect);
             return;
         }
@@ -65,8 +63,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // Validate required fields
         if (userId == null) {
             logger.error("User ID is null in OAuth2 attributes");
-            String errorRedirect = frontendUrl + "/oauth2/error?message=" +
-                    URLEncoder.encode("User ID not found in OAuth2 response", StandardCharsets.UTF_8.toString());
+            String errorRedirect = frontendUrl + "/oauth2/redirect?error=" +
+                    URLEncoder.encode("Không tìm thấy thông tin tài khoản sau khi xác thực OAuth2", StandardCharsets.UTF_8.toString());
             getRedirectStrategy().sendRedirect(request, response, errorRedirect);
             return;
         }
@@ -102,8 +100,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             getRedirectStrategy().sendRedirect(request, response, redirectUrl);
         } catch (Exception e) {
             logger.error("Error processing OAuth2 login: ", e);
-            String errorRedirect = frontendUrl + "/oauth2/error?message=" +
-                    URLEncoder.encode("An error occurred while processing " + provider + " login: " + e.getMessage(),
+            String errorRedirect = frontendUrl + "/oauth2/redirect?error=" +
+                    URLEncoder.encode("Đã xảy ra lỗi trong quá trình xử lý đăng nhập " + provider + ": " + e.getMessage(),
                             StandardCharsets.UTF_8.toString());
             getRedirectStrategy().sendRedirect(request, response, errorRedirect);
         }

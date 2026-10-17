@@ -9,11 +9,19 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "image")
 public class Image {
+    public Image() {
+    }
+
+    public Image(int imageId, String imageName, String link, Product product) {
+        this.imageId = imageId;
+        this.imageName = imageName;
+        this.link = link;
+        this.product = product;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "image_id")

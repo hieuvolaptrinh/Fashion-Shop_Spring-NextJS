@@ -185,3 +185,50 @@ export interface PageResponse<T> {
   last?: boolean;
 }
 
+/**
+ * Đánh giá & Bình luận sản phẩm (Comments & Reviews)
+ */
+export interface CommentResponse {
+  commentId: number;
+  userId: number;
+  userName: string;
+  productId: number;
+  productName: string;
+  orderDetailId: number;
+  content: string;
+  rating: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCommentRequest {
+  userId: number;
+  productId: number;
+  orderDetailId: number;
+  content: string;
+  rating: number;
+}
+
+/**
+ * Kiểu dữ liệu AI Chatbot (Gemini Assistant)
+ */
+export interface ChatHistoryItem {
+  role: "user" | "model";
+  text: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  sender: "user" | "bot";
+  text: string;
+  products?: Product[];
+  timestamp: string;
+}
+
+export interface ChatResponseData {
+  reply: string;
+  products?: Product[];
+}
+
+
+

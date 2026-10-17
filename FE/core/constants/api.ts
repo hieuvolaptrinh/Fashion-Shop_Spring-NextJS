@@ -64,12 +64,17 @@ export const API_ENDPOINTS = {
   COMMENTS: {
     BASE: "/api/v1/comments",
     BY_PRODUCT: (productId: number | string) =>
-      `/api/v1/comments?productId=${productId}`,
+      `/api/v1/comments/by-product/${productId}`,
   },
 
   // Tải lên & Quản lý Hình ảnh (Cloudinary Upload)
   IMAGES: {
     UPLOAD: "/api/v1/images/upload",
     DELETE: "/api/v1/images/delete",
+  },
+
+  // Trợ lý ảo AI Chatbot (Gemini AI Assistant)
+  CHAT: {
+    MESSAGE: "/api/v1/chat/message",
   },
 } as const;

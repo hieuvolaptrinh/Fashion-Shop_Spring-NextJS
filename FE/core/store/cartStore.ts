@@ -56,6 +56,13 @@ interface CartStore {
   removeGuestCartItem: (cartDetailId: number) => void;
   clearGuestCart: () => void;
 
+  // Thao tác thêm vào giỏ hàng thống nhất (tự động xử lý khách / đăng nhập)
+  addToCart: (
+    product: Product,
+    quantity?: number,
+    combo?: Combo
+  ) => Promise<{ success: boolean; message?: string }>;
+
   // Đồng bộ giỏ hàng khách lên server sau khi đăng nhập
   syncGuestCartToServer: () => Promise<void>;
 }
@@ -182,6 +189,40 @@ export const useCartStore = create<CartStore>((set, get) => ({
   clearGuestCart: () => {
     clearLocalGuestCart();
     set({ guestItems: [], quantity: 0 });
+  },
+
+  /**
+   * Thêm sản phẩm vào giỏ hàng thống nhất:
+   * - Nếu chưa đăng nhập: lưu vào giỏ hàng khách LocalStorage
+   * - Nếu đã đăng nhập: gọi API máy chủ và cập nhật badge số lượng
+   */
+  addToCart: async (product: Product, quantity = 1, combo?: Combo) => {
+    const token = getAccessToken();
+    if (!token) {
+      get().addToGuestCart(product, quantity, combo);
+      return { success: true };
+    }
+
+    try {
+      const response = await postShoppingCart({
+        productId: Number(product.productId),
+        quantity,
+        comboId: combo?.comboId || 0,
+      });
+
+      if (response?.status === 201 || response?.data || response?.cartDetailId) {
+        await get().fetchCartQuantity();
+        return { success: true };
+      }
+      return {
+        success: false,
+        message: response?.message || "Không thể thêm vào giỏ hàng",
+      };
+    } catch (error) {
+      const msg =
+        error instanceof Error ? error.message : "Thêm vào giỏ hàng thất bại";
+      return { success: false, message: msg };
+    }
   },
 
   /**

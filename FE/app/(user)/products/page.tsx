@@ -1,4 +1,5 @@
-import ProductsPage from "@/core/components/feature/products/productsPage";
+import ProductsPage from "@/core/components/feature/products/ProductsPage";
+import { IMAGES } from "@/core/constants";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/productDemo1.jpg",
+        url: IMAGES.DEMO_PRODUCTS.DEMO_1,
         width: 1200,
         height: 630,
         alt: "Sản phẩm sale chất lượng cao",

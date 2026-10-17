@@ -96,12 +96,12 @@ const ProductFilterCard: React.FC<ProductFilterCardProps> = ({
               <span>Loại sản phẩm:</span>
             </span>
             <div className="flex flex-wrap gap-1.5">
-              {productTypes.map((type) => {
+              {productTypes.map((type, idx) => {
                 const typeIdNum = parseInt(type.typeId);
                 const isSelected = filters.typeId.includes(typeIdNum);
                 return (
                   <button
-                    key={type.typeId}
+                    key={`filter-type-${type.typeId}-${idx}`}
                     type="button"
                     onClick={() => onToggleFilterType(typeIdNum)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer ${

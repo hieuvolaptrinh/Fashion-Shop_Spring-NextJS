@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "recharts",
+    ],
+  },
   async headers() {
     return [
       {
@@ -35,6 +41,12 @@ const nextConfig: NextConfig = {
         ],
         destination: "https://lanchuyenhangsale.com/:path*",
         permanent: true,
+      },
+      // Redirect /oauth2/error to /oauth2/redirect phòng ngừa trường hợp có request cũ
+      {
+        source: "/oauth2/error",
+        destination: "/oauth2/redirect",
+        permanent: false,
       },
     ];
   },

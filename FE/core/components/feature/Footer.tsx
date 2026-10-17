@@ -1,5 +1,5 @@
-import { Facebook } from "@mui/icons-material";
 import { Banknote, MessageCircle, Phone } from "lucide-react";
+import { FacebookIcon } from "@/core/components/icons";
 
 export default function Footer() {
   return (
@@ -46,7 +46,7 @@ export default function Footer() {
                 </span>
               </div>
               <div className="flex items-start gap-2">
-                <Facebook className="mt-1 h-5 w-5 flex-shrink-0 text-blue-400" />
+                <FacebookIcon className="mt-1 h-5 w-5 flex-shrink-0 text-blue-400" />
                 <a
                   href="https://lanchuyenhangsale.com"
                   className="transition-colors hover:text-blue-400"
@@ -55,7 +55,7 @@ export default function Footer() {
                 </a>
               </div>
               <div className="flex items-start gap-2">
-                <Facebook className="mt-1 h-5 w-5 flex-shrink-0 text-blue-400" />
+                <FacebookIcon className="mt-1 h-5 w-5 flex-shrink-0 text-blue-400" />
                 <a
                   href="https://lanchuyenhangsale.com"
                   className="transition-colors hover:text-blue-400"
@@ -64,7 +64,7 @@ export default function Footer() {
                 </a>
               </div>
               <div className="flex items-start gap-2">
-                <Facebook className="mt-1 h-5 w-5 flex-shrink-0 text-blue-400" />
+                <FacebookIcon className="mt-1 h-5 w-5 flex-shrink-0 text-blue-400" />
                 <a
                   href="https://lanchuyenhangsale.com"
                   className="transition-colors hover:text-blue-400"

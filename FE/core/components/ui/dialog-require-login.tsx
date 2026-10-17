@@ -1,7 +1,9 @@
 "use client";
 
-import { LoginOutlined, ShoppingCartOutlined } from "@mui/icons-material";
+import React from "react";
+import { LogIn, ShoppingCart } from "lucide-react";
 import Link from "next/link";
+import { ROUTES } from "@/core/constants";
 import { Button } from "./button";
 import {
   Dialog,
@@ -15,52 +17,63 @@ import {
 interface RequireLoginDialogProps {
   open: boolean;
   onClose: () => void;
+  redirectUrl?: string;
+  title?: string;
+  description?: string;
 }
 
 export default function RequireLoginDialog({
   open,
   onClose,
+  redirectUrl,
+  title = "Đăng nhập để tiếp tục",
+  description = "Bạn cần đăng nhập để tiến hành đặt hàng và thanh toán.",
 }: RequireLoginDialogProps) {
+  const loginHref = redirectUrl
+    ? `${ROUTES.AUTH.LOGIN}?redirect=${encodeURIComponent(redirectUrl)}`
+    : `${ROUTES.AUTH.LOGIN}?redirect=${encodeURIComponent(ROUTES.USER.CART)}`;
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[90vw] max-w-[400px] rounded-2xl border-rose-200 bg-white p-4 sm:p-6">
+      <DialogContent className="w-[90vw] max-w-[420px] rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-lg">
         <DialogHeader>
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-rose-100">
-            <ShoppingCartOutlined
-              sx={{ fontSize: 24, color: "#e11d48" }} // rose-600
-            />
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <ShoppingCart className="h-7 w-7" />
           </div>
-          <DialogTitle className="text-center text-xl font-bold text-gray-900 sm:text-2xl">
-            Đăng nhập để tiếp tục
+          <DialogTitle className="text-center text-xl font-bold text-foreground sm:text-2xl">
+            {title}
           </DialogTitle>
-          <DialogDescription className="text-center text-sm text-gray-600 sm:text-base">
-            Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng và tiến hành thanh
-            toán.
+          <DialogDescription className="text-center text-xs sm:text-sm text-muted-foreground mt-1">
+            {description}
           </DialogDescription>
         </DialogHeader>
-        <div className="py-3">
-          <div className="rounded-lg bg-rose-50 p-3 text-xs text-rose-700 sm:p-4 sm:text-sm">
-            <p>Đăng nhập giúp bạn:</p>
-            <ul className="mt-2 ml-4 list-disc space-y-1">
-              <li>Theo dõi đơn hàng của bạn</li>
-              <li>Lưu sản phẩm yêu thích</li>
-              <li>Nhận ưu đãi và khuyến mãi đặc biệt</li>
+
+        <div className="py-2">
+          <div className="rounded-xl border border-border/60 bg-muted/40 p-3 text-xs sm:text-sm text-muted-foreground space-y-2">
+            <p className="font-semibold text-foreground">Đăng nhập giúp bạn:</p>
+            <ul className="ml-4 list-disc space-y-1">
+              <li>Theo dõi và tra cứu đơn hàng nhanh chóng</li>
+              <li>Tự động lưu địa chỉ và lịch sử giao hàng</li>
+              <li>Nhận các ưu đãi, mã giảm giá độc quyền</li>
             </ul>
           </div>
         </div>
-        <DialogFooter className="flex max-w-full flex-col gap-2 overflow-hidden sm:gap-3">
-          <Button className="box-border w-full max-w-full truncate bg-gradient-to-r from-rose-600 to-red-600 px-4 py-2 text-sm font-medium text-white transition-all duration-300 hover:from-rose-700 hover:to-red-700 sm:px-6 sm:py-3 sm:text-base">
-            <Link href="/login" className="flex items-center justify-center">
-              <LoginOutlined sx={{ mr: 1, fontSize: { xs: 16, sm: 18 } }} />
-              Đăng nhập ngay
+
+        <DialogFooter className="flex flex-col gap-2 pt-2 sm:gap-2">
+          <Button
+            asChild
+            className="w-full h-11 rounded-xl text-sm font-semibold shadow-xs gap-2"
+          >
+            <Link href={loginHref} onClick={onClose}>
+              <LogIn className="h-4 w-4" />
+              <span>Đăng nhập ngay</span>
             </Link>
           </Button>
-        </DialogFooter>
-        <DialogFooter className="flex max-w-full flex-col gap-2 overflow-hidden sm:gap-3">
+
           <Button
             variant="outline"
             onClick={onClose}
-            className="box-border w-full max-w-full truncate border-2 border-rose-200 px-4 py-2 text-sm font-medium text-rose-700 hover:bg-rose-50 hover:text-rose-800 sm:px-6 sm:py-3 sm:text-base"
+            className="w-full h-10 rounded-xl text-sm font-medium border-border/80 hover:bg-muted"
           >
             Để sau
           </Button>

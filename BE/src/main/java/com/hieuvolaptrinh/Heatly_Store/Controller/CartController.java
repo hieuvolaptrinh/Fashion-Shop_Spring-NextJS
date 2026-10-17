@@ -4,7 +4,6 @@ import com.hieuvolaptrinh.Heatly_Store.Request.AddProductRequest;
 import com.hieuvolaptrinh.Heatly_Store.Response.CartResponse;
 import com.hieuvolaptrinh.Heatly_Store.Response.UpdateCartDetailRequest;
 import com.hieuvolaptrinh.Heatly_Store.Service.CartService;
-import com.hieuvolaptrinh.Heatly_Store.Request.UpdateCartItemRequest;
 import com.hieuvolaptrinh.Heatly_Store.Util.ApiMessage;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

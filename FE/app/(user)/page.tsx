@@ -1,4 +1,5 @@
-import HomePage from "core/components/feature/home/homePage";
+import HomePage from "@/core/components/feature/home/HomePage";
+import { IMAGES } from "@/core/constants";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/banner2.png",
+        url: IMAGES.BANNERS.BANNER_2,
         width: 1200,
         height: 630,
         alt: "Lan Chuyên Hàng Sale - Sản phẩm chính hãng giá rẻ",
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
     title: "Lan Chuyên Hàng Sale - Hàng Sale Chất Lượng Giá Rẻ",
     description:
       "Chuyên cung cấp sản phẩm sale chính hãng với giá ưu đãi nhất. Sức khỏe, làm đẹp, gia dụng chất lượng cao.",
-    images: ["/banner2.png"],
+    images: [IMAGES.BANNERS.BANNER_2],
   },
   alternates: {
     canonical: "https://lanchuyenhangsale.com",

@@ -11,10 +11,19 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "combo")
 public class Combo {
+    public Combo() {
+    }
+
+    public Combo(int comboId, Product product, int quantityInCombo, double comboPrice, String comboDescription) {
+        this.comboId = comboId;
+        this.product = product;
+        this.quantityInCombo = quantityInCombo;
+        this.comboPrice = comboPrice;
+        this.comboDescription = comboDescription;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "combo_id")

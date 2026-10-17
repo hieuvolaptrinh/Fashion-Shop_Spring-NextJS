@@ -31,6 +31,8 @@ public class UserResponse {
         private String addressName;
         private String districtName;
         private String provinceName;
-        private  String wardName;
+        private String wardName;
+        private String provinceCode;
+        private String wardCode;
     }
 }

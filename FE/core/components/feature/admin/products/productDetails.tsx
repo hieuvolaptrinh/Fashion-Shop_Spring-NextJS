@@ -14,8 +14,8 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
-import ComboSection from "./combo.section";
-import ProductImagesSection from "./productImagesSection";
+import ComboSection from "./ComboSection";
+import ProductImagesSection from "./ProductImagesSection";
 import { useProductForm } from "@/core/hooks/useProductForm";
 
 export interface ProductDetailsProps {
@@ -227,13 +227,13 @@ export const ProductDetails = ({
                   Chưa có loại sản phẩm nào
                 </span>
               ) : (
-                productTypes.map((typeItem) => {
+                productTypes.map((typeItem, idx) => {
                   const isSelected = formData.listTypes.some(
                     (t) => t.typeId === typeItem.typeId
                   );
                   return (
                     <button
-                      key={typeItem.typeId}
+                      key={`detail-type-${typeItem.typeId}-${idx}`}
                       type="button"
                       disabled={isViewing}
                       onClick={() => toggleType(typeItem)}

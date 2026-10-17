@@ -226,12 +226,15 @@ public class InvoiceService {
                     y -= 14;
 
                     // Phí vận chuyển
+                    double subtotal = inv.getTotalPrice();
+                    double shippingFee = (subtotal > 500000 || subtotal == 0) ? 0 : 30000;
+
                     cs.beginText();
                     cs.setFont(fontBold, 5);
                     cs.newLineAtOffset(margin, y);
                     cs.showText("Phí vận chuyển:");
                     cs.endText();
-                    showTextRightAligned(cs, String.format("%,.0f VND", 30000.00), fontBold, 5, 10, y);
+                    showTextRightAligned(cs, shippingFee == 0 ? "0 VND (Miễn phí)" : String.format("%,.0f VND", shippingFee), fontBold, 5, 10, y);
                     y -= 12;
 
                     // Tổng cộng
@@ -240,7 +243,7 @@ public class InvoiceService {
                     cs.newLineAtOffset(margin, y);
                     cs.showText("TỔNG CỘNG:");
                     cs.endText();
-                    showTextRightAligned(cs, String.format("%,.0f VND", inv.getTotalPrice() + 30000), fontBold, 8, 10, y);
+                    showTextRightAligned(cs, String.format("%,.0f VND", subtotal + shippingFee), fontBold, 8, 10, y);
                     y -= 15;
 
                     showTextCentered(cs, "Cảm ơn quý khách!", fontRegular, 5, y, centerX);

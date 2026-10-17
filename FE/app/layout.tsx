@@ -21,25 +21,9 @@
 */
 
 import type { Metadata } from "next";
-import { Merriweather, Montserrat } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/core/components/ui/sonner";
 import { Suspense, type ReactNode } from "react";
-
-// FONT CONFIGURATION: Cấu hình font chữ
-// Google Fonts giúp cải thiện tốc độ tải và SEO
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"], // Các độ đậm nhạt
-  display: "swap", // Hiển thị font dự phòng trước, sau đó swap
-  variable: "--font-primary", // CSS variable
-});
-const merriweather = Merriweather({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-  variable: "--font-secondary",
-});
 
 export const metadata: Metadata = {
   // TITLE: Tiêu đề trang web - quan trọng nhất cho SEO
@@ -165,14 +149,7 @@ export default function RootLayout({
     <html lang="vi">
       {/* Khai báo ngôn ngữ tiếng Việt cho website */}
       <head>
-        {/* 
-          PHẦN META TAGS TRONG <HEAD>
-          Đây là các thẻ meta bổ sung, một số có thể trùng với metadata ở trên
-          nhưng được viết trực tiếp để đảm bảo tương thích với mọi platform
-        */}
-        {/* META ROBOTS: Hướng dẫn bot tìm kiếm */}
         <meta name="robots" content="index, follow" />
-        {/* OPEN GRAPH META TAGS: Cho Facebook, Zalo khi chia sẻ */}
         <meta property="og:title" content="Lan Chuyên Hàng Sale" />
         <meta
           property="og:description"
@@ -192,16 +169,12 @@ export default function RootLayout({
         />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="vi_VN" />
-        {/* FACEBOOK OPEN GRAPH TAGS: Cài đặt bổ sung cho Facebook */}
-        <meta property="fb:app_id" content="your-facebook-app-id" />{" "}
-        {/* ID ứng dụng Facebook */}
+        <meta property="fb:app_id" content="your-facebook-app-id" />
         <meta
           property="article:publisher"
-          content="https://www.facebook.com/shopmonglan" // Link Facebook Page
+          content="https://www.facebook.com/shopmonglan"
         />
-        {/* TWITTER CARD TAGS: Cho Twitter khi chia sẻ link */}
-        <meta name="twitter:card" content="summary_large_image" />{" "}
-        {/* Loại card hiển thị */}
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Lan Chuyên Hàng Sale" />
         <meta
           name="twitter:description"
@@ -211,81 +184,68 @@ export default function RootLayout({
           name="twitter:image"
           content="https://lanchuyenhangsale.com/banner2.png"
         />
-        {/* CANONICAL URL: URL chính thức của trang (tránh trùng lặp nội dung) */}
         <link rel="canonical" href="https://lanchuyenhangsale.com" />
-        {/* PERFORMANCE OPTIMIZATION: Tối ưu hóa tốc độ tải trang */}
-        <link rel="dns-prefetch" href="//lanchuyenhangsale.com" />{" "}
-        {/* Tra cứu DNS trước */}
+        <link rel="dns-prefetch" href="//lanchuyenhangsale.com" />
         <link
-          rel="preconnect" /* Kết nối trước với server */
+          rel="preconnect"
           href="https://lanchuyenhangsale.com"
           crossOrigin=""
         />
-        {/* BOT CRAWLING: Hướng dẫn các bot tìm kiếm khác */}
-        <meta name="googlebot" content="index, follow" /> {/* Google Bot */}
-        <meta name="bingbot" content="index, follow" /> {/* Bing Bot */}
-        <meta name="facebookexternalhit" content="index, follow" />{" "}
-        {/* Facebook Bot */}
-        {/* STRUCTURED DATA: Dữ liệu có cấu trúc giúp Google hiểu rõ hơn về doanh nghiệp */}
-        {/* Schema.org Organization: Thông tin tổ chức/công ty */}
+        <meta name="googlebot" content="index, follow" />
+        <meta name="bingbot" content="index, follow" />
+        <meta name="facebookexternalhit" content="index, follow" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
-              "@context": "https://schema.org", // Ngữ cảnh schema
-              "@type": "Organization", // Loại: Tổ chức
-              name: "Lan Chuyên Hàng Sale", // Tên công ty
-              url: "https://lanchuyenhangsale.com", // Website chính
-              logo: "https://lanchuyenhangsale.com/logo.jpg", // Logo công ty
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Lan Chuyên Hàng Sale",
+              url: "https://lanchuyenhangsale.com",
+              logo: "https://lanchuyenhangsale.com/logo.jpg",
               contactPoint: {
-                // Thông tin liên hệ
                 "@type": "ContactPoint",
-                telephone: "+84-931-133-128", // Số điện thoại
-                contactType: "customer service", // Loại liên hệ
-                areaServed: "VN", // Khu vực phục vụ (Việt Nam)
-                availableLanguage: "Vietnamese", // Ngôn ngữ hỗ trợ
+                telephone: "+84-931-133-128",
+                contactType: "customer service",
+                areaServed: "VN",
+                availableLanguage: "Vietnamese",
               },
               sameAs: [
-                // Các trang mạng xã hội
                 "https://facebook.com/lanchuyenhangsale",
                 "https://zalo.me/0931133128",
               ],
               address: {
-                // Địa chỉ
                 "@type": "PostalAddress",
                 addressCountry: "VN",
               },
             }),
           }}
         />
-        {/* Schema.org Website: Thông tin về website và chức năng tìm kiếm */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "WebSite", // Loại: Website
+              "@type": "WebSite",
               name: "Lan Chuyên Hàng Sale",
               url: "https://lanchuyenhangsale.com",
               description:
                 "Chuyên cung cấp sản phẩm sale, giá rẻ, uy tín, chất lượng cao. Hàng gia dụng, sức khỏe, làm đẹp với giá ưu đãi nhất.",
               potentialAction: {
-                // Chức năng tìm kiếm
-                "@type": "SearchAction", // Loại hành động: Tìm kiếm
+                "@type": "SearchAction",
                 target: {
-                  // URL đích khi tìm kiếm
                   "@type": "EntryPoint",
                   urlTemplate:
                     "https://lanchuyenhangsale.com/products?search={search_term_string}",
                 },
-                "query-input": "required name=search_term_string", // Tham số tìm kiếm
+                "query-input": "required name=search_term_string",
               },
             }),
           }}
         />
       </head>
       <body
-        className={`${montserrat.variable} ${merriweather.variable} font-primary min-h-screen`}
+        className="font-primary min-h-screen"
         cz-shortcut-listen="true"
       >
         {/* 

@@ -31,6 +31,8 @@ public class AddressService {
         address.setDistrictName(addressRequest.getDistrictName());
         address.setProvinceName(addressRequest.getProvinceName());
         address.setWardName(addressRequest.getWardName());
+        address.setProvinceCode(addressRequest.getProvinceCode());
+        address.setWardCode(addressRequest.getWardCode());
         address.setUser(user);
 
         return addressRepository.save(address);
@@ -66,6 +68,9 @@ public class AddressService {
                 address.setStreetName(addressRequest.getAddressName());
                 address.setDistrictName(addressRequest.getDistrictName());
                 address.setProvinceName(addressRequest.getProvinceName());
+                address.setWardName(addressRequest.getWardName());
+                address.setProvinceCode(addressRequest.getProvinceCode());
+                address.setWardCode(addressRequest.getWardCode());
                 return addressRepository.save(address);
             }
         }
