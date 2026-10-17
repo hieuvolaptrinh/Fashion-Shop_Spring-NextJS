@@ -18,6 +18,15 @@ export const getStoredUser = (): string | null => {
 };
 
 /**
+ * Lưu Access Token và thông tin user an toàn (bảo vệ khi render Server-side)
+ */
+export const saveAuth = (token: string, userName: string): void => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem("accessToken", token);
+  localStorage.setItem("user", userName);
+};
+
+/**
  * Xóa sạch toàn bộ token và thông tin phiên đăng nhập
  */
 export const clearAuth = (): void => {

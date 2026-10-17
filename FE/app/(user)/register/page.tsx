@@ -1,4 +1,4 @@
-import RegisterPage from "core/components/feature/auth/registerPage";
+import RegisterPage from "@/core/components/feature/auth/RegisterPage";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
