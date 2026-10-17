@@ -10,10 +10,10 @@ import com.hieuvolaptrinh.Heatly_Store.Util.ApiMessage;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -52,8 +52,8 @@ public class TypeController {
     // Thêm loại sản phẩm mới (admin)
     @PostMapping("")
     @ApiMessage("Thêm loại sản phẩm mới thành công")
-    public ResponseEntity<TypeRequest> createType(@RequestBody TypeRequest typeRequest) {
-        TypeRequest createdType = typeService.createType(typeRequest);
+    public ResponseEntity<TypeResponse> createType(@Valid @RequestBody TypeRequest typeRequest) {
+        TypeResponse createdType = typeService.createType(typeRequest);
         return ResponseEntity.status(201).body(createdType);
     }
 

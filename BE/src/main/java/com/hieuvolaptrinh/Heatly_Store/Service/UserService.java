@@ -12,9 +12,9 @@ import com.hieuvolaptrinh.Heatly_Store.Request.RegisterRequest;
 import com.hieuvolaptrinh.Heatly_Store.Request.UserRequest;
 import com.hieuvolaptrinh.Heatly_Store.Response.UserResponse;
 import com.hieuvolaptrinh.Heatly_Store.Response.UserResponse.AddressResponse;
-import com.hieuvolaptrinh.Heatly_Store.Util.Error.GlobalException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,15 +35,17 @@ public class UserService {
         this.addressService = addressService;
         this.roleRepository = roleRepository;
         this.cartRepository = cartRepository;
+    }
 
-    } // Fetch user by phone number
-
+    // Fetch user by phone number
+    @Transactional(readOnly = true)
     public User fetchUserLogin(String identifier) {
         Optional<User> userOptional;
         userOptional = userRepository.findByPhoneNumber(identifier);
         return userOptional.orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public String registerUser(RegisterRequest registerRequest) throws Exception {
 
         Optional<User> existingUser = userRepository.findByPhoneNumber(registerRequest.getPhoneNumber());
@@ -55,8 +57,6 @@ public class UserService {
         newUser.setFullName(registerRequest.getFullName());
         newUser.setActive(true);
 
-        System.out.println("Creating user with phone: " + registerRequest.getPhoneNumber()); // Gán role mặc định là
-        // USER
         Role defaultRole = roleRepository.findByRoleName("USER")
                 .orElseThrow(() -> new RuntimeException("Default role USER not found"));
 
@@ -64,33 +64,27 @@ public class UserService {
         roles.add(defaultRole);
         newUser.setListRoles(roles);
 
-        System.out.println("Assigned role: " + defaultRole.getRoleName());
-
         User savedUser = userRepository.save(newUser);
-        System.out.println("Saved user with ID: " + savedUser.getUserId());
 
         Cart cart = new Cart();
         cart.setUser(savedUser);
         cart.setListCartDetails(new ArrayList<>());
         Cart savedCart = cartRepository.save(cart);
-        System.out.println("Created cart with ID: " + savedCart.getCartId());
 
         savedUser.setCart(savedCart);
 
         if (registerRequest.getAddressRequest() != null) {
-            System.out.println("Creating address...");
             Address address = addressService.createAddress(registerRequest.getAddressRequest(), savedUser);
             if (savedUser.getBaseAddresses() == null) {
                 savedUser.setBaseAddresses(new ArrayList<>());
             }
             savedUser.getBaseAddresses().add(address);
-            System.out.println("Created address with ID: " + address.getAddressId());
         }
         User finalUser = userRepository.save(savedUser);
-        System.out.println("Registration completed successfully for user ID: " + finalUser.getUserId());
         return "Đăng ký thành công với số điện thoại: " + finalUser.getPhoneNumber();
     }
 
+    @Transactional(readOnly = true)
     public UserResponse getUserInfor(UserDetails userDetails) {
         Integer userId = Integer.parseInt(userDetails.getUsername());
         return userRepository.findByUserId(userId)
@@ -99,7 +93,7 @@ public class UserService {
     }
 
     // get all users (for admin)
-
+    @Transactional(readOnly = true)
     public List<UserResponse> getAllUser() {
         List<User> users = userRepository.findAll();
         return convertToUserResponseList(users);
@@ -108,6 +102,7 @@ public class UserService {
     /**
      * Update user information
      */
+    @Transactional(rollbackFor = Exception.class)
     public UserResponse updateUser(UserDetails userDetails, UserRequest userRequest) {
         Integer userId = Integer.parseInt(userDetails.getUsername());
 
@@ -126,6 +121,7 @@ public class UserService {
     /**
      * Add new address for user
      */
+    @Transactional(rollbackFor = Exception.class)
     public AddressResponse addAddress(UserDetails userDetails, AddressRequest addressRequest) {
         Integer userId = Integer.parseInt(userDetails.getUsername());
 
@@ -134,12 +130,12 @@ public class UserService {
                     Address address = addressService.createAddress(addressRequest, user);
                     return convertToAddressResponse(address);
                 }).orElseThrow(() -> new RuntimeException("User not found"));
-
     }
 
     /**
      * Delete address by id
      */
+    @Transactional(rollbackFor = Exception.class)
     public String deleteAddress(UserDetails userDetails, Integer addressId) {
         Integer userId = Integer.parseInt(userDetails.getUsername());
 
@@ -155,6 +151,7 @@ public class UserService {
     /**
      * Update address
      */
+    @Transactional(rollbackFor = Exception.class)
     public AddressResponse updateAddress(UserDetails userDetails, Integer addressId, AddressRequest addressRequest) {
         Integer userId = Integer.parseInt(userDetails.getUsername());
 
@@ -170,6 +167,7 @@ public class UserService {
     /**
      * Get all addresses for user
      */
+    @Transactional(readOnly = true)
     public List<AddressResponse> getAllAddress(UserDetails userDetails) {
         Integer userId = Integer.parseInt(userDetails.getUsername());
 
@@ -215,6 +213,8 @@ public class UserService {
         response.setDistrictName(address.getDistrictName());
         response.setProvinceName(address.getProvinceName());
         response.setWardName(address.getWardName());
+        response.setProvinceCode(address.getProvinceCode());
+        response.setWardCode(address.getWardCode());
         return response;
     }
 

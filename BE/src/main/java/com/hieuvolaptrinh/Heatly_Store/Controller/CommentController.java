@@ -30,9 +30,10 @@ public class CommentController {
     @PostMapping
     @ApiMessage("Create a new comment successfully")
     public ResponseEntity<List<CommentResponse>> create(
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody CreateCommentRequest req) {
         List<CommentResponse> comments = svc.createComment(
-                req.getUserId(),
+                userDetails,
                 req.getProductId(),
                 req.getOrderDetailId(),
                 req.getContent(),
@@ -45,14 +46,15 @@ public class CommentController {
     // lấy bình luận theo id bình luận
     @GetMapping("/{id}")
     @ApiMessage("Get comment by ID successfully")
-    public CommentResponse get(@PathVariable int id) {
-        return svc.getComment(id);
+    public ResponseEntity<CommentResponse> get(@PathVariable int id) {
+        return ResponseEntity.ok(svc.getComment(id));
     }
 
     // cập nhật bình luận
     @PutMapping()
     @ApiMessage("Update comment successfully")
     public ResponseEntity<List<CommentResponse>> update(
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody UpdateCommentRequest req) {
         if (req.getContent() == null && req.getRating() == null) {
             return ResponseEntity
@@ -60,7 +62,10 @@ public class CommentController {
                     .build();
         }
 
-        List<CommentResponse> updatedComments = svc.updateComment(req.getCommentId(), req.getContent(),
+        List<CommentResponse> updatedComments = svc.updateComment(
+                userDetails,
+                req.getCommentId(),
+                req.getContent(),
                 req.getRating());
 
         return ResponseEntity
@@ -70,24 +75,25 @@ public class CommentController {
     // xóa bình luận
     @DeleteMapping("/{id}")
     @ApiMessage("Delete comment successfully")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<List<CommentResponse>> delete(@PathVariable int id) {
-        List<CommentResponse> allOfProduct = svc.deleteComment(id);
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .body(allOfProduct);
+    public ResponseEntity<List<CommentResponse>> delete(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable int id) {
+        List<CommentResponse> allOfProduct = svc.deleteComment(userDetails, id);
+        return ResponseEntity.ok(allOfProduct);
     }
 
     // lấy tất cả bình luận của id người dùng
     @GetMapping("/by-user")
-    public List<CommentResponse> byUser(@AuthenticationPrincipal UserDetails userDetails) {
+    @ApiMessage("Get comments by user successfully")
+    public ResponseEntity<List<CommentResponse>> byUser(@AuthenticationPrincipal UserDetails userDetails) {
         int userId = userDetails.getUsername() != null ? Integer.parseInt(userDetails.getUsername()) : 0;
-        return svc.getByUser(userId);
+        return ResponseEntity.ok(svc.getByUser(userId));
     }
 
-    // lấy tất cả bình luận của sản phầm
+    // lấy tất cả bình luận của sản phẩm
     @GetMapping("/by-product/{productId}")
-    public List<CommentResponse> byProduct(@PathVariable int productId) {
-        return svc.getByProduct(productId);
+    @ApiMessage("Get comments by product successfully")
+    public ResponseEntity<List<CommentResponse>> byProduct(@PathVariable int productId) {
+        return ResponseEntity.ok(svc.getByProduct(productId));
     }
 }

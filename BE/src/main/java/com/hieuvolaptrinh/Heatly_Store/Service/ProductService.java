@@ -98,7 +98,7 @@ public class ProductService {
         return response;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteProduct(int id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm với ID: " + id));
@@ -117,7 +117,7 @@ public class ProductService {
         productRepository.delete(product);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Product updateProduct(int id, ProductRequest productRequest, List<MultipartFile> images) throws Exception {
         if (productRequest == null) {
             throw new IllegalArgumentException("ProductRequest is null");
@@ -256,7 +256,7 @@ public class ProductService {
 
         return productRepository.save(existingProduct);
     }
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Product createProduct(ProductRequest productRequest, List<MultipartFile> images) throws Exception {
         if (productRequest == null) {
             throw new IllegalArgumentException("ProductRequest is null");
@@ -305,6 +305,7 @@ public class ProductService {
         }
         return productRepository.save(product);
     }
+    @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts() {
         List<Product> products = productRepository.findAll();
         List<ProductResponse> responses = new ArrayList<>();
@@ -315,6 +316,7 @@ public class ProductService {
     }
 
     // phân trang và lọc
+    @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getAllProducts(int page, int size, ProductFilterRequest filter) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("productName").ascending());
         Specification<Product> spec = ProductSpecification.filterProducts(filter);
@@ -331,6 +333,7 @@ public class ProductService {
     }
 
     // chỉ phân trang (không có filter)
+    @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getAllProducts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("productName").ascending());
         Page<Product> productPage = productRepository.findAll(pageable);
@@ -345,6 +348,7 @@ public class ProductService {
                 productPage.getTotalPages());
     }
 
+    @Transactional(readOnly = true)
     public ProductResponse getProductById(int id) {
         Product product = productRepository.findById(id).orElse(null);
         if (product == null) {

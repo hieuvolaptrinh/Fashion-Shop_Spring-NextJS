@@ -1,6 +1,7 @@
 package com.hieuvolaptrinh.Heatly_Store.Service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
@@ -24,6 +25,7 @@ public class TypeService {
      * 
      * @return List<TypeResponse> - Danh sách tất cả các loại sản phẩm
      */
+    @Transactional(readOnly = true)
     public List<TypeResponse> getAllTypes() {
         List<Type> types = typeRepository.findAll();
         return types.stream()
@@ -37,6 +39,7 @@ public class TypeService {
      * @param typeId - ID của loại sản phẩm cần tìm
      * @return TypeResponse - Thông tin loại sản phẩm hoặc null nếu không tìm thấy
      */
+    @Transactional(readOnly = true)
     public TypeResponse getTypeById(int typeId) {
         Optional<Type> typeOptional = typeRepository.findById(typeId);
         if (typeOptional.isPresent()) {
@@ -49,19 +52,15 @@ public class TypeService {
      * Tạo loại sản phẩm mới
      * 
      * @param typeRequest - Thông tin loại sản phẩm cần tạo
-     * @return TypeRequest - Thông tin loại sản phẩm đã được tạo
+     * @return TypeResponse - Thông tin loại sản phẩm đã được tạo
      */
-    public TypeRequest createType(TypeRequest typeRequest) {
+    @Transactional(rollbackFor = Exception.class)
+    public TypeResponse createType(TypeRequest typeRequest) {
         Type type = new Type();
         type.setTypeName(typeRequest.getTypeName());
 
         Type savedType = typeRepository.save(type);
-
-        TypeRequest response = new TypeRequest();
-        response.setTypeId(savedType.getTypeId());
-        response.setTypeName(savedType.getTypeName());
-
-        return response;
+        return convertToTypeResponse(savedType);
     }
 
     /**

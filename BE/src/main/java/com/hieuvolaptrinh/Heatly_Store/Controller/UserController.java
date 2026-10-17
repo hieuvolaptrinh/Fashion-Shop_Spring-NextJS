@@ -8,6 +8,9 @@ import com.hieuvolaptrinh.Heatly_Store.Response.Notification;
 import com.hieuvolaptrinh.Heatly_Store.Response.UserResponse;
 import com.hieuvolaptrinh.Heatly_Store.Response.UserResponse.AddressResponse;
 import com.hieuvolaptrinh.Heatly_Store.Service.UserService;
+import com.hieuvolaptrinh.Heatly_Store.Util.ApiMessage;
+
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -34,6 +37,7 @@ public class UserController {
 
     // của user
     @GetMapping("")
+    @ApiMessage("Lấy thông tin người dùng thành công")
     public ResponseEntity<UserResponse> getInfor(@AuthenticationPrincipal UserDetails userDetails) {
 
         UserResponse userResponse = userService.getUserInfor(userDetails);
@@ -44,6 +48,7 @@ public class UserController {
     }
 
     @GetMapping("/admin")
+    @ApiMessage("Lấy danh sách tất cả người dùng thành công")
     public ResponseEntity<List<UserResponse>> getAllUser() {
         List<UserResponse> listUser = this.userService.getAllUser();
         return ResponseEntity.ok(listUser);
@@ -51,26 +56,33 @@ public class UserController {
 
     // update user
     @PutMapping("")
+    @ApiMessage("Cập nhật thông tin người dùng thành công")
     public ResponseEntity<UserResponse> updateUser(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody UserRequest userRequest) {
+            @Valid @RequestBody UserRequest userRequest) {
 
         UserResponse updatedUser = userService.updateUser(userDetails, userRequest);
         if (updatedUser == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(updatedUser);
-    } // add address
+    }
 
+    // add address
     @PostMapping("/address")
-    public ResponseEntity<AddressResponse> postMethodName(@AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody AddressRequest addressRequest) {
+    @ApiMessage("Thêm địa chỉ người dùng thành công")
+    public ResponseEntity<AddressResponse> addAddress(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody AddressRequest addressRequest) {
         AddressResponse addressResponse = userService.addAddress(userDetails, addressRequest);
         return ResponseEntity.ok(addressResponse);
-    } // delete address
+    }
 
+    // delete address
     @DeleteMapping("/address/{addressId}")
-    public ResponseEntity<Notification> deleteAddress(@AuthenticationPrincipal UserDetails userDetails,
+    @ApiMessage("Xóa địa chỉ người dùng thành công")
+    public ResponseEntity<Notification> deleteAddress(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Integer addressId) {
         String result = userService.deleteAddress(userDetails, addressId);
         return ResponseEntity.ok(new Notification(result));
@@ -78,9 +90,11 @@ public class UserController {
 
     // update address
     @PutMapping("/address/{addressId}")
-    public ResponseEntity<AddressResponse> updateAddress(@AuthenticationPrincipal UserDetails userDetails,
+    @ApiMessage("Cập nhật địa chỉ người dùng thành công")
+    public ResponseEntity<AddressResponse> updateAddress(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Integer addressId,
-            @RequestBody AddressRequest addressRequest) {
+            @Valid @RequestBody AddressRequest addressRequest) {
         AddressResponse updatedAddress = userService.updateAddress(userDetails, addressId, addressRequest);
         if (updatedAddress == null) {
             return ResponseEntity.notFound().build();
@@ -90,6 +104,7 @@ public class UserController {
 
     // get all address
     @GetMapping("/address")
+    @ApiMessage("Lấy tất cả địa chỉ của người dùng thành công")
     public ResponseEntity<List<AddressResponse>> getAllAddress(@AuthenticationPrincipal UserDetails userDetails) {
         List<AddressResponse> listAddress = userService.getAllAddress(userDetails);
         if (listAddress == null) {

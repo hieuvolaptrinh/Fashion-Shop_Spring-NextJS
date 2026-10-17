@@ -3,10 +3,10 @@ package com.hieuvolaptrinh.Heatly_Store.Service;
 import com.hieuvolaptrinh.Heatly_Store.Model.*;
 import com.hieuvolaptrinh.Heatly_Store.Repository.*;
 import com.hieuvolaptrinh.Heatly_Store.Response.UpdateCartDetailRequest;
-import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.hieuvolaptrinh.Heatly_Store.Request.AddProductRequest;
@@ -40,6 +40,7 @@ private final ComboRepository comboRepo;
     }
 
     // Thêm sản phẩm vào giỏ hàng
+    @Transactional(rollbackFor = Exception.class)
     public CartResponse addProductToCart(UserDetails userDetails, AddProductRequest req) {
         int userId = Integer.parseInt(userDetails.getUsername());
         User user = userRepo.findByUserId(userId)
@@ -101,6 +102,7 @@ private final ComboRepository comboRepo;
         return buildCartResponse(cart);
     }
     // Cập nhật số lượng sản phẩm trong giỏ hàng
+    @Transactional(rollbackFor = Exception.class)
     public CartResponse updateProductQuantity(UserDetails userDetails, UpdateCartDetailRequest req) {
         int userId = Integer.parseInt(userDetails.getUsername());
         User user = userRepo.findByUserId(userId)
@@ -125,6 +127,7 @@ private final ComboRepository comboRepo;
         return buildCartResponse(cart);
     }
     // Lấy cart theo user details
+    @Transactional(readOnly = true)
     public CartResponse getCartByUserDetails(UserDetails userDetails) {
         int userId = Integer.parseInt(userDetails.getUsername());
         User user = userRepo.findByUserId(userId)
@@ -144,6 +147,7 @@ private final ComboRepository comboRepo;
     }
 
     // Xóa sản phẩm khỏi giỏ hàng
+    @Transactional(rollbackFor = Exception.class)
     public CartResponse removeProductFromCart(UserDetails userDetails, int cartDetailId) {
         int userId = Integer.parseInt(userDetails.getUsername());
         User user = userRepo.findByUserId(userId)

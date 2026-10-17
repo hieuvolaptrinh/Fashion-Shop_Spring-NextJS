@@ -10,7 +10,7 @@ public class Endpoint {
             "/api/v1/oauth2/google",
             "/api/v1/images/**",
             "/api/v1/comments/by-product/**",
-            "/api/v1/bills/**",
+            "/api/v1/chat/**",
     };
 
     public static final String[] ADMIN_ENDPOINTS = {

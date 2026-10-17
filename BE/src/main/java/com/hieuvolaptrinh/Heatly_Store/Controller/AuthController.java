@@ -2,7 +2,6 @@ package com.hieuvolaptrinh.Heatly_Store.Controller;
 
 import com.hieuvolaptrinh.Heatly_Store.Jwt.JwtUtil;
 import com.hieuvolaptrinh.Heatly_Store.Model.User;
-import com.hieuvolaptrinh.Heatly_Store.Repository.UserRepository;
 import com.hieuvolaptrinh.Heatly_Store.Request.AuthRequest;
 import com.hieuvolaptrinh.Heatly_Store.Request.RegisterRequest;
 import com.hieuvolaptrinh.Heatly_Store.Response.AuthResponse;
@@ -13,7 +12,6 @@ import com.hieuvolaptrinh.Heatly_Store.Util.ApiMessage;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,10 +26,7 @@ public class AuthController {
     private final JwtUtil jwtService;
     private final UserService userService;
 
-    public AuthController(UserRepository userRepository,
-            AuthenticationManager authenticationManager,
-            JwtUtil jwtService,
-            UserService userService) {
+    public AuthController(JwtUtil jwtService, UserService userService) {
         this.jwtService = jwtService;
         this.userService = userService;
     }
@@ -55,12 +50,7 @@ public class AuthController {
         String jwt = jwtService.generateToken(user.getUserId(), roles);
 
         AuthResponse authResponse = new AuthResponse(user.getUserId(), jwt, user.getFullName(), roles);
-        System.out.println("UserId: " + user.getUserId());
-        System.out.println("JWT: " + jwt);
-        System.out.println("Fullname: " + user.getFullName());
-        System.out.println("Roles: " + roles);
         return ResponseEntity.ok(authResponse);
-
     }
 
     // {
