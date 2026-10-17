@@ -74,14 +74,15 @@ public class OrderService {
 
         }
 
-        // dưới này e code là ko cần trigger
-        double totalPrice = selectedCartDetails.stream()
+        double subtotal = selectedCartDetails.stream()
                 .mapToDouble(cd -> cd.getPrice() * cd.getQuantity())
-                .sum() + 30000; // thêm phí ship cố định 30k
+                .sum();
+
+        double shippingFee = (subtotal > 500000 || subtotal == 0) ? 0 : 30000;
+        double totalPrice = subtotal + shippingFee;
 
         Order order = new Order();
         order.setUser(user);
-        // order.setShippingAddress(shippingAddress);
         order.setShippingAddress(orderRequest.getShippingAddress());
 
         order.setStatus(OrderStatusEnum.PENDING);
@@ -147,19 +148,44 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    public void cancelOrder(int orderId) {
+    public void cancelOrder(UserDetails userDetails, int orderId) {
         Order order = orderRepo.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found: " + orderId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng: " + orderId));
 
-        if (order.getStatus() == OrderStatusEnum.DELIVERED || order.getStatus() == OrderStatusEnum.CANCELLED) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Cannot cancel order with status: " + order.getStatus());
+        // Kiểm tra quyền sở hữu đơn hàng (Ngăn chặn lỗ hổng BOLA/IDOR)
+        if (userDetails != null) {
+            int currentUserId = Integer.parseInt(userDetails.getUsername());
+            boolean isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+            if (!isAdmin && order.getUser().getUserId() != currentUserId) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền thao tác trên đơn hàng này!");
+            }
         }
 
-        // tăng số lượng sản phẩm trong kho
+        doCancelOrder(order);
+    }
+
+    public void cancelOrder(int orderId) {
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng: " + orderId));
+        doCancelOrder(order);
+    }
+
+    private void doCancelOrder(Order order) {
+        if (order.getStatus() == OrderStatusEnum.DELIVERED || order.getStatus() == OrderStatusEnum.CANCELLED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Không thể hủy đơn hàng có trạng thái: " + (order.getStatus() != null ? order.getStatus().getLabel() : "DELIVERED/CANCELLED"));
+        }
+
         for (OrderDetail orderDetail : order.getOrderDetails()) {
             Product product = orderDetail.getProduct();
-            product.setQuantity(product.getQuantity() + orderDetail.getQuantity());
+            int restoredQuantity = orderDetail.getQuantity();
+
+            if (orderDetail.getCombo() != null) {
+                restoredQuantity = orderDetail.getCombo().getQuantityInCombo() * orderDetail.getQuantity();
+            }
+
+            product.setQuantity(product.getQuantity() + restoredQuantity);
             productRepo.save(product);
         }
 

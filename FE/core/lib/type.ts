@@ -173,3 +173,15 @@ export interface ApiResponse<T = any> {
   data: T;
 }
 
+/**
+ * Cấu trúc phân trang chuẩn từ Spring Boot PageResponse
+ */
+export interface PageResponse<T> {
+  content: T[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last?: boolean;
+}
+

@@ -11,6 +11,8 @@ import lombok.Setter;
 @Setter
 @Entity
 public class OrderDetail {
+    public OrderDetail() {}
+
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private int orderDetailId;

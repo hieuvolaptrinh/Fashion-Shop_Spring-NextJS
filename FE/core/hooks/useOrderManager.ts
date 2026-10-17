@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getAllOrders, type OrderFilterRequest } from "@/core/apis/order";
+import { getAllOrders, updateOrderStatus, type OrderFilterRequest } from "@/core/apis/order";
 import { exportMultipleBills, exportAllBills } from "@/core/apis/bill";
 import { printPdfBlob } from "@/core/lib/printUtils";
 import type { Order } from "@/core/lib/type";
@@ -17,15 +17,19 @@ export const useOrderManager = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [isPrintingBatch, setIsPrintingBatch] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState<number[]>([]);
 
   // Pagination states
   const [paginationModel, setPaginationModel] = useState<PaginationModel>(DEFAULT_PAGINATION);
   const [totalRows, setTotalRows] = useState(0);
 
-  // Filter states
+  // Filter states (draftFilters for form UI, appliedFilters for API trigger)
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState<OrderFilterRequest>(INITIAL_ORDER_FILTERS);
+  const [draftFilters, setDraftFilters] =
+    useState<OrderFilterRequest>(INITIAL_ORDER_FILTERS);
+  const [appliedFilters, setAppliedFilters] =
+    useState<OrderFilterRequest>(INITIAL_ORDER_FILTERS);
 
   // Dialog states
   const [orderDetailsOpen, setOrderDetailsOpen] = useState(false);
@@ -38,7 +42,7 @@ export const useOrderManager = () => {
       const filterParams: OrderFilterRequest = {
         page: paginationModel.page,
         size: paginationModel.pageSize,
-        ...filters,
+        ...appliedFilters,
       };
 
       const response = await getAllOrders(filterParams);
@@ -61,7 +65,7 @@ export const useOrderManager = () => {
     } finally {
       setLoading(false);
     }
-  }, [paginationModel, filters]);
+  }, [paginationModel, appliedFilters]);
 
   // Initial load & when dependencies change
   useEffect(() => {
@@ -85,14 +89,12 @@ export const useOrderManager = () => {
     }
   };
 
-  // Pagination handler
   const handlePaginationModelChange = (newModel: PaginationModel) => {
     setPaginationModel(newModel);
   };
 
-  // Filter handlers
   const handleStatusToggle = (statusValue: string) => {
-    setFilters((prev) => {
+    setDraftFilters((prev) => {
       const current = prev.status || [];
       const exists = current.includes(statusValue);
       const nextStatus = exists
@@ -103,7 +105,7 @@ export const useOrderManager = () => {
   };
 
   const handleBillFilterToggle = (targetValue: boolean) => {
-    setFilters((prev) => ({
+    setDraftFilters((prev) => ({
       ...prev,
       isBill: prev.isBill === targetValue ? undefined : targetValue,
     }));
@@ -113,23 +115,23 @@ export const useOrderManager = () => {
     field: "minTotalPrice" | "maxTotalPrice",
     value: number | undefined
   ) => {
-    setFilters((prev) => ({
+    setDraftFilters((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
   const handleClearFilters = () => {
-    setFilters(INITIAL_ORDER_FILTERS);
+    setDraftFilters(INITIAL_ORDER_FILTERS);
+    setAppliedFilters(INITIAL_ORDER_FILTERS);
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
   };
 
   const handleApplyFilters = () => {
+    setAppliedFilters(draftFilters);
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
-    fetchOrders();
   };
 
-  // Print selected orders
   const handlePrintSelected = async () => {
     if (selectedOrders.length === 0) {
       toast.error("Vui lòng chọn ít nhất 1 đơn hàng để in hóa đơn!");
@@ -152,7 +154,6 @@ export const useOrderManager = () => {
     }
   };
 
-  // Print all unprinted orders
   const handlePrintAllUnprinted = async () => {
     try {
       setIsPrintingBatch(true);
@@ -169,7 +170,6 @@ export const useOrderManager = () => {
     }
   };
 
-  // Order Details Modal Handlers
   const handleOrderDetailsOpen = (order: Order) => {
     setSelectedOrder(order);
     setOrderDetailsOpen(true);
@@ -180,16 +180,35 @@ export const useOrderManager = () => {
     setSelectedOrder(null);
   };
 
+  const handleUpdateStatus = async (orderId: number, newStatus: string) => {
+    try {
+      setIsUpdatingStatus(true);
+      await updateOrderStatus(orderId, newStatus);
+      toast.success(`Cập nhật trạng thái đơn hàng #${orderId} thành công!`);
+      setSelectedOrder((prev) =>
+        prev && prev.orderId === orderId ? { ...prev, status: newStatus } : prev
+      );
+      await fetchOrders();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái đơn hàng:", error);
+      toast.error("Không thể cập nhật trạng thái đơn hàng. Vui lòng thử lại!");
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
   return {
     orders,
     loading,
     isPrintingBatch,
+    isUpdatingStatus,
     selectedOrders,
     paginationModel,
     totalRows,
     showFilters,
     setShowFilters,
-    filters,
+    filters: draftFilters,
+    appliedFilters,
     orderDetailsOpen,
     selectedOrder,
     statusOptions: ORDER_STATUS_OPTIONS,
@@ -206,6 +225,7 @@ export const useOrderManager = () => {
     handlePrintAllUnprinted,
     handleOrderDetailsOpen,
     handleOrderDetailsClose,
+    handleUpdateStatus,
   };
 };
 

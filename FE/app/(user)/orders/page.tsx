@@ -1,5 +1,5 @@
-import Order from "@/core/components/feature/order/order";
 import { Metadata } from "next";
+import OrderPage from "@/core/components/feature/order/OrderPage";
 
 export const metadata: Metadata = {
   title: "Đơn Hàng Của Tôi",
@@ -24,11 +24,6 @@ export const metadata: Metadata = {
   },
 };
 
-const OrderPage = () => {
-  return (
-    <>
-      <Order />
-    </>
-  );
-};
-export default OrderPage;
+export default function UserOrdersPage() {
+  return <OrderPage />;
+}

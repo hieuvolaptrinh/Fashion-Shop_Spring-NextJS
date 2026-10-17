@@ -24,6 +24,9 @@ export const API_ENDPOINTS = {
   USERS: {
     BASE: "/api/v1/users",
     BY_ID: (id: number | string) => `/api/v1/users/${id}`,
+    ADDRESS: "/api/v1/users/address",
+    ADDRESS_BY_ID: (addressId: number | string) =>
+      `/api/v1/users/address/${addressId}`,
   },
 
   // Sản phẩm & Danh mục (Products & Types)
@@ -45,6 +48,9 @@ export const API_ENDPOINTS = {
     BASE: "/api/v1/orders",
     ADMIN_FILTER: "/api/v1/orders/admin/filter",
     BY_ID: (id: number | string) => `/api/v1/orders/${id}`,
+    CANCEL: (id: number | string) => `/api/v1/orders/${id}`,
+    STATUS: (orderId: number | string, status: string) =>
+      `/api/v1/orders/admin?orderId=${orderId}&status=${status}`,
   },
 
   // Hóa đơn & Xuất phiếu (Bills & Invoices)

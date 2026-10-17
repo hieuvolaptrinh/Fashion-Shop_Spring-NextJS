@@ -29,9 +29,7 @@ interface OrdersDataGridProps {
   selectedOrders: number[];
   paginationModel: PaginationModel;
   totalRows: number;
-  sortModel?: any;
   onPaginationModelChange: (newModel: PaginationModel) => void;
-  onSortModelChange?: (newModel: any) => void;
   onOrderSelection: (orderId: number, checked: boolean) => void;
   onSelectAll: (checked: boolean) => void;
   onOrderDetailsOpen: (order: Order) => void;
@@ -51,8 +49,6 @@ const OrdersDataGrid = ({
   const isAllSelected =
     orders.length > 0 && selectedOrders.length === orders.length;
 
-
-
   const columns: TableColumn<Order>[] = useMemo(
     () => [
       {
@@ -63,7 +59,7 @@ const OrdersDataGrid = ({
             checked={isAllSelected}
             onChange={(e) => onSelectAll(e.target.checked)}
             disabled={orders.length === 0}
-            className="h-4 w-4 rounded-sm border-gray-300 text-primary focus:ring-primary cursor-pointer accent-primary"
+            className="h-4 w-4 rounded-sm border-input text-primary focus:ring-primary cursor-pointer accent-primary"
             aria-label="Chọn tất cả đơn hàng"
           />
         ),
@@ -74,7 +70,7 @@ const OrdersDataGrid = ({
             type="checkbox"
             checked={selectedOrders.includes(order.orderId)}
             onChange={(e) => onOrderSelection(order.orderId, e.target.checked)}
-            className="h-4 w-4 rounded-sm border-gray-300 text-primary focus:ring-primary cursor-pointer accent-primary"
+            className="h-4 w-4 rounded-sm border-input text-primary focus:ring-primary cursor-pointer accent-primary"
             aria-label={`Chọn đơn hàng #${order.orderId}`}
           />
         ),
@@ -127,7 +123,7 @@ const OrdersDataGrid = ({
         header: "Tổng tiền",
         headClassName: "w-[130px]",
         render: (order: Order) => (
-          <span className="text-xs font-bold text-foreground">
+          <span className="text-xs font-bold text-primary">
             {formatCurrency(order.totalPrice)}
           </span>
         ),
@@ -142,8 +138,8 @@ const OrdersDataGrid = ({
             variant="outline"
             className={
               order.bill
-                ? "bg-emerald-50 text-emerald-700 border-emerald-200 gap-1 text-[11px]"
-                : "bg-amber-50 text-amber-700 border-amber-200 gap-1 text-[11px]"
+                ? "bg-success/15 text-success border-success/30 gap-1 text-[11px] font-medium"
+                : "bg-warning/15 text-warning border-warning/30 gap-1 text-[11px] font-medium"
             }
           >
             {order.bill ? (
@@ -199,7 +195,9 @@ const OrdersDataGrid = ({
     <AdminDataTable<Order>
       data={orders}
       columns={columns}
-      keyExtractor={(item) => item.orderId}
+      keyExtractor={(item, index) =>
+        item.orderId ? `order-${item.orderId}-${index}` : `order-${index}`
+      }
       loading={loading}
       totalRows={totalRows}
       paginationModel={paginationModel}

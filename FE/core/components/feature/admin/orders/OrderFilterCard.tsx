@@ -99,7 +99,7 @@ export function OrderFilterCard({
                 onClick={() => onBillFilterToggle(false)}
                 className={`flex-1 py-1.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
                   filters.isBill === false
-                    ? "bg-amber-500 text-white border-amber-500"
+                    ? "bg-warning text-warning-foreground border-warning shadow-xs"
                     : "bg-background text-muted-foreground border-border hover:bg-muted/50"
                 }`}
               >
@@ -110,7 +110,7 @@ export function OrderFilterCard({
                 onClick={() => onBillFilterToggle(true)}
                 className={`flex-1 py-1.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
                   filters.isBill === true
-                    ? "bg-emerald-500 text-white border-emerald-500"
+                    ? "bg-success text-success-foreground border-success shadow-xs"
                     : "bg-background text-muted-foreground border-border hover:bg-muted/50"
                 }`}
               >

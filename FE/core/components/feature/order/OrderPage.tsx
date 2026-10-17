@@ -10,23 +10,27 @@ import UserOrderCard from "./UserOrderCard";
 import UserOrderDetailDialog from "./UserOrderDetailDialog";
 import EmptyOrdersView from "./EmptyOrdersView";
 
-export const Order: React.FC = () => {
+export const OrderPage: React.FC = () => {
   const {
     orders,
     filteredOrders,
     paginatedOrders,
     loading,
+    isAuthenticated,
+    isCancelling,
     activeTab,
     statusCounts,
     selectedOrder,
     isDetailOpen,
     currentPage,
     totalPages,
+    pageSize,
     paginationSummary,
     setActiveTab,
     handlePageChange,
     handleOpenDetail,
     handleCloseDetail,
+    handleCancelOrder,
     fetchOrders,
   } = useUserOrders();
 
@@ -71,7 +75,10 @@ export const Order: React.FC = () => {
             <p className="text-sm text-muted-foreground">Đang tải lịch sử đơn hàng...</p>
           </div>
         ) : filteredOrders.length === 0 ? (
-          <EmptyOrdersView isFiltered={orders.length > 0} />
+          <EmptyOrdersView
+            isFiltered={orders.length > 0}
+            isUnauthenticated={!isAuthenticated}
+          />
         ) : (
           <div className="space-y-6">
             <div className="space-y-4">
@@ -89,7 +96,7 @@ export const Order: React.FC = () => {
               totalPages={totalPages}
               onPageChange={handlePageChange}
               totalItems={paginationSummary.total}
-              itemsPerPage={5}
+              itemsPerPage={pageSize}
               itemName="đơn hàng"
               disabled={loading}
             />
@@ -101,10 +108,12 @@ export const Order: React.FC = () => {
           open={isDetailOpen}
           onClose={handleCloseDetail}
           order={selectedOrder}
+          onCancelOrder={handleCancelOrder}
+          isCancelling={isCancelling}
         />
       </div>
     </div>
   );
 };
 
-export default Order;
+export default OrderPage;

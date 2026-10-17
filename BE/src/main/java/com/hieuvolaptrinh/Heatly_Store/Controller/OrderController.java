@@ -43,13 +43,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getAllOrdersByUser(userDetails));
     }
 
-    // hủy đơn hàng-> oke
-    @PostMapping("/{orderId}")
+    // Hủy đơn hàng (Kiểm tra quyền sở hữu hoặc quyền Admin)
+    @PostMapping(value = {"/{orderId}", "/{orderId}/cancel"})
     @ApiMessage("Cancel order successfully")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelOrder(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable int orderId) {
-        orderService.cancelOrder(orderId);
+        orderService.cancelOrder(userDetails, orderId);
     }
 
     // cập nhật trạng thái đơn hàng

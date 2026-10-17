@@ -22,6 +22,8 @@ import java.util.List;
 @Table(name = "orders")
 
 public class Order {
+    public Order() {}
+
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private int orderId;

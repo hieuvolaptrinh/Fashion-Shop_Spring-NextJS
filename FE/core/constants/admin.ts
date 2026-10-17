@@ -20,7 +20,6 @@ export const PAGE_SIZE_OPTIONS: number[] = [10, 20, 50];
  */
 export const ORDER_STATUS_OPTIONS = [
   { value: "PENDING", label: "Chờ xử lý" },
-  { value: "CONFIRMED", label: "Đã xác nhận" },
   { value: "SHIPPING", label: "Đang giao" },
   { value: "DELIVERED", label: "Đã giao" },
   { value: "CANCELLED", label: "Đã hủy" },

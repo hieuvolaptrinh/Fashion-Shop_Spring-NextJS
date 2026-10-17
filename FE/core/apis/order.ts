@@ -1,6 +1,6 @@
 import { http } from "@/core/lib/apiClient";
 import { API_ENDPOINTS } from "@/core/constants";
-import type { OrderResponse, ApiResponse } from "@/core/lib/type";
+import type { OrderResponse, ApiResponse, PageResponse } from "@/core/lib/type";
 
 export interface OrderItemPayload {
   shippingAddress: string;
@@ -22,51 +22,54 @@ export interface OrderFilterRequest {
 /**
  * Tạo mới đơn hàng
  */
-export const postOrder = async (data: OrderItemPayload, accessToken?: string) => {
-  const config = accessToken
-    ? { headers: { Authorization: `Bearer ${accessToken}` } }
-    : undefined;
-
-  return http.post<ApiResponse<OrderResponse>>(API_ENDPOINTS.ORDERS.BASE, data, config);
+export const postOrder = async (data: OrderItemPayload) => {
+  return http.post<ApiResponse<OrderResponse>>(API_ENDPOINTS.ORDERS.BASE, data);
 };
 
 /**
  * Lấy danh sách đơn hàng cho Admin kèm bộ lọc tìm kiếm & phân trang
  */
 export const getAllOrders = async (
-  filters: OrderFilterRequest = {},
-  accessToken?: string
-) => {
-  try {
-    const params = new URLSearchParams();
+  filters: OrderFilterRequest = {}
+): Promise<PageResponse<OrderResponse>> => {
+  const params = new URLSearchParams();
 
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        if (Array.isArray(value)) {
-          value.forEach((v) => params.append(key, v.toString()));
-        } else {
-          params.append(key, value.toString());
-        }
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      if (Array.isArray(value)) {
+        value.forEach((v) => params.append(key, v.toString()));
+      } else {
+        params.append(key, value.toString());
       }
-    });
-
-    const config: any = { params };
-    if (accessToken) {
-      config.headers = { Authorization: `Bearer ${accessToken}` };
     }
+  });
 
-    const res = await http.get<any>(API_ENDPOINTS.ORDERS.ADMIN_FILTER, config);
-    return res?.data ?? res;
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    throw error;
-  }
+  return http.get<PageResponse<OrderResponse>>(
+    API_ENDPOINTS.ORDERS.ADMIN_FILTER,
+    { params }
+  );
 };
 
 /**
  * Lấy danh sách đơn hàng của người dùng hiện tại
  */
-export const getOrders = async () => {
-  const res = await http.get<any>(API_ENDPOINTS.ORDERS.BASE);
-  return res;
+export const getOrders = async (): Promise<OrderResponse[]> => {
+  const res = await http.get<ApiResponse<OrderResponse[]> | OrderResponse[]>(
+    API_ENDPOINTS.ORDERS.BASE
+  );
+  return Array.isArray(res) ? res : res?.data ?? [];
+};
+
+/**
+ * Hủy đơn hàng (Kiểm tra quyền phía backend: khách hàng chủ đơn hoặc Quản trị viên)
+ */
+export const cancelOrder = async (orderId: number) => {
+  return http.post(API_ENDPOINTS.ORDERS.CANCEL(orderId), {});
+};
+
+/**
+ * Cập nhật trạng thái đơn hàng (Dành cho Quản trị viên)
+ */
+export const updateOrderStatus = async (orderId: number, status: string) => {
+  return http.put(API_ENDPOINTS.ORDERS.STATUS(orderId, status));
 };
