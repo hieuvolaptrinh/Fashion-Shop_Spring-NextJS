@@ -38,9 +38,12 @@ export function DashboardCharts({
   revenueData,
   orderStatusData,
 }: DashboardChartsProps) {
+  const currentYear = new Date().getFullYear();
+  const isZeroRevenue =
+    revenueData.length === 0 || revenueData.every((item) => item.revenue === 0);
+
   return (
     <div className="grid gap-6 lg:grid-cols-7">
-      {/* Biểu đồ Doanh thu (Area Chart) */}
       <Card className="rounded-2xl lg:col-span-4 border shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between pb-4">
           <div>
@@ -48,12 +51,14 @@ export function DashboardCharts({
               Biến Động Doanh Thu
             </CardTitle>
             <CardDescription className="text-xs">
-              Tổng giá trị giao dịch 6 tháng gần nhất (VNĐ)
+              {isZeroRevenue
+                ? "Chưa phát sinh giao dịch trong 6 tháng qua (VNĐ)"
+                : "Tổng giá trị giao dịch 6 tháng gần nhất (VNĐ)"}
             </CardDescription>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-lg">
             <Calendar className="h-3.5 w-3.5" />
-            <span>Năm 2026</span>
+            <span>Năm {currentYear}</span>
           </div>
         </CardHeader>
         <CardContent className="pt-2">
@@ -126,7 +131,6 @@ export function DashboardCharts({
         </CardContent>
       </Card>
 
-      {/* Biểu đồ Phân bổ Đơn hàng (Bar Chart) */}
       <Card className="rounded-2xl lg:col-span-3 border shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between pb-4">
           <div>

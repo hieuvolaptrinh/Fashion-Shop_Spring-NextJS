@@ -79,7 +79,7 @@ export function DashboardRecentOrders({
               <TableBody>
                 {orders.map((order) => {
                   const price = order.totalPrice || order.totalAmount || 0;
-                  const date = order.createdDate || order.createdAt;
+                  const date = order.createAt || order.createdDate || order.createdAt;
                   const name =
                     order.receiverName || order.customerName || "Khách hàng";
 
@@ -103,7 +103,7 @@ export function DashboardRecentOrders({
                       <TableCell className="text-xs text-muted-foreground">
                         {formatDate(date)}
                       </TableCell>
-                      <TableCell className="font-semibold text-foreground text-sm">
+                      <TableCell className="font-semibold text-rose-600 text-sm">
                         {formatCurrency(Number(price))}
                       </TableCell>
                       <TableCell>

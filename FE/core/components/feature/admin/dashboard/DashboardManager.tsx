@@ -21,28 +21,26 @@ export function DashboardManager() {
 
   return (
     <div className="space-y-6 md:space-y-8 animate-in fade-in-50 duration-500">
-      {/* 1. Header & Actions */}
       <DashboardHeader loading={loading} onRefresh={refresh} />
 
-      {/* 2. KPI Stats Cards */}
       <DashboardStatsCards
         loading={loading}
         totalRevenue={totalRevenue}
         totalOrders={totalOrders}
         totalProducts={totalProducts}
+        totalCustomers={data.totalCustomers}
+        revenueGrowth={data.revenueGrowth}
+        ordersToday={data.ordersToday}
       />
 
-      {/* 3. Analytics & Charts */}
       <DashboardCharts
         mounted={mounted}
         revenueData={revenueData}
         orderStatusData={orderStatusData}
       />
 
-      {/* 4. Recent Orders Table */}
       <DashboardRecentOrders loading={loading} orders={recentOrders} />
 
-      {/* 5. Quick Actions Footer */}
       <DashboardQuickActions />
     </div>
   );

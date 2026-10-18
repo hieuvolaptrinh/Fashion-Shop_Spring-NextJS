@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import {
   getDashboardSummary,
-  DashboardSummary,
+  type DashboardSummary,
 } from "@/core/apis/dashboard";
 
 interface DashboardState {
@@ -14,9 +14,12 @@ interface DashboardState {
 }
 
 const INITIAL_SUMMARY: DashboardSummary = {
+  totalRevenue: 0,
   totalOrders: 0,
   totalProducts: 0,
-  totalRevenue: 0,
+  totalCustomers: 0,
+  revenueGrowth: null,
+  ordersToday: 0,
   recentOrders: [],
   orderStatusData: [],
   revenueData: [],
@@ -32,11 +35,11 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   lastFetched: null,
 
   fetchDashboardData: async (force = false) => {
-    const { lastFetched, data } = get();
+    const { lastFetched } = get();
     const now = Date.now();
 
     // Nếu đã có dữ liệu và chưa hết hạn cache (và không phải ép làm mới force), dùng lại cache
-    if (!force && lastFetched && now - lastFetched < CACHE_DURATION_MS && data.totalOrders > 0) {
+    if (!force && lastFetched && now - lastFetched < CACHE_DURATION_MS) {
       set({ loading: false });
       return;
     }
@@ -49,10 +52,14 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         lastFetched: Date.now(),
         loading: false,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("useDashboardStore: Lỗi tải dữ liệu Dashboard:", err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Không thể tải dữ liệu bảng điều khiển.";
       set({
-        error: err?.message || "Không thể tải dữ liệu bảng điều khiển.",
+        error: message,
         loading: false,
       });
     }
