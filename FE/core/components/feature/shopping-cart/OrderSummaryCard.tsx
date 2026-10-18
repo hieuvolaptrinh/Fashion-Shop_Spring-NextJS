@@ -80,7 +80,7 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
             <p className="text-sm font-semibold text-foreground">Tổng thanh toán</p>
             <p className="text-xs text-muted-foreground">(Đã bao gồm VAT)</p>
           </div>
-          <p className="text-xl font-bold text-primary">
+          <p className="text-xl font-bold text-rose-600">
             {formatCurrency(total)}
           </p>
         </div>

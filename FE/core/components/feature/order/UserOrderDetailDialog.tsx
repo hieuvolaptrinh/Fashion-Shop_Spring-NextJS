@@ -113,10 +113,8 @@ export const UserOrderDetailDialog: React.FC<UserOrderDetailDialogProps> = ({
         </DialogHeader>
 
         <div className="max-h-[calc(90vh-120px)] overflow-y-auto p-6 space-y-5">
-          {/* Status Message */}
           {renderStatusBanner()}
 
-          {/* Shipping & Contact Info */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div className="rounded-xl border border-border/60 bg-muted/20 p-3.5 space-y-1">
               <span className="flex items-center gap-1.5 text-muted-foreground font-medium">
@@ -146,7 +144,6 @@ export const UserOrderDetailDialog: React.FC<UserOrderDetailDialogProps> = ({
             </div>
           </div>
 
-          {/* Products List */}
           <div className="space-y-2.5">
             <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
               Danh sách sản phẩm ({(order.items || []).length})
@@ -188,7 +185,6 @@ export const UserOrderDetailDialog: React.FC<UserOrderDetailDialogProps> = ({
             </div>
           </div>
 
-          {/* Total Breakdown */}
           <div className="rounded-xl border border-border/60 bg-muted/30 p-4 space-y-2 text-xs">
             <div className="flex justify-between items-center text-muted-foreground">
               <span>Tạm tính ({items.length} món):</span>
@@ -202,7 +198,7 @@ export const UserOrderDetailDialog: React.FC<UserOrderDetailDialogProps> = ({
             </div>
             <div className="border-t border-border/40 pt-2 flex justify-between items-center text-sm">
               <span className="font-semibold text-foreground">Tổng thanh toán:</span>
-              <span className="text-base font-bold text-primary">{formatCurrency(order.totalPrice)}</span>
+              <span className="text-base font-bold text-rose-600">{formatCurrency(order.totalPrice)}</span>
             </div>
           </div>
 
@@ -232,7 +228,6 @@ export const UserOrderDetailDialog: React.FC<UserOrderDetailDialogProps> = ({
         </div>
       </DialogContent>
 
-      {/* Confirm Cancel Dialog dùng chung */}
       <ConfirmDialog
         open={confirmCancelOpen}
         variant="destructive"

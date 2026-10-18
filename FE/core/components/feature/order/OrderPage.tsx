@@ -37,7 +37,6 @@ export const OrderPage: React.FC = () => {
   return (
     <div className="min-h-screen py-8 bg-background">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-border/60">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -61,14 +60,12 @@ export const OrderPage: React.FC = () => {
           </Button>
         </div>
 
-        {/* Status Filter Tabs */}
         <UserOrderFilterTabs
           activeTab={activeTab}
           onSelectTab={setActiveTab}
           counts={statusCounts}
         />
 
-        {/* Content Section */}
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -103,7 +100,6 @@ export const OrderPage: React.FC = () => {
           </div>
         )}
 
-        {/* Order Detail Modal */}
         <UserOrderDetailDialog
           open={isDetailOpen}
           onClose={handleCloseDetail}

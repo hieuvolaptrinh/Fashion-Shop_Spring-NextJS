@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "./dialog";
@@ -35,7 +34,7 @@ export default function RequireLoginDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[90vw] max-w-[420px] rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-lg">
+      <DialogContent className="w-[92vw] max-w-[420px] rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xl overflow-hidden">
         <DialogHeader>
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <ShoppingCart className="h-7 w-7" />
@@ -59,25 +58,26 @@ export default function RequireLoginDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex flex-col gap-2 pt-2 sm:gap-2">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 pt-2 w-full">
           <Button
-            asChild
-            className="w-full h-11 rounded-xl text-sm font-semibold shadow-xs gap-2"
-          >
-            <Link href={loginHref} onClick={onClose}>
-              <LogIn className="h-4 w-4" />
-              <span>Đăng nhập ngay</span>
-            </Link>
-          </Button>
-
-          <Button
+            type="button"
             variant="outline"
             onClick={onClose}
-            className="w-full h-10 rounded-xl text-sm font-medium border-border/80 hover:bg-muted"
+            className="w-full h-10 sm:h-11 rounded-xl text-xs sm:text-sm font-medium border-border/80 hover:bg-muted"
           >
             Để sau
           </Button>
-        </DialogFooter>
+
+          <Button
+            asChild
+            className="w-full h-10 sm:h-11 rounded-xl text-xs sm:text-sm font-semibold shadow-xs gap-1.5 sm:gap-2"
+          >
+            <Link href={loginHref} onClick={onClose}>
+              <LogIn className="h-4 w-4 shrink-0" />
+              <span>Đăng nhập ngay</span>
+            </Link>
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

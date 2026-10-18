@@ -15,7 +15,6 @@ export const sendChatMessage = async (
 ): Promise<ChatResponseData> => {
   try {
     const res = await http.post<any>(API_ENDPOINTS.CHAT.MESSAGE, payload);
-    // Spring Boot trả về dạng RestResponse: { status: 200, message: "...", data: { reply, products } }
     if (res?.data) {
       return res.data as ChatResponseData;
     }

@@ -49,6 +49,7 @@ export const ProductDetails = ({
     removeCombo,
     updateCombo,
     handleImageUpload,
+    handleAddImageUrl,
     handleRemoveImage,
     toggleType,
     handleSave,
@@ -74,7 +75,6 @@ export const ProductDetails = ({
         </DialogHeader>
 
         <div className="space-y-5 py-3">
-          {/* Tên sản phẩm */}
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold">
               Tên sản phẩm <span className="text-destructive">*</span>
@@ -97,7 +97,6 @@ export const ProductDetails = ({
             )}
           </div>
 
-          {/* Giá gốc & Giá bán */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold">
@@ -154,7 +153,6 @@ export const ProductDetails = ({
             </div>
           </div>
 
-          {/* Tồn kho & Hạn sử dụng */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold">
@@ -212,7 +210,6 @@ export const ProductDetails = ({
             </div>
           </div>
 
-          {/* Danh mục sản phẩm (Tags) */}
           <div className="space-y-2">
             <Label className="text-xs font-semibold">
               Danh mục loại sản phẩm (Chọn các loại phù hợp)
@@ -251,7 +248,6 @@ export const ProductDetails = ({
             </div>
           </div>
 
-          {/* Combo Section */}
           <ComboSection
             combos={combos}
             onAddCombo={addCombo}
@@ -262,7 +258,6 @@ export const ProductDetails = ({
             isViewing={isViewing}
           />
 
-          {/* Mô tả sản phẩm */}
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold">
               Mô tả sản phẩm <span className="text-destructive">*</span>
@@ -286,7 +281,6 @@ export const ProductDetails = ({
             )}
           </div>
 
-          {/* Hướng dẫn sử dụng & Thành phần */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold">
@@ -328,7 +322,7 @@ export const ProductDetails = ({
                     ingredients: e.target.value,
                   }))
                 }
-                placeholder="100% Cotton, lụa tự nhiên, vải đũi..."
+                placeholder="100% Cotton, lụa tự nhiên..."
                 className={`rounded-xl text-xs ${
                   errors.ingredients ? "border-destructive focus-visible:ring-destructive/20" : ""
                 }`}
@@ -341,12 +335,12 @@ export const ProductDetails = ({
             </div>
           </div>
 
-          {/* Quản lý hình ảnh (Tách thành sub-component) */}
           <ProductImagesSection
             images={formData.listImages}
             isViewing={isViewing}
             onUpload={handleImageUpload}
             onRemove={handleRemoveImage}
+            onAddUrl={handleAddImageUrl}
           />
         </div>
 

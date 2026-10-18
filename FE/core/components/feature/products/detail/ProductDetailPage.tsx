@@ -45,12 +45,9 @@ export default function ProductDetailPage({ productId }: ProductDetailPageProps)
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-8 pb-28 md:pb-16">
-      {/* 1. Thanh điều hướng Breadcrumb phân cấp */}
       <ProductBreadcrumb product={p.product} />
 
-      {/* 2. Khối chính: Gallery (trái) & Sticky Buy Box (phải) */}
       <div className="grid gap-8 lg:grid-cols-12 lg:gap-10 items-start">
-        {/* Cột trái: Gallery trình diễn ảnh & Lightbox */}
         <div className="lg:col-span-7">
           <ProductGallery
             product={p.product}
@@ -59,7 +56,6 @@ export default function ProductDetailPage({ productId }: ProductDetailPageProps)
           />
         </div>
 
-        {/* Cột phải: Sticky Buy Box trên Desktop */}
         <div className="space-y-6 lg:sticky lg:top-24 lg:col-span-5 rounded-3xl border border-border/70 bg-card/60 p-5 sm:p-7 backdrop-blur-xs shadow-xs">
           <ProductPricingOptions
             product={p.product}
@@ -82,7 +78,6 @@ export default function ProductDetailPage({ productId }: ProductDetailPageProps)
         </div>
       </div>
 
-      {/* 3. Khối Tabs: Thông số kỹ thuật & Đánh giá khách hàng thực tế */}
       <ProductTabs
         product={p.product}
         comments={p.comments}
@@ -90,13 +85,11 @@ export default function ProductDetailPage({ productId }: ProductDetailPageProps)
         onRefreshComments={p.refreshComments}
       />
 
-      {/* 4. Khối Sản phẩm tương tự & Cùng loại */}
       <ProductRelated
         currentProductId={p.product.productId}
         typeId={primaryTypeId}
       />
 
-      {/* 5. Thanh đặt hàng ghim đáy trên thiết bị Di động */}
       <ProductMobileStickyBar
         product={p.product}
         currentPrice={p.currentPrice}

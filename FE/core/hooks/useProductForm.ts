@@ -48,6 +48,7 @@ export const useProductForm = ({
   const [isLoadingTypes, setIsLoadingTypes] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  const [newImageUrls, setNewImageUrls] = useState<string[]>([]);
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
   const [combos, setCombos] = useState<Combo[]>([]);
   const [deletedComboIds, setDeletedComboIds] = useState<number[]>([]);
@@ -63,31 +64,11 @@ export const useProductForm = ({
     try {
       setIsLoadingTypes(true);
       const response = await getCategories();
-      let typesData: ListTypes[] = [];
-      if (Array.isArray(response)) {
-        typesData = response.map((item) => ({
-          typeId: item.typeId.toString(),
-          typeName: item.typeName,
-        }));
-      } else if (response && response.data && Array.isArray(response.data)) {
-        typesData = response.data.map(
-          (item: { typeId: number | string; typeName: string }) => ({
-            typeId: item.typeId.toString(),
-            typeName: item.typeName,
-          }),
-        );
-      } else if (
-        response &&
-        response.content &&
-        Array.isArray(response.content)
-      ) {
-        typesData = response.content.map(
-          (item: { typeId: number | string; typeName: string }) => ({
-            typeId: item.typeId.toString(),
-            typeName: item.typeName,
-          }),
-        );
-      }
+      const list = Array.isArray(response) ? response : [];
+      const typesData: ListTypes[] = list.map((item) => ({
+        typeId: item.typeId.toString(),
+        typeName: item.typeName,
+      }));
       setProductTypes(typesData);
     } catch (error) {
       console.error("Error fetching product types:", error);
@@ -116,6 +97,7 @@ export const useProductForm = ({
       setDeletedComboIds([]);
       setDeletedImageIds([]);
       setNewImageFiles([]);
+      setNewImageUrls([]);
       setErrors({});
     } else if (!isEditing && !isViewing) {
       setFormData(INITIAL_PRODUCT);
@@ -123,6 +105,7 @@ export const useProductForm = ({
       setDeletedComboIds([]);
       setDeletedImageIds([]);
       setNewImageFiles([]);
+      setNewImageUrls([]);
       setErrors({});
     }
   }, [product, isEditing, isViewing, open]);
@@ -169,13 +152,33 @@ export const useProductForm = ({
     }
   };
 
+  const handleAddImageUrl = (url: string) => {
+    const trimmed = url.trim();
+    if (!trimmed) return;
+    if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
+      toast.error("Liên kết ảnh phải bắt đầu bằng http:// hoặc https://");
+      return;
+    }
+    if (formData.listImages.some((img) => img.link === trimmed)) {
+      toast.error("Hình ảnh này đã có trong danh sách!");
+      return;
+    }
+    setNewImageUrls((prev) => [...prev, trimmed]);
+    setFormData((prev) => ({
+      ...prev,
+      listImages: [...prev.listImages, { imageId: "", link: trimmed }],
+    }));
+    toast.success("Đã thêm liên kết ảnh thành công!");
+  };
+
   const handleRemoveImage = (index: number) => {
     const imageToRemove = formData.listImages[index];
     if (imageToRemove && imageToRemove.imageId) {
       setDeletedImageIds((prev) => [...prev, imageToRemove.imageId]);
-    } else {
+    } else if (imageToRemove) {
+      setNewImageUrls((prev) => prev.filter((url) => url !== imageToRemove.link));
       const fileIndex = newImageFiles.findIndex(
-        (file: File) => URL.createObjectURL(file) === imageToRemove?.link,
+        (file: File) => URL.createObjectURL(file) === imageToRemove.link,
       );
       if (fileIndex >= 0) {
         setNewImageFiles((prev) => prev.filter((_, i) => i !== fileIndex));
@@ -235,6 +238,7 @@ export const useProductForm = ({
         deletedImageIds: deletedImageIds
           .map((id: string) => parseInt(String(id)))
           .filter((id: number) => !isNaN(id)),
+        newImageUrls: newImageUrls.length > 0 ? newImageUrls : undefined,
         deletedComboIds:
           deletedComboIds.length > 0 ? deletedComboIds : undefined,
         listCombo: combos.length > 0 ? combos : undefined,
@@ -258,17 +262,21 @@ export const useProductForm = ({
       };
       onSave(savedProduct, newImageFiles, deletedImageIds);
     } catch (error: unknown) {
-      console.error("=== ERROR in handleSave ===", error);
+      console.error("Lỗi khi lưu thông tin sản phẩm:", error);
       let errorMessage = "Có lỗi xảy ra khi lưu sản phẩm";
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "response" in error &&
-        typeof (error as { response?: { data?: { message?: string } } })
-          .response?.data?.message === "string"
-      ) {
-        errorMessage = (error as { response: { data: { message: string } } })
-          .response.data.message;
+      if (typeof error === "object" && error !== null && "response" in error) {
+        const responseData = (error as any).response?.data;
+        if (responseData) {
+          if (responseData.error) {
+            if (Array.isArray(responseData.error)) {
+              errorMessage = responseData.error.join(", ");
+            } else if (typeof responseData.error === "string") {
+              errorMessage = responseData.error;
+            }
+          } else if (typeof responseData.message === "string") {
+            errorMessage = responseData.message;
+          }
+        }
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
@@ -290,6 +298,7 @@ export const useProductForm = ({
     removeCombo,
     updateCombo,
     handleImageUpload,
+    handleAddImageUrl,
     handleRemoveImage,
     toggleType,
     handleSave,

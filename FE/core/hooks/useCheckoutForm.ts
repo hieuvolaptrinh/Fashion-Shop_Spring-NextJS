@@ -283,8 +283,12 @@ export const useCheckoutForm = ({
 
       if (res?.statusCode === 201 || res?.data?.orderId || (res as any)?.status === 201) {
         toast.success("Đặt hàng thành công!");
+        // Tự động đồng bộ lại thông tin profile (số điện thoại vừa được BE gán, danh sách địa chỉ mới nhất)
+        fetchProfile().catch((err) =>
+          console.warn("Lỗi đồng bộ hồ sơ người dùng sau khi đặt hàng:", err)
+        );
         onOrderSuccess(selectedIds);
-        router.push(ROUTES.USER.HOME);
+        router.push(ROUTES.USER.ORDERS);
       } else {
         toast.error(`Đặt hàng không thành công: ${res?.message || "Lỗi máy chủ"}`);
       }

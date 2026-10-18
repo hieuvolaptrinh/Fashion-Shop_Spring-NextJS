@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -34,17 +34,13 @@ export const CartItemList: React.FC<CartItemListProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const totalPages = Math.ceil(cartItems.length / CART_ITEMS_PER_PAGE);
-
-  useEffect(() => {
-    if (currentPage > totalPages && totalPages > 0) {
-      setCurrentPage(totalPages);
-    }
-  }, [totalPages, currentPage]);
+  // Tính trang an toàn trực tiếp (derived value) - tránh re-render kép bằng useEffect
+  const safeCurrentPage = Math.min(currentPage, Math.max(1, totalPages));
 
   const paginatedItems = useMemo(() => {
-    const start = (currentPage - 1) * CART_ITEMS_PER_PAGE;
+    const start = (safeCurrentPage - 1) * CART_ITEMS_PER_PAGE;
     return cartItems.slice(start, start + CART_ITEMS_PER_PAGE);
-  }, [cartItems, currentPage]);
+  }, [cartItems, safeCurrentPage]);
 
   return (
     <Card className="border border-border/60 bg-card shadow-xs">
@@ -79,7 +75,7 @@ export const CartItemList: React.FC<CartItemListProps> = ({
         ))}
 
         <Pagination
-          currentPage={currentPage}
+          currentPage={safeCurrentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
           totalItems={cartItems.length}

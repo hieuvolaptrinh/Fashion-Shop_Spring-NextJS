@@ -12,9 +12,6 @@ import { API_BASE_URL } from "@/core/constants";
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // Request Interceptor: Tự động đính kèm accessToken từ localStorage (phía client)
@@ -24,6 +21,16 @@ apiClient.interceptors.request.use(
       const token = localStorage.getItem("accessToken");
       if (token && !config.headers.Authorization) {
         config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+
+    // Nếu gửi FormData (upload file/multipart), xóa Content-Type để Axios & trình duyệt tự sinh boundary chuẩn
+    if (config.data instanceof FormData) {
+      if (config.headers) {
+        delete config.headers["Content-Type"];
+        if (typeof (config.headers as any).delete === "function") {
+          (config.headers as any).delete("Content-Type");
+        }
       }
     }
     return config;

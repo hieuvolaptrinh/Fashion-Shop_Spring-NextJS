@@ -30,7 +30,6 @@ export function ProductMobileStickyBar({
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/80 bg-background/95 p-3 shadow-lg backdrop-blur-md md:hidden">
       <div className="flex items-center justify-between gap-3">
-        {/* Thông tin nhanh sản phẩm */}
         <div className="flex min-w-0 items-center gap-2.5">
           <div className="relative aspect-square size-11 shrink-0 overflow-hidden rounded-lg border border-border/60 bg-muted/20">
             <Image
@@ -46,13 +45,12 @@ export function ProductMobileStickyBar({
             <p className="truncate text-xs font-semibold text-foreground">
               {product.productName}
             </p>
-            <p className="text-sm font-black text-primary">
+            <p className="text-sm font-black text-rose-600">
               {formatCurrency(currentPrice)}
             </p>
           </div>
         </div>
 
-        {/* Các nút hành động nhanh */}
         <div className="flex shrink-0 items-center gap-2">
           <Button
             type="button"

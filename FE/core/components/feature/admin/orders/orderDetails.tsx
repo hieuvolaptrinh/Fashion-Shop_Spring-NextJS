@@ -3,13 +3,9 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import {
-  Calendar,
-  Phone,
-  MapPin,
   Printer,
   FileCheck,
   FileClock,
-  DollarSign,
   Loader2,
   Package,
 } from "lucide-react";
@@ -111,7 +107,6 @@ export const OrderDetails = ({
         </DialogHeader>
 
         <div className="space-y-5 py-4">
-          {/* Thanh cập nhật trạng thái đơn hàng dành cho Admin */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-border/60 bg-muted/20">
             <div className="space-y-0.5">
               <span className="text-xs font-semibold text-foreground">
@@ -143,25 +138,21 @@ export const OrderDetails = ({
             </div>
           </div>
 
-          {/* Thông tin đơn hàng & giao nhận */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Thông tin đơn */}
             <Card className="rounded-xl border border-border/60 shadow-xs bg-muted/20">
               <CardContent className="p-4 space-y-2.5">
                 <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
                   Thông tin đơn hàng
                 </p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Calendar className="h-4 w-4 shrink-0 text-primary" />
                   <span>
                     Ngày đặt: <strong className="text-foreground">{formatDate(order.createAt)}</strong>
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <DollarSign className="h-4 w-4 shrink-0 text-primary" />
                   <span>
                     Tổng tiền:{" "}
-                    <strong className="text-base font-bold text-primary">
+                    <strong className="text-base font-bold text-rose-600">
                       {formatCurrency(order.totalPrice)}
                     </strong>
                   </span>
@@ -169,20 +160,17 @@ export const OrderDetails = ({
               </CardContent>
             </Card>
 
-            {/* Thông tin khách hàng */}
             <Card className="rounded-xl border border-border/60 shadow-xs bg-muted/20">
               <CardContent className="p-4 space-y-2.5">
                 <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
                   Thông tin giao hàng
                 </p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Phone className="h-4 w-4 shrink-0 text-primary" />
                   <span>
                     Số điện thoại: <strong className="text-foreground">{order.phoneNumber || "Chưa cập nhật"}</strong>
                   </span>
                 </div>
                 <div className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <MapPin className="h-4 w-4 shrink-0 text-primary mt-0.5" />
                   <span className="leading-snug">
                     Địa chỉ: <strong className="text-foreground">{order.shippingAddress || "Chưa cập nhật"}</strong>
                   </span>
@@ -191,7 +179,6 @@ export const OrderDetails = ({
             </Card>
           </div>
 
-          {/* Danh sách mặt hàng */}
           <div className="space-y-2">
             <p className="text-xs font-semibold text-foreground uppercase tracking-wide">
               Mặt hàng đã đặt ({order.items?.length || 0} sản phẩm)
@@ -235,7 +222,7 @@ export const OrderDetails = ({
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="text-xs font-bold text-primary">
+                        <span className="text-xs font-bold text-rose-600">
                           {formatCurrency(itemTotal)}
                         </span>
                       </div>

@@ -40,7 +40,6 @@ export const UserOrderCard: React.FC<UserOrderCardProps> = ({
 
   return (
     <Card className="border border-border/60 bg-card shadow-xs transition-all duration-200 hover:border-border hover:shadow-sm">
-      {/* Card Header */}
       <CardHeader className="border-b border-border/60 px-5 py-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="space-y-0.5">
@@ -73,7 +72,6 @@ export const UserOrderCard: React.FC<UserOrderCardProps> = ({
         </div>
       </CardHeader>
 
-      {/* Items List (Limited to first 2 items) */}
       <CardContent className="p-5 space-y-3">
         <div className="divide-y divide-border/40 space-y-3">
           {visibleItems.map((detail) => {
@@ -119,7 +117,6 @@ export const UserOrderCard: React.FC<UserOrderCardProps> = ({
           })}
         </div>
 
-        {/* Thanh xem thêm sản phẩm ẩn */}
         {remainingCount > 0 && (
           <button
             type="button"
@@ -134,14 +131,13 @@ export const UserOrderCard: React.FC<UserOrderCardProps> = ({
         )}
       </CardContent>
 
-      {/* Card Footer */}
       <CardFooter className="border-t border-border/60 bg-muted/20 px-5 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="space-y-0.5">
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">
               Tổng thanh toán ({items.length} món):
             </span>
-            <span className="text-base font-bold text-primary">
+            <span className="text-base font-bold text-rose-600">
               {formatCurrency(order.totalPrice)}
             </span>
           </div>

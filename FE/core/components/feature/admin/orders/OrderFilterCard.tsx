@@ -60,7 +60,6 @@ export function OrderFilterCard({
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Trạng thái đơn hàng */}
         <div className="space-y-1.5">
           <span className="text-xs font-medium text-foreground">
             Trạng thái đơn hàng:
@@ -86,9 +85,7 @@ export function OrderFilterCard({
           </div>
         </div>
 
-        {/* Trạng thái in bill & Khoảng giá */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {/* Lọc trạng thái in bill */}
           <div className="space-y-1.5">
             <span className="text-xs font-medium text-foreground">
               Trạng thái in hóa đơn:
@@ -99,7 +96,7 @@ export function OrderFilterCard({
                 onClick={() => onBillFilterToggle(false)}
                 className={`flex-1 py-1.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
                   filters.isBill === false
-                    ? "bg-warning text-warning-foreground border-warning shadow-xs"
+                    ? "bg-primary text-primary-foreground border-primary shadow-xs"
                     : "bg-background text-muted-foreground border-border hover:bg-muted/50"
                 }`}
               >
@@ -110,7 +107,7 @@ export function OrderFilterCard({
                 onClick={() => onBillFilterToggle(true)}
                 className={`flex-1 py-1.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
                   filters.isBill === true
-                    ? "bg-success text-success-foreground border-success shadow-xs"
+                    ? "bg-primary text-primary-foreground border-primary shadow-xs"
                     : "bg-background text-muted-foreground border-border hover:bg-muted/50"
                 }`}
               >
@@ -119,7 +116,6 @@ export function OrderFilterCard({
             </div>
           </div>
 
-          {/* Giá từ */}
           <div className="space-y-1.5">
             <span className="text-xs font-medium text-foreground">
               Tổng tiền từ (VNĐ):
@@ -143,7 +139,6 @@ export function OrderFilterCard({
             </div>
           </div>
 
-          {/* Đến giá */}
           <div className="space-y-1.5">
             <span className="text-xs font-medium text-foreground">
               Đến tổng tiền (VNĐ):
@@ -168,7 +163,6 @@ export function OrderFilterCard({
           </div>
         </div>
 
-        {/* Filter buttons */}
         <div className="flex items-center gap-2 pt-1 border-t">
           <Button
             size="sm"

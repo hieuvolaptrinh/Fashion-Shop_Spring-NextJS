@@ -30,10 +30,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <AdminLayoutProvider>
       <div className="flex min-h-screen w-full bg-slate-50/70 dark:bg-slate-950">
-        {/* Sidebar */}
         <AdminSidebar />
 
-        {/* Content Wrapper */}
         <div className="flex flex-1 flex-col min-w-0 transition-all duration-300">
           <AdminHeader />
           <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">

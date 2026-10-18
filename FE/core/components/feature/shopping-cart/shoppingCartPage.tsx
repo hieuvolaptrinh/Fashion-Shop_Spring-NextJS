@@ -66,7 +66,6 @@ export const ShoppingCartPage: React.FC = () => {
   return (
     <div className="min-h-screen py-8 bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Page Title */}
         <div className="space-y-1">
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             Giỏ hàng của bạn
@@ -76,9 +75,7 @@ export const ShoppingCartPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Main Content Layout */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8 items-start">
-          {/* Left Column: Cart Items & Shipping Form */}
           <div className="space-y-6 lg:col-span-2">
             <CartItemList
               cartItems={cartItems}
@@ -105,7 +102,6 @@ export const ShoppingCartPage: React.FC = () => {
             />
           </div>
 
-          {/* Right Column: Order Summary & Shipping Info */}
           <div className="lg:col-span-1 space-y-4 lg:sticky lg:top-6">
             <OrderSummaryCard
               subtotal={subtotal}

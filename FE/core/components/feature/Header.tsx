@@ -18,13 +18,10 @@ import {
 export default function Header() {
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/85 sticky top-0 z-50 w-full border-b border-border/60 backdrop-blur-md shadow-xs">
-      {/* 1. Thanh thông tin liên hệ & thanh toán trên cùng */}
       <HeaderTopBar />
 
-      {/* 2. Thanh điều hướng chính */}
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between gap-4">
-          {/* Logo & Slogan thương hiệu */}
           <Link
             href={ROUTES.USER.HOME}
             className="flex items-center space-x-2.5 group shrink-0"
@@ -49,13 +46,10 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* Menu điều hướng Desktop */}
           <HeaderDesktopNav />
 
-          {/* Cụm nút hành động Desktop (Giỏ hàng, Đăng nhập / Tài khoản) */}
           <HeaderActions />
 
-          {/* Menu Drawer & Giỏ hàng trên Mobile */}
           <HeaderMobileNav />
         </div>
       </div>

@@ -68,10 +68,11 @@ export function useProductDetail(productId: string) {
     refreshComments();
   }, [refreshComments]);
 
-  // Đặt lại số lượng về 1 khi người dùng đổi combo / mua lẻ
-  useEffect(() => {
+  // Đặt lại số lượng về 1 trực tiếp khi người dùng chọn combo / mua lẻ (tránh re-render kép bằng useEffect)
+  const handleSelectOption = useCallback((option: PurchaseOption) => {
+    setSelectedOption(option);
     setQuantity(1);
-  }, [selectedOption]);
+  }, []);
 
   const maxQuantity = useMemo(() => {
     if (!product) return 0;
@@ -190,7 +191,7 @@ export function useProductDetail(productId: string) {
     quantity,
     handleQuantityChange,
     selectedOption,
-    setSelectedOption,
+    setSelectedOption: handleSelectOption,
     maxQuantity,
     currentPrice,
     currentOriginalPrice,

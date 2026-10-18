@@ -38,7 +38,6 @@ export function ProductActions({
 
   return (
     <div className="space-y-6 pt-2">
-      {/* Bộ chọn số lượng */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <Label className="text-sm font-bold text-foreground">Số lượng mua</Label>
@@ -78,7 +77,6 @@ export function ProductActions({
         </div>
       </div>
 
-      {/* Trạng thái tồn kho */}
       {!isOutOfStock ? (
         <div className="flex items-center justify-between rounded-xl border border-success/30 bg-success/10 px-4 py-3">
           <div className="flex items-center gap-2.5">
@@ -102,7 +100,6 @@ export function ProductActions({
         </div>
       )}
 
-      {/* Nút hành động Mua hàng */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Button
           type="button"
@@ -138,7 +135,6 @@ export function ProductActions({
         </Button>
       </div>
 
-      {/* 4 Thẻ Cam Kết An Tâm Mua Sắm */}
       <div className="grid grid-cols-2 gap-2.5 pt-2">
         <div className="flex items-start gap-2.5 rounded-xl border border-border/70 bg-card p-3">
           <ShieldCheck className="size-5 shrink-0 text-primary mt-0.5" />

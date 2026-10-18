@@ -5,7 +5,6 @@
 export const IMAGES = {
   // Logo & Nhận diện thương hiệu
   LOGO: "/logo.jpg",
-  OWNER: "/ChiLan.jpg",
 
   // Ảnh mặc định & Giữ chỗ (Fallback / Placeholder)
   FALLBACK_PRODUCT: "/older.png",
@@ -32,5 +31,16 @@ export const IMAGES = {
     DEMO_4: "/productDemo4.jpg",
     DEMO_5: "/productDemo5.jpg",
     DEMO_6: "/productDemo6.jpg",
+  },
+
+  // Ảnh danh mục sản phẩm (Boutique Fashion & Lifestyle)
+  CATEGORIES: {
+    MEN: "/categories/men.jpg",
+    WOMEN: "/categories/women.jpg",
+    ACCESSORIES: "/categories/accessories.jpg",
+    WELLNESS: "/categories/wellness.jpg",
+    COSMETICS: "/categories/cosmetics.jpg",
+    HOMEWARE: "/categories/homeware.jpg",
+    DEFAULT: "/categories/women.jpg",
   },
 } as const;

@@ -62,7 +62,6 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
       <form onSubmit={onSubmit}>
         <CardContent className="p-4 sm:p-5 space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* Phone Number */}
             <div className="space-y-1.5">
               <Label htmlFor="phoneNumber" className="text-xs font-medium text-foreground">
                 Số điện thoại liên hệ <span className="text-destructive">*</span>
@@ -87,7 +86,6 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
               )}
             </div>
 
-            {/* Street / House */}
             <div className="space-y-1.5">
               <Label htmlFor="streetHouse" className="text-xs font-medium text-foreground">
                 Địa chỉ chi tiết (Số nhà, tên đường) <span className="text-destructive">*</span>
@@ -108,7 +106,6 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
               )}
             </div>
 
-            {/* Province Select */}
             <div className="space-y-1.5">
               <Label className="text-xs font-medium text-foreground">
                 Tỉnh / Thành phố <span className="text-destructive">*</span>
@@ -146,7 +143,6 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
               )}
             </div>
 
-            {/* Ward Select */}
             <div className="space-y-1.5">
               <Label className="text-xs font-medium text-foreground">
                 Phường / Xã <span className="text-destructive">*</span>
@@ -211,7 +207,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
                 ? "Đang xử lý đơn hàng..."
                 : isLoadingLocation
                 ? "Đang tải thông tin địa chỉ..."
-                : `Thanh toán ngay (${selectedCount} sản phẩm)`}
+                : `Đặt hàng ngay (${selectedCount} sản phẩm)`}
             </span>
           </Button>
         </CardFooter>

@@ -77,9 +77,7 @@ export const ProductsFilterBar = ({
 
   return (
     <div className="mb-8 space-y-4 rounded-2xl border border-border/70 bg-card p-4 shadow-sm sm:p-5">
-      {/* Hàng 1: Tìm kiếm + Lọc giá + Sắp xếp + Đặt lại */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        {/* Ô tìm kiếm thông minh */}
         <div className="relative flex-1">
           <Search className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -101,9 +99,7 @@ export const ProductsFilterBar = ({
           )}
         </div>
 
-        {/* Cụm Dropdown Lọc giá & Sắp xếp */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          {/* Dropdown Khoảng giá */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -136,7 +132,6 @@ export const ProductsFilterBar = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Dropdown Sắp xếp */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -169,7 +164,6 @@ export const ProductsFilterBar = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Nút đặt lại bộ lọc */}
           {hasActiveFilters && (
             <Button
               type="button"
@@ -186,7 +180,6 @@ export const ProductsFilterBar = ({
         </div>
       </div>
 
-      {/* Hàng 2: Thanh chọn danh mục nhanh dạng Pill ngang */}
       <div className="flex items-center gap-2 overflow-x-auto pt-1 pb-1 scrollbar-none">
         <button
           type="button"

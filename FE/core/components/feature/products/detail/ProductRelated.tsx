@@ -3,7 +3,6 @@
 import { getProducts } from '@/core/apis/products';
 import ProductCard from '@/core/components/feature/products/ProductCard';
 import type { Product } from '@/core/lib/type';
-import { Layers } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface ProductRelatedProps {
@@ -24,7 +23,7 @@ export function ProductRelated({ currentProductId, typeId }: ProductRelatedProps
         const parsedTypeId = typeId ? Number(typeId) : undefined;
         const filters = parsedTypeId ? { typeId: [parsedTypeId], size: 6 } : { size: 6 };
         const res = await getProducts(filters);
-        const list: Product[] = res?.content || res || [];
+        const list: Product[] = res?.content ?? (Array.isArray(res) ? res : []);
 
         if (isMounted) {
           const filtered = list
@@ -34,6 +33,7 @@ export function ProductRelated({ currentProductId, typeId }: ProductRelatedProps
         }
       } catch (error) {
         console.error('Lỗi khi tải sản phẩm tương tự:', error);
+        if (isMounted) setRelatedProducts([]);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -54,10 +54,6 @@ export function ProductRelated({ currentProductId, typeId }: ProductRelatedProps
     <section className="mt-14 border-t border-border/60 pt-12 sm:mt-18 sm:pt-16">
       <div className="mb-8 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-end">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
-            <Layers className="size-3.5" />
-            <span>Gợi ý cho bạn</span>
-          </div>
           <h3 className="mt-1 text-xl font-black tracking-tight text-foreground sm:text-2xl">
             Sản phẩm tương tự & Cùng loại
           </h3>

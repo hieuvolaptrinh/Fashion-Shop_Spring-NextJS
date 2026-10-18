@@ -62,9 +62,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Card className="group relative mx-auto flex h-full w-full max-w-[340px] flex-col overflow-hidden rounded-2xl border border-border/70 bg-card p-0 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md">
-      {/* Khối hình ảnh sản phẩm */}
       <div className="relative aspect-square w-full overflow-hidden bg-muted/30">
-        <Link href={productDetailUrl} className="block h-full w-full">
+        <Link href={productDetailUrl} className="relative block h-full w-full">
           <Image
             src={imageSrc}
             alt={product.productName}
@@ -74,7 +73,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           />
         </Link>
 
-        {/* Huy hiệu % giảm giá */}
         {hasDiscount && (
           <div className="pointer-events-none absolute top-2.5 left-2.5 z-10">
             <Badge variant="destructive" className="px-2 py-0.5 text-xs font-bold">
@@ -84,7 +82,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
       </div>
 
-      {/* Thông tin sản phẩm */}
       <CardContent className="flex flex-1 flex-col p-3.5 sm:p-4">
         <Link href={productDetailUrl} className="group-hover:text-primary">
           <h3
@@ -95,10 +92,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           </h3>
         </Link>
 
-        {/* Giá tiền chuẩn xanh Primary & Đánh giá */}
         <div className="mb-2 flex items-baseline justify-between gap-2">
           <div className="flex items-baseline gap-1.5">
-            <span className="text-base font-bold text-primary sm:text-lg">
+            <span className="text-base font-bold text-rose-600 sm:text-lg">
               {formatCurrency(product.salePrice)}
             </span>
             {hasDiscount && (
@@ -120,7 +116,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
-        {/* Danh mục & Số lượng tồn kho */}
         <div className="mb-3.5 flex items-center justify-between gap-2 text-xs text-muted-foreground">
           <span className="truncate">
             Loại:{' '}
@@ -142,14 +137,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
 
-        {/* Nút hành động */}
         <div className="mt-auto grid grid-cols-4 gap-1.5 sm:gap-2">
           <Button
             type="button"
             size="sm"
             disabled={isOutOfStock || isAdding}
             onClick={handleAddToCart}
-            className="col-span-3 w-full cursor-pointer rounded-xl bg-primary text-primary-foreground shadow-xs transition-all hover:bg-primary/90"
+            className="col-span-3 w-full cursor-pointer rounded-xl bg-gradient-to-r from-primary to-blue-600 text-primary-foreground shadow-xs transition-all hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none"
           >
             {isAdding ? (
               <>

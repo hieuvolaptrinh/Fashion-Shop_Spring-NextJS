@@ -248,19 +248,14 @@ export default function RootLayout({
         className="font-primary min-h-screen"
         cz-shortcut-listen="true"
       >
-        {/* 
-          SUSPENSE: Hiển thị loading trong khi chờ component tải
-          Giúp cải thiện trải nghiệm người dùng và Core Web Vitals (SEO ranking factor)
-        */}
         <Suspense fallback={<p>Loading...</p>}>
-          {children} {/* Nội dung các trang con */}
-          {/* TOASTER: Thông báo cho người dùng */}
+          {children}
           <Toaster
-            position="bottom-right" // Vị trí hiển thị
-            richColors // Màu sắc đa dạng
-            closeButton // Nút đóng
-            expand={true} // Mở rộng
-            visibleToasts={5} // Số lượng toast hiển thị cùng lúc
+            position="bottom-right"
+            richColors
+            closeButton
+            expand={true}
+            visibleToasts={5}
           />
         </Suspense>
       </body>

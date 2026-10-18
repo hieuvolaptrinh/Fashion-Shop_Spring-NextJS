@@ -32,22 +32,28 @@ export const postOrder = async (data: OrderItemPayload) => {
 export const getAllOrders = async (
   filters: OrderFilterRequest = {}
 ): Promise<PageResponse<OrderResponse>> => {
-  const params = new URLSearchParams();
+  try {
+    const params = new URLSearchParams();
 
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      if (Array.isArray(value)) {
-        value.forEach((v) => params.append(key, v.toString()));
-      } else {
-        params.append(key, value.toString());
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        if (Array.isArray(value)) {
+          value.forEach((v) => params.append(key, v.toString()));
+        } else {
+          params.append(key, value.toString());
+        }
       }
-    }
-  });
+    });
 
-  return http.get<PageResponse<OrderResponse>>(
-    API_ENDPOINTS.ORDERS.ADMIN_FILTER,
-    { params }
-  );
+    const res = await http.get<any>(
+      API_ENDPOINTS.ORDERS.ADMIN_FILTER,
+      { params }
+    );
+    return res?.data ?? res;
+  } catch (error) {
+    console.error("Error fetching admin orders:", error);
+    throw error;
+  }
 };
 
 /**
@@ -72,4 +78,14 @@ export const cancelOrder = async (orderId: number) => {
  */
 export const updateOrderStatus = async (orderId: number, status: string) => {
   return http.put(API_ENDPOINTS.ORDERS.STATUS(orderId, status));
+};
+
+/**
+ * Cập nhật trạng thái hàng loạt đơn hàng (Dành cho Quản trị viên)
+ */
+export const updateBatchOrderStatus = async (
+  orderIds: number[],
+  status: string
+) => {
+  return http.put(API_ENDPOINTS.ORDERS.BATCH_STATUS(status), orderIds);
 };

@@ -56,11 +56,9 @@ export function ProductTabs({
           </TabsTrigger>
         </TabsList>
 
-        {/* Tab Mô tả */}
         <TabsContent value="description" className="mt-6">
           <Card className="rounded-2xl border-border/70 shadow-xs">
             <CardContent className="space-y-8 pt-6">
-              {/* Đoạn mô tả chính */}
               <div>
                 <h3 className="mb-3 text-lg font-extrabold text-foreground sm:text-xl">
                   Thông tin sản phẩm
@@ -73,7 +71,6 @@ export function ProductTabs({
                 </div>
               </div>
 
-              {/* Các khối thông số chi tiết dạng Bento Cards */}
               <div className="grid grid-cols-1 gap-4 border-t border-border/60 pt-6 md:grid-cols-3">
                 <div className="space-y-2 rounded-2xl border border-border/60 bg-muted/20 p-4.5">
                   <div className="flex items-center gap-2 text-primary">
@@ -111,11 +108,9 @@ export function ProductTabs({
           </Card>
         </TabsContent>
 
-        {/* Tab Đánh giá */}
         <TabsContent value="reviews" className="mt-6">
           <Card className="rounded-2xl border-border/70 shadow-xs">
             <CardContent className="space-y-8 pt-6">
-              {/* Tóm tắt điểm số đánh giá */}
               <div className="flex flex-col gap-6 rounded-2xl border border-border/60 bg-muted/20 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
                 <div>
                   <div className="flex items-baseline gap-2">
@@ -183,7 +178,6 @@ export function ProductTabs({
                 </div>
               </div>
 
-              {/* Trạng thái tải hoặc Danh sách bình luận thực tế */}
               {loadingComments ? (
                 <div className="space-y-4 py-4">
                   {[1, 2].map((i) => (

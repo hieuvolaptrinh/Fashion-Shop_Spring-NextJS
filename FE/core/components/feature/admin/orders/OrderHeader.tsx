@@ -9,29 +9,41 @@ import {
   ChevronDown,
   ChevronUp,
   Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/core/components/ui/select";
+import { ORDER_STATUS_OPTIONS } from "@/core/constants";
 
 interface OrderHeaderProps {
   loading: boolean;
   isPrintingBatch: boolean;
+  isBatchUpdatingStatus?: boolean;
   showFilters: boolean;
   selectedCount: number;
   onRefresh: () => void;
   onToggleFilters: () => void;
   onPrintSelected: () => void;
   onPrintAllUnprinted: () => void;
+  onBatchUpdateStatus?: (status: string) => Promise<void>;
 }
 
 export const OrderHeader: React.FC<OrderHeaderProps> = ({
   loading,
   isPrintingBatch,
+  isBatchUpdatingStatus = false,
   showFilters,
   selectedCount,
   onRefresh,
   onToggleFilters,
   onPrintSelected,
   onPrintAllUnprinted,
+  onBatchUpdateStatus,
 }) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b">
@@ -73,6 +85,38 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             <ChevronDown className="h-3.5 w-3.5" />
           )}
         </Button>
+
+        {selectedCount > 0 && onBatchUpdateStatus && (
+          <Select
+            onValueChange={(val) => onBatchUpdateStatus(val)}
+            disabled={isBatchUpdatingStatus}
+          >
+            <SelectTrigger className="rounded-xl gap-1.5 text-xs h-9 border-primary/40 bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors w-[175px]">
+              {isBatchUpdatingStatus ? (
+                <div className="flex items-center gap-1.5">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Đang cập nhật...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span>Đổi trạng thái ({selectedCount})</span>
+                </div>
+              )}
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              {ORDER_STATUS_OPTIONS.map((opt) => (
+                <SelectItem
+                  key={`batch-opt-${opt.value}`}
+                  value={opt.value}
+                  className="text-xs cursor-pointer"
+                >
+                  Chuyển sang: {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         <Button
           variant="outline"

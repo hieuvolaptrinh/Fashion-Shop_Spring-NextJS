@@ -41,7 +41,6 @@ export const CartItemCard: React.FC<CartItemCardProps> = ({
           : "border-border/60 bg-card hover:border-border"
       }`}
     >
-      {/* Mobile Layout */}
       <div className="flex flex-col space-y-3 sm:hidden">
         <div className="flex items-start gap-3">
           <Checkbox
@@ -78,7 +77,7 @@ export const CartItemCard: React.FC<CartItemCardProps> = ({
                 </span>
               )}
             </div>
-            <p className="mt-1 text-sm font-bold text-primary">
+            <p className="mt-1 text-sm font-bold text-rose-600">
               {formatCurrency(itemTotal)}
             </p>
             {isExceedingStock && (
@@ -128,7 +127,6 @@ export const CartItemCard: React.FC<CartItemCardProps> = ({
         </div>
       </div>
 
-      {/* Desktop Layout */}
       <div className="hidden sm:flex sm:items-center sm:gap-4">
         <Checkbox
           checked={isOutOfStock ? false : isSelected}
@@ -202,7 +200,7 @@ export const CartItemCard: React.FC<CartItemCardProps> = ({
         </div>
 
         <div className="w-28 text-right">
-          <p className="text-base font-bold text-primary">
+          <p className="text-base font-bold text-rose-600">
             {formatCurrency(itemTotal)}
           </p>
         </div>

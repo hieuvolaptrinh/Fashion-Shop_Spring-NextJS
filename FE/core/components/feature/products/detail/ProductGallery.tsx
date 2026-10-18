@@ -56,9 +56,7 @@ export function ProductGallery({
 
   return (
     <div className="space-y-3">
-      {/* Khung hiển thị ảnh: Thumbnail dọc Desktop & Ảnh lớn */}
       <div className="flex flex-col-reverse gap-3.5 md:flex-row md:items-start">
-        {/* Dải ảnh thu nhỏ (Cột dọc trên Desktop, trượt ngang trên Mobile) */}
         {hasMultipleImages && (
           <div className="flex gap-2.5 overflow-x-auto pb-1 md:flex-col md:overflow-y-auto md:pb-0 md:max-h-[500px] scrollbar-none shrink-0">
             {images.map((image, index) => {
@@ -89,7 +87,6 @@ export function ProductGallery({
           </div>
         )}
 
-        {/* Khung ảnh chính */}
         <div className="group relative aspect-square w-full flex-1 overflow-hidden rounded-2xl border border-border/70 bg-muted/20 shadow-xs">
           <Image
             src={currentImageSrc}
@@ -101,7 +98,6 @@ export function ProductGallery({
             className="cursor-zoom-in object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
 
-          {/* Nút phóng to Lightbox */}
           <button
             type="button"
             onClick={() => setIsLightboxOpen(true)}
@@ -111,7 +107,6 @@ export function ProductGallery({
             <Maximize2 className="size-4" />
           </button>
 
-          {/* Nút lùi/tiến ảnh */}
           {hasMultipleImages && (
             <>
               <button
@@ -131,7 +126,6 @@ export function ProductGallery({
                 <ChevronRight className="size-4" />
               </button>
 
-              {/* Chỉ số ảnh */}
               <div className="absolute right-3 bottom-3 rounded-lg bg-background/85 px-2.5 py-1 text-xs font-semibold text-foreground shadow-xs backdrop-blur-xs">
                 {selectedImage + 1} / {images.length}
               </div>
@@ -140,7 +134,6 @@ export function ProductGallery({
         </div>
       </div>
 
-      {/* Dấu chấm chỉ báo slide trên Mobile */}
       {hasMultipleImages && (
         <div className="flex justify-center gap-1.5 md:hidden">
           {images.map((_, index) => (
@@ -160,7 +153,6 @@ export function ProductGallery({
         </div>
       )}
 
-      {/* Modal Phóng To Ảnh (Lightbox) */}
       {isLightboxOpen && (
         <div
           className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-black/92 p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200"
@@ -168,7 +160,6 @@ export function ProductGallery({
           aria-modal="true"
           aria-label="Xem ảnh phóng to"
         >
-          {/* Header Lightbox */}
           <div className="flex w-full max-w-5xl items-center justify-between text-white">
             <span className="text-sm font-semibold opacity-80">
               {product.productName} ({selectedImage + 1} / {images.length})
@@ -183,7 +174,6 @@ export function ProductGallery({
             </button>
           </div>
 
-          {/* Vùng ảnh chính phóng to */}
           <div className="relative my-auto flex h-[70vh] w-full max-w-4xl items-center justify-center">
             <Image
               src={currentImageSrc}
@@ -215,7 +205,6 @@ export function ProductGallery({
             )}
           </div>
 
-          {/* Dải thumbnail chân Modal */}
           {hasMultipleImages && (
             <div className="flex max-w-2xl gap-2 overflow-x-auto pb-2 scrollbar-none">
               {images.map((image, index) => (

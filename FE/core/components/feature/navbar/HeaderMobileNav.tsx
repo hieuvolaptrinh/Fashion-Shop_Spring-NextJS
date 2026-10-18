@@ -47,7 +47,6 @@ export const HeaderMobileNav: React.FC = () => {
 
   return (
     <div className="flex items-center space-x-2 md:hidden">
-      {/* Icon Giỏ hàng trên Mobile */}
       <button
         type="button"
         onClick={handleGoToCart}
@@ -62,7 +61,6 @@ export const HeaderMobileNav: React.FC = () => {
         )}
       </button>
 
-      {/* Nút Mở Menu Drawer */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <Button
@@ -79,7 +77,6 @@ export const HeaderMobileNav: React.FC = () => {
           <SheetTitle className="sr-only">Menu Điều Hướng</SheetTitle>
 
           <div className="p-6 space-y-6 overflow-y-auto">
-            {/* Logo Thương Hiệu */}
             <Link
               href={ROUTES.USER.HOME}
               className="flex items-center space-x-2.5"
@@ -104,7 +101,6 @@ export const HeaderMobileNav: React.FC = () => {
 
             <Separator />
 
-            {/* Menu Links */}
             <nav className="flex flex-col space-y-1">
               {NAVIGATION_ITEMS.map((item) => (
                 <Link
@@ -120,7 +116,6 @@ export const HeaderMobileNav: React.FC = () => {
 
             <Separator />
 
-            {/* Phân Hệ Tài Khoản & Hành Động */}
             <div className="space-y-2">
               {!isAuthenticated ? (
                 <div className="grid grid-cols-2 gap-2">
@@ -205,7 +200,6 @@ export const HeaderMobileNav: React.FC = () => {
             </div>
           </div>
 
-          {/* Footer Thông Tin Liên Hệ */}
           <div className="p-6 border-t border-border/60 bg-muted/30 space-y-2 text-xs text-muted-foreground">
             <div className="flex items-center space-x-2">
               <Phone className="h-3.5 w-3.5 text-primary shrink-0" />

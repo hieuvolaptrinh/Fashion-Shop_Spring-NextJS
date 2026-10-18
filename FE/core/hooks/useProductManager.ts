@@ -13,8 +13,6 @@ import {
 } from "@/core/constants";
 
 export type { ProductFiltersState };
-const INITIAL_FILTERS: ProductFiltersState = INITIAL_PRODUCT_FILTERS;
-const INITIAL_PAGINATION: PaginationModel = DEFAULT_PAGINATION;
 
 export const useProductManager = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -33,29 +31,26 @@ export const useProductManager = () => {
   const [productTypes, setProductTypes] = useState<ListTypes[]>([]);
 
   // Pagination states
-  const [paginationModel, setPaginationModel] = useState<PaginationModel>(INITIAL_PAGINATION);
+  const [paginationModel, setPaginationModel] =
+    useState<PaginationModel>(DEFAULT_PAGINATION);
   const [totalRows, setTotalRows] = useState(0);
 
-  // Filter states
-  const [filters, setFilters] = useState<ProductFiltersState>(INITIAL_FILTERS);
+  // Filter states: filters (draft form state) vs appliedFilters (API trigger state)
+  const [filters, setFilters] =
+    useState<ProductFiltersState>(INITIAL_PRODUCT_FILTERS);
+  const [appliedFilters, setAppliedFilters] =
+    useState<ProductFiltersState>(INITIAL_PRODUCT_FILTERS);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
 
+  // 1. Fetch categories/types once on mount
   const fetchProductTypes = useCallback(async () => {
     try {
       const response = await getCategories();
-      let typesData: ListTypes[] = [];
-
-      if (Array.isArray(response)) {
-        typesData = response;
-      } else if (response && response.data && Array.isArray(response.data)) {
-        typesData = response.data;
-      } else if (
-        response &&
-        response.content &&
-        Array.isArray(response.content)
-      ) {
-        typesData = response.content;
-      }
+      const list = Array.isArray(response) ? response : [];
+      const typesData: ListTypes[] = list.map((item) => ({
+        typeId: item.typeId.toString(),
+        typeName: item.typeName,
+      }));
 
       setProductTypes(typesData);
     } catch (error) {
@@ -64,92 +59,62 @@ export const useProductManager = () => {
     }
   }, []);
 
-  const fetchProducts = useCallback(
-    async (
-      pageNumber?: number,
-      pageSize?: number,
-      currentFilters?: ProductFiltersState
-    ) => {
-      try {
-        setIsLoadingProducts(true);
-        const finalPageNumber =
-          pageNumber !== undefined ? pageNumber : paginationModel.page;
-        const finalPageSize =
-          pageSize !== undefined ? pageSize : paginationModel.pageSize;
-        const finalFilters =
-          currentFilters !== undefined ? currentFilters : filters;
+  useEffect(() => {
+    fetchProductTypes();
+  }, [fetchProductTypes]);
 
-        const filterParams = {
-          page: finalPageNumber,
-          size: finalPageSize,
-          ...Object.fromEntries(
-            Object.entries(finalFilters).filter(([_, value]) => {
-              if (Array.isArray(value)) {
-                return value.length > 0;
-              }
-              return value !== "" && value !== null;
-            })
-          ),
-        };
+  // 2. Fetch products triggered ONLY when paginationModel or appliedFilters changes
+  const fetchProducts = useCallback(async () => {
+    try {
+      setIsLoadingProducts(true);
 
-        const response = await getProducts(filterParams);
+      const filterParams = {
+        page: paginationModel.page,
+        size: paginationModel.pageSize,
+        ...Object.fromEntries(
+          Object.entries(appliedFilters).filter(([_, value]) => {
+            if (Array.isArray(value)) {
+              return value.length > 0;
+            }
+            return value !== "" && value !== null;
+          })
+        ),
+      };
 
-        let productsData: any[] = [];
-        let pagination: any = {};
+      const response = await getProducts(filterParams);
+      const rawList = response?.content ?? (Array.isArray(response) ? response : []);
+      const total = response?.totalElements ?? rawList.length;
 
-        if (response && response.content && Array.isArray(response.content)) {
-          productsData = response.content;
-          pagination = {
-            totalElements: response.totalElements || 0,
-            totalPages: response.totalPages || 0,
-            number: response.pageNumber || 0,
-            size: finalPageSize,
-          };
-        } else if (
-          response &&
-          response.data &&
-          response.data.content &&
-          Array.isArray(response.data.content)
-        ) {
-          productsData = response.data.content;
-          pagination = {
-            totalElements: response.data.totalElements || 0,
-            totalPages: response.data.totalPages || 0,
-            number: response.data.pageNumber || response.data.number || 0,
-            size: finalPageSize,
-          };
-        }
+      const convertedProducts: Product[] = rawList.map((product) => ({
+        ...product,
+        productId: product.productId.toString(),
+        manufactureDate: new Date(product.manufactureDate),
+        listCombo: product.listCombo || [],
+      }));
 
-        const convertedProducts: Product[] = productsData.map((product) => ({
-          ...product,
-          productId: product.productId.toString(),
-          manufactureDate: new Date(product.manufactureDate),
-          listCombo: product.listCombo || [],
-        }));
+      setProducts(convertedProducts);
+      setTotalRows(total);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setProducts([]);
+      setTotalRows(0);
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  }, [paginationModel, appliedFilters]);
 
-        setProducts(convertedProducts);
+  // Initial load and when pagination / appliedFilters change
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
-        if (pagination.totalElements !== undefined) {
-          setTotalRows(pagination.totalElements);
-          setPaginationModel((prev) => ({
-            ...prev,
-            page: pagination.number || finalPageNumber,
-            pageSize: finalPageSize,
-          }));
-        }
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        setProducts([]);
-      } finally {
-        setIsLoadingProducts(false);
-      }
+  // Handlers for filters
+  const handleFilterChange = useCallback(
+    (field: keyof ProductFiltersState, value: any) => {
+      setFilters((prev) => ({ ...prev, [field]: value }));
     },
-    [paginationModel, filters]
+    []
   );
-
-  const handleFilterChange = useCallback((field: keyof ProductFiltersState, value: any) => {
-    setFilters((prev) => ({ ...prev, [field]: value }));
-  }, []);
 
   const toggleFilterType = useCallback((typeIdNum: number) => {
     setFilters((prev) => {
@@ -164,29 +129,25 @@ export const useProductManager = () => {
   const handleApplyFilters = useCallback(() => {
     const hasValues = Boolean(
       filters.productName.trim() ||
-      filters.minSalePrice ||
-      filters.maxSalePrice ||
-      filters.typeId.length > 0
+        filters.minSalePrice ||
+        filters.maxSalePrice ||
+        filters.typeId.length > 0
     );
     setIsFilterApplied(hasValues);
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
-    fetchProducts(0, paginationModel.pageSize, filters);
-  }, [paginationModel.pageSize, filters, fetchProducts]);
+    setAppliedFilters(filters);
+  }, [filters]);
 
   const handleResetFilters = useCallback(() => {
-    setFilters(INITIAL_FILTERS);
+    setFilters(INITIAL_PRODUCT_FILTERS);
+    setAppliedFilters(INITIAL_PRODUCT_FILTERS);
     setIsFilterApplied(false);
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
-    fetchProducts(0, paginationModel.pageSize, INITIAL_FILTERS);
-  }, [paginationModel.pageSize, fetchProducts]);
+  }, []);
 
-  const handlePaginationModelChange = useCallback(
-    (newModel: PaginationModel) => {
-      setPaginationModel(newModel);
-      fetchProducts(newModel.page, newModel.pageSize, filters);
-    },
-    [filters, fetchProducts]
-  );
+  const handlePaginationModelChange = useCallback((newModel: PaginationModel) => {
+    setPaginationModel(newModel);
+  }, []);
 
   const handleView = useCallback((product: Product) => {
     setSelectedProduct(product);
@@ -213,19 +174,19 @@ export const useProductManager = () => {
     setLoading(true);
     try {
       await deleteProduct(parseInt(productToDelete.productId));
-      setProducts((prev) =>
-        prev.filter((p) => p.productId !== productToDelete.productId)
+      toast.success(
+        `Đã xóa thành công sản phẩm "${productToDelete.productName}"`
       );
-      toast.success(`Đã xóa thành công sản phẩm "${productToDelete.productName}"`);
       setIsDeleteDialogOpen(false);
       setProductToDelete(null);
+      await fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
       toast.error("Không thể xóa sản phẩm. Vui lòng thử lại!");
     } finally {
       setLoading(false);
     }
-  }, [productToDelete]);
+  }, [productToDelete, fetchProducts]);
 
   const handleCancelDelete = useCallback(() => {
     setIsDeleteDialogOpen(false);
@@ -239,43 +200,20 @@ export const useProductManager = () => {
     setIsDialogOpen(true);
   }, []);
 
-  const handleSave = useCallback(
-    async (productData: Product) => {
-      setLoading(true);
-      try {
-        if (isEditing && selectedProduct) {
-          setProducts((prev) =>
-            prev.map((p) =>
-              p.productId === selectedProduct.productId
-                ? { ...productData, productId: selectedProduct.productId }
-                : p
-            )
-          );
-        } else {
-          setProducts((prev) => {
-            const maxId =
-              prev.length > 0
-                ? Math.max(...prev.map((p) => parseInt(p.productId) || 0))
-                : 0;
-            const newProduct = {
-              ...productData,
-              productId: (maxId + 1).toString(),
-            };
-            return [newProduct, ...prev];
-          });
-        }
-
-        setIsDialogOpen(false);
-        setSelectedProduct(null);
-        await fetchProducts();
-      } catch (error) {
-        console.error("Error saving product:", error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [isEditing, selectedProduct, fetchProducts]
-  );
+  const handleSave = useCallback(async () => {
+    setLoading(true);
+    try {
+      setIsDialogOpen(false);
+      setSelectedProduct(null);
+      setIsEditing(false);
+      setIsViewing(false);
+      await fetchProducts();
+    } catch (error) {
+      console.error("Error refreshing products after save:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchProducts]);
 
   const handleCloseDialog = useCallback(() => {
     setIsDialogOpen(false);
@@ -288,10 +226,6 @@ export const useProductManager = () => {
     await fetchProducts();
   }, [fetchProducts]);
 
-  useEffect(() => {
-    Promise.all([fetchProducts(), fetchProductTypes()]);
-  }, [fetchProducts, fetchProductTypes]);
-
   return {
     // Data states
     products,
@@ -302,6 +236,7 @@ export const useProductManager = () => {
 
     // Filters states
     filters,
+    appliedFilters,
     isFilterApplied,
     productTypes,
 
@@ -330,3 +265,5 @@ export const useProductManager = () => {
     handleCloseDialog,
   };
 };
+
+export default useProductManager;

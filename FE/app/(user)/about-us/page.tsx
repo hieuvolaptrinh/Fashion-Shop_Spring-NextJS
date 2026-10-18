@@ -43,21 +43,15 @@ export const metadata: Metadata = {
 const AboutUsPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* 1. Asymmetric Split Hero lồng ghép Brand Logo & 4 Floating Stat Cards */}
       <AboutHero />
 
-      {/* 2. Main Content Sections */}
       <main className="container mx-auto px-4 py-8 sm:py-12 md:py-16 space-y-12 sm:space-y-16">
-        {/* 2.1. Bento Grid 3 cột bất đối xứng (Câu chuyện 10 năm & 4 Giá trị cốt lõi) */}
         <AboutBento />
 
-        {/* 2.2. Đội ngũ nhân sự dạng Profile Cards tương tác */}
         <AboutTeam />
 
-        {/* 2.3. Thông tin liên hệ & Chính sách (Action Cards gọi Hotline/Zalo trực tiếp) */}
         <AboutInfo />
 
-        {/* 2.4. Kêu gọi hành động cuối trang */}
         <AboutCta />
       </main>
     </div>

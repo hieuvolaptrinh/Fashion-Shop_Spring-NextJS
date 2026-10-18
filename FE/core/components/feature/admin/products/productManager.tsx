@@ -42,7 +42,6 @@ const ProductManager = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
-      {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -78,7 +77,6 @@ const ProductManager = () => {
         </div>
       </div>
 
-      {/* Filters Card */}
       <ProductFilterCard
         filters={filters}
         productTypes={productTypes}
@@ -89,7 +87,6 @@ const ProductManager = () => {
         onResetFilters={handleResetFilters}
       />
 
-      {/* Products Table */}
       <ProductsDataGrid
         products={products}
         loading={isLoadingProducts}
@@ -101,7 +98,6 @@ const ProductManager = () => {
         onDelete={handleDelete}
       />
 
-      {/* Product Details Dialog */}
       <ProductDetails
         open={isDialogOpen}
         onClose={handleCloseDialog}
@@ -112,7 +108,6 @@ const ProductManager = () => {
         loading={loading}
       />
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDelete
         open={isDeleteDialogOpen}
         product={productToDelete}

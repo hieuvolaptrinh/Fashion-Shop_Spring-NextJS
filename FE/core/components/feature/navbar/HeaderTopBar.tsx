@@ -6,7 +6,6 @@ export const HeaderTopBar: React.FC = () => {
     <div className="bg-muted/40 hidden border-b border-border/40 md:block text-xs text-muted-foreground">
       <div className="container mx-auto px-4">
         <div className="flex h-9 items-center justify-between">
-          {/* Thông tin liên hệ bên trái */}
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-1.5 hover:text-foreground transition-colors">
               <Phone className="h-3.5 w-3.5 text-primary" />
@@ -19,7 +18,6 @@ export const HeaderTopBar: React.FC = () => {
             </div>
           </div>
 
-          {/* Thông tin thanh toán & cam kết bên phải */}
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-1.5">
               <CreditCard className="h-3.5 w-3.5 text-primary" />

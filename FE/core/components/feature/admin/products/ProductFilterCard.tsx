@@ -45,7 +45,6 @@ const ProductFilterCard: React.FC<ProductFilterCardProps> = ({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {/* Tên sản phẩm */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -57,7 +56,6 @@ const ProductFilterCard: React.FC<ProductFilterCardProps> = ({
             />
           </div>
 
-          {/* Giá tối thiểu */}
           <div className="relative">
             <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
@@ -72,7 +70,6 @@ const ProductFilterCard: React.FC<ProductFilterCardProps> = ({
             />
           </div>
 
-          {/* Giá tối đa */}
           <div className="relative">
             <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
@@ -88,7 +85,6 @@ const ProductFilterCard: React.FC<ProductFilterCardProps> = ({
           </div>
         </div>
 
-        {/* Chọn loại sản phẩm */}
         {productTypes.length > 0 && (
           <div className="space-y-1.5 pt-1">
             <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
@@ -118,7 +114,6 @@ const ProductFilterCard: React.FC<ProductFilterCardProps> = ({
           </div>
         )}
 
-        {/* Action buttons */}
         <div className="flex items-center gap-2 pt-1">
           <Button
             size="sm"

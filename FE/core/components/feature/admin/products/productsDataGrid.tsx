@@ -115,7 +115,7 @@ const ProductsDataGrid = ({
         header: "Giá bán",
         headClassName: "w-[130px]",
         render: (item: Product) => (
-          <span className="text-sm font-bold text-primary">
+          <span className="text-sm font-bold text-rose-600">
             {formatCurrency(item.salePrice || 0)}
           </span>
         ),

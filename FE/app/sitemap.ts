@@ -69,12 +69,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let productSitemap: MetadataRoute.Sitemap = [];
 
   try {
-    const products = await getProducts();
+    const productsResponse = await getProducts({ size: 100 });
+    const products = productsResponse?.content ?? [];
 
-    if (products && products.length > 0) {
-      productSitemap = products.map((product: any) => ({
+    if (products.length > 0) {
+      productSitemap = products.map((product) => ({
         url: `${baseUrl}/products/${product.productId}`,
-        lastModified: new Date(product.updatedAt || currentDate),
+        lastModified: product.manufactureDate ? new Date(product.manufactureDate) : currentDate,
         changeFrequency: "weekly" as const,
         priority: 0.8,
       }));

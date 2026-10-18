@@ -5,11 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ROUTES } from "@/core/constants";
 import { useAuthStore } from "@/core/store/authStore";
 import { useCartStore } from "@/core/store/cartStore";
+import { toast } from "sonner";
 
 export interface OAuthRedirectState {
   isSuccess: boolean | null;
   errorMessage: string | null;
-  countdown: number;
   isAdmin: boolean;
   targetRoute: string;
   handleRedirectNow: () => void;
@@ -21,7 +21,8 @@ export interface OAuthRedirectState {
  * - Đồng bộ phiên đăng nhập vào Zustand `useAuthStore`
  * - Tự động đồng bộ giỏ hàng tạm lên server nếu có
  * - Tự động phát hiện quyền Admin để điều hướng chính xác về Dashboard hoặc Trang chủ/Giỏ hàng
- * - Quản lý đồng hồ đếm ngược 5 giây và trạng thái lỗi nếu OAuth2 thất bại
+ * - Chuyển hướng ngay lập tức (Instant Redirect) kèm thông báo toast thành công
+ * - Xử lý hiển thị thông báo lỗi nếu OAuth2 thất bại
  */
 export const useOAuthRedirect = (): OAuthRedirectState => {
   const router = useRouter();
@@ -30,11 +31,9 @@ export const useOAuthRedirect = (): OAuthRedirectState => {
 
   const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState(5);
   const [isAdmin, setIsAdmin] = useState(false);
   const [targetRoute, setTargetRoute] = useState<string>(ROUTES.USER.HOME);
 
-  // Phân tích tham số từ URL khi mount
   useEffect(() => {
     const errorParam = searchParams.get("error");
     const token = searchParams.get("token");
@@ -65,33 +64,16 @@ export const useOAuthRedirect = (): OAuthRedirectState => {
       : ROUTES.USER.HOME;
     setTargetRoute(destination);
 
-    // Đồng bộ vào Store
     loginToStore(token, fullName, roles);
 
-    // Âm thầm đồng bộ giỏ hàng tạm lên server
     useCartStore.getState().syncGuestCartToServer();
 
     setIsSuccess(true);
-  }, [searchParams, loginToStore]);
+    toast.success("Đăng nhập thành công!");
 
-  // Bộ đếm lùi tự động chuyển hướng khi thành công
-  useEffect(() => {
-    if (isSuccess !== true) return;
+    router.replace(destination);
+  }, [searchParams, loginToStore, router]);
 
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          router.replace(targetRoute);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [isSuccess, targetRoute, router]);
-
-  // Nút hành động chuyển hướng ngay lập tức
   const handleRedirectNow = () => {
     if (isSuccess) {
       router.replace(targetRoute);
@@ -103,7 +85,6 @@ export const useOAuthRedirect = (): OAuthRedirectState => {
   return {
     isSuccess,
     errorMessage,
-    countdown,
     isAdmin,
     targetRoute,
     handleRedirectNow,

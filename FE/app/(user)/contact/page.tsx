@@ -36,23 +36,18 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* 1. Hero Header */}
       <ContactHero />
 
-      {/* 2. Bento Channels Quick Contact */}
       <ContactChannels />
 
-      {/* 3. Main Split Section: Form & Store Information */}
       <section className="container mx-auto px-4 pb-12 sm:pb-16">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-          {/* Contact Interactive Form */}
           <div className="lg:col-span-7">
             <ScrollReveal direction="up" distance={24} duration={600}>
               <ContactForm />
             </ScrollReveal>
           </div>
 
-          {/* Store Info & Commitments */}
           <div className="lg:col-span-5">
             <ScrollReveal direction="up" distance={24} delay={150} duration={600}>
               <ContactInfo />
@@ -61,10 +56,8 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* 4. Frequently Asked Questions (Accordion) */}
       <ContactFaq />
 
-      {/* 5. Quick Support Call to Action */}
       <ContactCta />
     </div>
   );

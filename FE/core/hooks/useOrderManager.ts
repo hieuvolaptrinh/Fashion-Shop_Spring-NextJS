@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { getAllOrders, updateOrderStatus, type OrderFilterRequest } from "@/core/apis/order";
+import {
+  getAllOrders,
+  updateOrderStatus,
+  updateBatchOrderStatus,
+  type OrderFilterRequest,
+} from "@/core/apis/order";
 import { exportMultipleBills, exportAllBills } from "@/core/apis/bill";
 import { printPdfBlob } from "@/core/lib/printUtils";
 import type { Order } from "@/core/lib/type";
@@ -18,10 +23,13 @@ export const useOrderManager = () => {
   const [loading, setLoading] = useState(false);
   const [isPrintingBatch, setIsPrintingBatch] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
+  const [isBatchUpdatingStatus, setIsBatchUpdatingStatus] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState<number[]>([]);
 
   // Pagination states
-  const [paginationModel, setPaginationModel] = useState<PaginationModel>(DEFAULT_PAGINATION);
+  const [paginationModel, setPaginationModel] =
+    useState<PaginationModel>(DEFAULT_PAGINATION);
   const [totalRows, setTotalRows] = useState(0);
 
   // Filter states (draftFilters for form UI, appliedFilters for API trigger)
@@ -46,17 +54,31 @@ export const useOrderManager = () => {
       };
 
       const response = await getAllOrders(filterParams);
+      const pageData = (response as any)?.data ?? response;
 
-      if (response && response.content) {
-        setOrders(response.content);
-        setTotalRows(response.totalElements || 0);
+      let ordersData: Order[] = [];
+      let total = 0;
+
+      if (pageData && pageData.content && Array.isArray(pageData.content)) {
+        ordersData = pageData.content;
+        total = pageData.totalElements || 0;
+      } else if (
+        response &&
+        response.content &&
+        Array.isArray(response.content)
+      ) {
+        ordersData = response.content;
+        total = response.totalElements || 0;
+      } else if (Array.isArray(pageData)) {
+        ordersData = pageData;
+        total = pageData.length;
       } else if (Array.isArray(response)) {
-        setOrders(response);
-        setTotalRows(response.length);
-      } else {
-        setOrders([]);
-        setTotalRows(0);
+        ordersData = response;
+        total = response.length;
       }
+
+      setOrders(ordersData);
+      setTotalRows(total);
     } catch (error) {
       console.error("Error fetching orders:", error);
       toast.error("Không thể tải danh sách đơn hàng");
@@ -144,8 +166,16 @@ export const useOrderManager = () => {
       printPdfBlob(pdfBlob);
 
       toast.success(`Đang mở ${selectedOrders.length} hóa đơn để in...`);
+      // Cập nhật optimistic trạng thái đã in ngay trên UI
+      setOrders((prev) =>
+        prev.map((order) =>
+          selectedOrders.includes(order.orderId)
+            ? { ...order, isPrinted: true }
+            : order
+        )
+      );
       setSelectedOrders([]);
-      setTimeout(() => fetchOrders(), 1500);
+      await fetchOrders();
     } catch (error) {
       console.error("Error printing selected orders:", error);
       toast.error("Không thể in hóa đơn các đơn đã chọn!");
@@ -161,7 +191,11 @@ export const useOrderManager = () => {
       printPdfBlob(pdfBlob);
 
       toast.success("Đang mở toàn bộ hóa đơn chưa in...");
-      setTimeout(() => fetchOrders(), 1500);
+      // Cập nhật optimistic toàn bộ đơn hàng hiện tại sang trạng thái đã in
+      setOrders((prev) =>
+        prev.map((order) => ({ ...order, isPrinted: true }))
+      );
+      await fetchOrders();
     } catch (error) {
       console.error("Error printing all unprinted orders:", error);
       toast.error("Không có đơn hàng nào chưa in hoặc đã xảy ra lỗi!");
@@ -182,18 +216,50 @@ export const useOrderManager = () => {
 
   const handleUpdateStatus = async (orderId: number, newStatus: string) => {
     try {
+      setUpdatingOrderId(orderId);
       setIsUpdatingStatus(true);
       await updateOrderStatus(orderId, newStatus);
       toast.success(`Cập nhật trạng thái đơn hàng #${orderId} thành công!`);
+
+      // Optimistic state update
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.orderId === orderId ? { ...o, status: newStatus } : o
+        )
+      );
       setSelectedOrder((prev) =>
         prev && prev.orderId === orderId ? { ...prev, status: newStatus } : prev
       );
+
       await fetchOrders();
     } catch (error) {
       console.error("Lỗi khi cập nhật trạng thái đơn hàng:", error);
       toast.error("Không thể cập nhật trạng thái đơn hàng. Vui lòng thử lại!");
     } finally {
       setIsUpdatingStatus(false);
+      setUpdatingOrderId(null);
+    }
+  };
+
+  const handleBatchUpdateStatus = async (newStatus: string) => {
+    if (selectedOrders.length === 0) {
+      toast.error("Vui lòng chọn ít nhất 1 đơn hàng để đổi trạng thái!");
+      return;
+    }
+
+    try {
+      setIsBatchUpdatingStatus(true);
+      await updateBatchOrderStatus(selectedOrders, newStatus);
+      toast.success(
+        `Đã cập nhật trạng thái thành công cho ${selectedOrders.length} đơn hàng!`
+      );
+      setSelectedOrders([]);
+      await fetchOrders();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái hàng loạt:", error);
+      toast.error("Không thể cập nhật trạng thái các đơn đã chọn!");
+    } finally {
+      setIsBatchUpdatingStatus(false);
     }
   };
 
@@ -202,6 +268,8 @@ export const useOrderManager = () => {
     loading,
     isPrintingBatch,
     isUpdatingStatus,
+    updatingOrderId,
+    isBatchUpdatingStatus,
     selectedOrders,
     paginationModel,
     totalRows,
@@ -226,6 +294,7 @@ export const useOrderManager = () => {
     handleOrderDetailsOpen,
     handleOrderDetailsClose,
     handleUpdateStatus,
+    handleBatchUpdateStatus,
   };
 };
 

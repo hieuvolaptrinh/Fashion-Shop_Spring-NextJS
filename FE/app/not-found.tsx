@@ -8,7 +8,6 @@ export default function NotFound() {
           content="Trang bạn tìm kiếm không tồn tại trên Lan Chuyên Hàng Sale"
         />
 
-        {/* Open Graph for 404 page */}
         <meta
           property="og:title"
           content="Trang không tìm thấy - Lan Chuyên Hàng Sale"

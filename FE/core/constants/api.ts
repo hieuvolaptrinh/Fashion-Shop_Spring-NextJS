@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
     BASE: "/api/v1/products",
     BY_ID: (id: number | string) => `/api/v1/products/${id}`,
     TYPES: "/api/v1/types",
+    TYPE_BY_ID: (id: number | string) => `/api/v1/types/${id}`,
   },
 
   // Giỏ hàng (Shopping Cart)
@@ -51,6 +52,14 @@ export const API_ENDPOINTS = {
     CANCEL: (id: number | string) => `/api/v1/orders/${id}`,
     STATUS: (orderId: number | string, status: string) =>
       `/api/v1/orders/admin?orderId=${orderId}&status=${status}`,
+    BATCH_STATUS: (status: string) =>
+      `/api/v1/orders/admin/batch-status?status=${status}`,
+  },
+
+  // Bảng điều khiển quản trị (Admin Dashboard)
+  DASHBOARD: {
+    SUMMARY: (months: number = 6) =>
+      `/api/v1/admin/dashboard/summary?months=${months}`,
   },
 
   // Hóa đơn & Xuất phiếu (Bills & Invoices)

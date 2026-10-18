@@ -47,7 +47,7 @@ export default function SlideShow() {
         opts={{ loop: true }}
         plugins={[
           Autoplay({
-            delay: 5000,
+            delay: 8000,
             stopOnInteraction: false,
           }),
         ]}
@@ -73,17 +73,14 @@ export default function SlideShow() {
           ))}
         </CarouselContent>
 
-        {/* Nút điều hướng kính mờ (Desktop) */}
         <div className="hidden md:block">
           <CarouselPrevious className="absolute top-1/2 left-4 h-10 w-10 -translate-y-1/2 border-white/20 bg-black/30 text-white opacity-0 backdrop-blur-md transition-all hover:bg-black/50 hover:text-white group-hover:opacity-100" />
           <CarouselNext className="absolute top-1/2 right-4 h-10 w-10 -translate-y-1/2 border-white/20 bg-black/30 text-white opacity-0 backdrop-blur-md transition-all hover:bg-black/50 hover:text-white group-hover:opacity-100" />
         </div>
 
-        {/* Thanh chỉ số phân trang (Pagination Dots) */}
         <div className="absolute right-6 bottom-4 z-20 flex items-center gap-1.5 sm:right-10 sm:bottom-6 sm:gap-2">
           {Array.from({ length: count }).map((_, index) => (
             <button
-              // biome-ignore lint/suspicious/noArrayIndexKey: Fixed slide snaps
               key={index}
               type="button"
               aria-label={`Chuyển đến slide ${index + 1}`}

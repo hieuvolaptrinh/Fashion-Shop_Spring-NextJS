@@ -48,7 +48,6 @@ export const HeaderActions: React.FC = () => {
 
   return (
     <div className="hidden items-center space-x-3 md:flex">
-      {/* Icon Giỏ hàng - Luôn hiển thị cho cả Khách và Thành viên */}
       <TooltipProvider delayDuration={200}>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -70,10 +69,8 @@ export const HeaderActions: React.FC = () => {
         </Tooltip>
       </TooltipProvider>
 
-      {/* Phân nhánh Chưa đăng nhập vs Đã đăng nhập */}
       {!isAuthenticated ? (
         <div className="flex items-center space-x-2">
-          {/* Nút Tra cứu đơn hàng */}
           <Button
             variant="ghost"
             size="sm"
@@ -86,7 +83,6 @@ export const HeaderActions: React.FC = () => {
             </Link>
           </Button>
 
-          {/* Nút Đăng nhập */}
           <Button
             size="sm"
             asChild
@@ -100,7 +96,6 @@ export const HeaderActions: React.FC = () => {
         </div>
       ) : (
         <div className="flex items-center space-x-2">
-          {/* Nút Lối tắt Đơn hàng */}
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -120,7 +115,6 @@ export const HeaderActions: React.FC = () => {
             </Tooltip>
           </TooltipProvider>
 
-          {/* Dropdown Tài khoản người dùng */}
           <Popover>
             <PopoverTrigger asChild>
               <button

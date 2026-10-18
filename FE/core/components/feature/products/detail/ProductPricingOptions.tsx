@@ -61,22 +61,7 @@ export function ProductPricingOptions({
 
   return (
     <div className="space-y-5">
-      {/* Danh mục, Tên sản phẩm, Nút chia sẻ & Thông số */}
       <div>
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleShare}
-            className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer rounded-lg"
-            title="Chia sẻ sản phẩm"
-          >
-            <Share2 className="size-3.5" />
-            <span className="hidden sm:inline">Chia sẻ</span>
-          </Button>
-        </div>
-
         <h1 className="text-2xl font-black tracking-tight text-foreground md:text-3xl">
           {product.productName}
         </h1>
@@ -95,32 +80,44 @@ export function ProductPricingOptions({
         )}
       </div>
 
-      {/* Đánh giá sao & Uy tín */}
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-0.5">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Star
-              key={i}
-              className={`size-4 ${
-                i <= Math.round(averageRating)
-                  ? 'fill-warning text-warning'
-                  : 'text-muted-foreground/30'
-              }`}
-            />
-          ))}
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Star
+                key={i}
+                className={`size-4 ${
+                  i <= Math.round(averageRating)
+                    ? 'fill-warning text-warning'
+                    : 'text-muted-foreground/30'
+                }`}
+              />
+            ))}
+          </div>
+          <span className="text-xs font-medium text-muted-foreground sm:text-sm">
+            {totalReviews > 0
+              ? `(${averageRating.toFixed(1)} / 5 từ ${totalReviews} đánh giá)`
+              : 'Chưa có đánh giá'}
+          </span>
+          <span className="text-muted-foreground/40">•</span>
+          <span className="text-xs font-medium text-success">Đã bán 340+</span>
         </div>
-        <span className="text-xs font-medium text-muted-foreground sm:text-sm">
-          {totalReviews > 0
-            ? `(${averageRating.toFixed(1)} / 5 từ ${totalReviews} đánh giá)`
-            : 'Chưa có đánh giá'}
-        </span>
-        <span className="text-muted-foreground/40">•</span>
-        <span className="text-xs font-medium text-success">Đã bán 340+</span>
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleShare}
+          className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 cursor-pointer rounded-lg px-2.5 transition-colors"
+          title="Chia sẻ sản phẩm"
+        >
+          <Share2 className="size-3.5" />
+          <span className="hidden sm:inline">Chia sẻ</span>
+        </Button>
       </div>
 
-      {/* Giá tiền hiện tại tổng hợp */}
       <div className="flex flex-wrap items-baseline gap-3 rounded-2xl bg-muted/30 p-4 border border-border/60">
-        <span className="text-3xl font-black text-primary md:text-4xl">
+        <span className="text-3xl font-black text-rose-600 md:text-4xl">
           {formatCurrency(currentPrice)}
         </span>
         {hasDiscount && (
@@ -135,7 +132,6 @@ export function ProductPricingOptions({
         )}
       </div>
 
-      {/* Khối tùy chọn mua hàng Bento Combo */}
       <div className="space-y-3 pt-1">
         <div className="flex items-center justify-between">
           <Label className="text-sm font-bold text-foreground">
@@ -145,7 +141,6 @@ export function ProductPricingOptions({
         </div>
 
         <div className="grid gap-2.5">
-          {/* Mua sản phẩm đơn lẻ */}
           <div
             onClick={() => onSelectOption({ type: 'single' })}
             className={cn(
@@ -180,7 +175,7 @@ export function ProductPricingOptions({
               </div>
 
               <div className="text-right">
-                <span className="text-base font-black text-primary">
+                <span className="text-base font-black text-rose-600">
                   {formatCurrency(product.salePrice)}
                 </span>
                 {product.originalPrice > product.salePrice && (
@@ -192,7 +187,6 @@ export function ProductPricingOptions({
             </div>
           </div>
 
-          {/* Các tùy chọn Combo ưu đãi Bento Card */}
           {product.listCombo && product.listCombo.length > 0 && (
             <>
               {product.listCombo.map((combo) => {
@@ -259,7 +253,7 @@ export function ProductPricingOptions({
                       </div>
 
                       <div className="text-right">
-                        <span className="text-base font-black text-primary">
+                        <span className="text-base font-black text-rose-600">
                           {formatCurrency(combo.comboPrice)}
                         </span>
                         {comboOriginalTotal > combo.comboPrice && (

@@ -1,6 +1,9 @@
 import apiClient, { http } from "@/core/lib/apiClient";
-import type { Product, ProductRequest } from "../lib/type";
+import type { Product, ProductRequest, PageResponse, ApiResponse } from "../lib/type";
 import { API_ENDPOINTS } from "@/core/constants";
+
+// Tái sử dụng hàm getCategories chuẩn hóa từ categories.ts (Single Source of Truth)
+export { getCategories } from "@/core/apis/categories";
 
 export interface ProductQueryFilters {
   page?: number;
@@ -12,24 +15,11 @@ export interface ProductQueryFilters {
 }
 
 /**
- * Lấy danh sách danh mục / loại sản phẩm
- */
-export const getCategories = async (): Promise<any> => {
-  try {
-    const res = await http.get<any>(API_ENDPOINTS.PRODUCTS.TYPES);
-    return res?.data ?? res ?? [];
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-    throw error;
-  }
-};
-
-/**
  * Lấy danh sách sản phẩm phân trang và có bộ lọc
  */
 export const getProducts = async (
   filters: ProductQueryFilters = {}
-): Promise<any> => {
+): Promise<PageResponse<Product>> => {
   try {
     const params = new URLSearchParams();
 
@@ -58,11 +48,11 @@ export const getProducts = async (
       });
     }
 
-    const res = await http.get<any>(
+    const res = await http.get<ApiResponse<PageResponse<Product>> | PageResponse<Product>>(
       API_ENDPOINTS.PRODUCTS.BASE,
       { params }
     );
-    return res?.data ?? res;
+    return (res as ApiResponse<PageResponse<Product>>)?.data ?? (res as PageResponse<Product>);
   } catch (error) {
     console.error("Error fetching products:", error);
     throw error;
@@ -83,7 +73,8 @@ export const updateProduct = async (
       "product",
       new Blob([JSON.stringify(product)], {
         type: "application/json",
-      })
+      }),
+      "product.json"
     );
 
     if (files && files.length > 0) {
@@ -115,7 +106,8 @@ export const createProduct = async (
     const formData = new FormData();
     formData.append(
       "product",
-      new Blob([JSON.stringify(product)], { type: "application/json" })
+      new Blob([JSON.stringify(product)], { type: "application/json" }),
+      "product.json"
     );
 
     if (files && files.length > 0) {

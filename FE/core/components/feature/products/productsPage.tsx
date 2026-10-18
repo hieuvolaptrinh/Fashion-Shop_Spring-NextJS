@@ -16,7 +16,6 @@ function ProductsContent() {
   return (
     <div className="min-h-screen bg-background pb-16">
       <div className="container mx-auto px-3 pt-6 sm:px-4 sm:pt-8">
-        {/* Header với Breadcrumb & Tiêu đề */}
         <div className="mb-6 border-b border-border/60 pb-5">
           <div className="mb-3 flex items-center gap-1.5 text-xs text-muted-foreground">
             <Link href={ROUTES.USER.HOME} className="transition-colors hover:text-primary">
@@ -57,7 +56,6 @@ function ProductsContent() {
           </div>
         </div>
 
-        {/* Thanh tìm kiếm & bộ lọc */}
         <ProductsFilterBar
           searchTerm={p.searchTerm}
           onSearchChange={p.handleSearchChange}
@@ -72,14 +70,12 @@ function ProductsContent() {
           hasActiveFilters={p.hasActiveFilters}
         />
 
-        {/* Lưới sản phẩm */}
         <div className="grid min-h-[360px] grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6">
           {p.products.map((product) => (
             <ProductCard key={product.productId} product={product} variant="compact" />
           ))}
         </div>
 
-        {/* Trạng thái Loading */}
         {p.loading && (
           <div className="py-12 text-center">
             <div className="inline-flex items-center gap-2 text-sm text-muted-foreground sm:text-base">
@@ -89,7 +85,6 @@ function ProductsContent() {
           </div>
         )}
 
-        {/* Trạng thái không có kết quả */}
         {!p.loading && p.products.length === 0 && (
           <div className="my-14 text-center">
             <p className="text-base font-medium text-foreground sm:text-lg">
@@ -101,7 +96,6 @@ function ProductsContent() {
           </div>
         )}
 
-        {/* Phân trang */}
         {!p.loading && p.products.length > 0 && (
           <div className="mt-8 mb-6">
             <Pagination

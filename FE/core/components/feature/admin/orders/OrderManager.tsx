@@ -13,6 +13,8 @@ export const OrderManager: React.FC = () => {
     loading,
     isPrintingBatch,
     isUpdatingStatus,
+    updatingOrderId,
+    isBatchUpdatingStatus,
     selectedOrders,
     paginationModel,
     totalRows,
@@ -36,23 +38,24 @@ export const OrderManager: React.FC = () => {
     handleOrderDetailsOpen,
     handleOrderDetailsClose,
     handleUpdateStatus,
+    handleBatchUpdateStatus,
   } = useOrderManager();
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
-      {/* Page Header Toolbar */}
       <OrderHeader
         loading={loading}
         isPrintingBatch={isPrintingBatch}
+        isBatchUpdatingStatus={isBatchUpdatingStatus}
         showFilters={showFilters}
         selectedCount={selectedOrders.length}
         onRefresh={() => fetchOrders()}
         onToggleFilters={() => setShowFilters(!showFilters)}
         onPrintSelected={handlePrintSelected}
         onPrintAllUnprinted={handlePrintAllUnprinted}
+        onBatchUpdateStatus={handleBatchUpdateStatus}
       />
 
-      {/* Filter Section (Collapsible) */}
       {showFilters && (
         <OrderFilterCard
           filters={filters}
@@ -66,7 +69,6 @@ export const OrderManager: React.FC = () => {
         />
       )}
 
-      {/* Orders Table */}
       <OrdersDataGrid
         orders={orders}
         loading={loading}
@@ -77,9 +79,10 @@ export const OrderManager: React.FC = () => {
         onOrderSelection={handleOrderSelection}
         onSelectAll={handleSelectAll}
         onOrderDetailsOpen={handleOrderDetailsOpen}
+        onUpdateStatus={handleUpdateStatus}
+        updatingOrderId={updatingOrderId}
       />
 
-      {/* Order Details Modal */}
       <OrderDetails
         open={orderDetailsOpen}
         onClose={handleOrderDetailsClose}

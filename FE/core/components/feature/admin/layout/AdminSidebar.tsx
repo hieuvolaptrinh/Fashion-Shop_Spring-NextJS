@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
+  FolderTree,
   ShoppingBag,
   Store,
   ChevronRight,
@@ -32,7 +33,13 @@ const menuItems = [
     title: "Sản phẩm",
     href: ROUTES.ADMIN.PRODUCTS,
     icon: Package,
-    description: "Quản lý danh mục & kho",
+    description: "Quản lý sản phẩm & kho",
+  },
+  {
+    title: "Danh mục",
+    href: ROUTES.ADMIN.CATEGORIES,
+    icon: FolderTree,
+    description: "Phân loại sản phẩm",
   },
   {
     title: "Đơn hàng",
@@ -109,7 +116,6 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile Backdrop */}
       {isMobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
@@ -117,7 +123,6 @@ export default function AdminSidebar() {
         />
       )}
 
-      {/* Main Sidebar */}
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-background/95 backdrop-blur transition-all duration-300 md:static",
@@ -125,7 +130,6 @@ export default function AdminSidebar() {
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
-        {/* Brand / Logo Header */}
         <div className="flex h-16 items-center justify-between border-b px-4">
           <Link
             href={ROUTES.ADMIN.DASHBOARD}
@@ -152,7 +156,6 @@ export default function AdminSidebar() {
           </Link>
         </div>
 
-        {/* Navigation Section */}
         <div className="flex-1 overflow-y-auto py-4">
           <div className="px-4 mb-2">
             {!isCollapsed && (
@@ -164,9 +167,7 @@ export default function AdminSidebar() {
           {renderNavLinks()}
         </div>
 
-        {/* Bottom Section */}
         <div className="border-t p-3 space-y-2">
-          {/* Quick link to Storefront */}
           <TooltipProvider delayDuration={100}>
             {isCollapsed ? (
               <Tooltip>
@@ -193,7 +194,6 @@ export default function AdminSidebar() {
             )}
           </TooltipProvider>
 
-          {/* Toggle Button when collapsed */}
           {isCollapsed && (
             <Button
               variant="ghost"

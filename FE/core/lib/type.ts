@@ -31,6 +31,8 @@ export type Combo = {
 export type CategoryItem = {
   typeId: number;
   typeName: string;
+  imageUrl?: string;
+  productCount?: number;
 };
 
 export type ProductRequest = {
@@ -45,6 +47,7 @@ export type ProductRequest = {
   manufactureDate?: string;
   listTypes?: number[];
   deletedImageIds?: number[];
+  newImageUrls?: string[];
   listCombo?: Combo[];
   deletedComboIds?: number[];
 };
