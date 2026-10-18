@@ -31,6 +31,8 @@ export const IMAGES = {
     DEMO_4: "/productDemo4.jpg",
     DEMO_5: "/productDemo5.jpg",
     DEMO_6: "/productDemo6.jpg",
+    DEMO_7: "/productDemo7.jpg",
+    DEMO_8: "/productDemo8.jpg",
   },
 
   // Ảnh danh mục sản phẩm (Boutique Fashion & Lifestyle)
