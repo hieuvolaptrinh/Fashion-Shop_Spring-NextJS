@@ -27,7 +27,7 @@ export const ContactChannels = () => {
                 </h3>
 
                 {/* Main Value */}
-                <p className="mb-2 text-base font-bold text-foreground sm:text-lg">
+                <p className="mb-2 text-xs font-bold text-foreground sm:text-sm">
                   {channel.value}
                 </p>
 
