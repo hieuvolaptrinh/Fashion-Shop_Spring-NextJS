@@ -33,6 +33,22 @@ public class HealtyStoreApplication {
                 System.setProperty("CLOUDINARY_CLOUD_NAME",
                                 dotenv.get("CLOUDINARY_CLOUD_NAME"));
 
+                // Gemini AI Chatbot Key Pool
+                String geminiKeys = dotenv.get("GEMINI_API_KEYS");
+                if (geminiKeys == null || geminiKeys.isBlank()) {
+                    String k1 = dotenv.get("GEMINI_KEY_1");
+                    String k2 = dotenv.get("GEMINI_KEY_2");
+                    java.util.List<String> list = new java.util.ArrayList<>();
+                    if (k1 != null && !k1.isBlank()) list.add(k1.trim());
+                    if (k2 != null && !k2.isBlank()) list.add(k2.trim());
+                    if (!list.isEmpty()) {
+                        geminiKeys = String.join(",", list);
+                    }
+                }
+                if (geminiKeys != null && !geminiKeys.isBlank()) {
+                    System.setProperty("GEMINI_API_KEYS", geminiKeys);
+                }
+
                 SpringApplication.run(HealtyStoreApplication.class, args);
         }
 }

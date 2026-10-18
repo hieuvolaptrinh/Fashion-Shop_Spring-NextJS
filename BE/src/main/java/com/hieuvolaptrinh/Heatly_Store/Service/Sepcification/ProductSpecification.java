@@ -14,33 +14,37 @@ public class ProductSpecification {
     public static Specification<Product> filterProducts(ProductFilterRequest filter) {
         return (root, query, criteriaBuilder) -> {
             Predicate predicate = criteriaBuilder.conjunction();
+            Join<Product, Type> typeJoin = null;
 
-            // Lọc theo tên sản phẩm (LIKE - không phân biệt hoa thường)
+            // Lọc theo tên sản phẩm / từ khóa (tìm trong productName, description, hoặc typeName)
             if (filter.getProductName() != null && !filter.getProductName().trim().isEmpty()) {
-                predicate = criteriaBuilder.and(predicate,
-                        criteriaBuilder.like(
-                                criteriaBuilder.lower(root.get("productName")),
-                                "%" + filter.getProductName().toLowerCase().trim() + "%"));
+                String searchKeyword = "%" + filter.getProductName().toLowerCase().trim() + "%";
+                typeJoin = root.join("listTypes", jakarta.persistence.criteria.JoinType.LEFT);
+
+                Predicate nameMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")), searchKeyword);
+                Predicate descMatch = criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), searchKeyword);
+                Predicate typeNameMatch = criteriaBuilder.like(criteriaBuilder.lower(typeJoin.get("typeName")), searchKeyword);
+
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.or(nameMatch, descMatch, typeNameMatch));
+                query.distinct(true);
             }
 
-            // Lọc theo khoảng giá bán tối thiểu
             if (filter.getMinSalePrice() != null && filter.getMinSalePrice() > 0) {
                 predicate = criteriaBuilder.and(predicate,
                         criteriaBuilder.greaterThanOrEqualTo(root.get("salePrice"), filter.getMinSalePrice()));
             }
 
-            // Lọc theo khoảng giá bán tối đa
             if (filter.getMaxSalePrice() != null && filter.getMaxSalePrice() > 0) {
                 predicate = criteriaBuilder.and(predicate,
                         criteriaBuilder.lessThanOrEqualTo(root.get("salePrice"), filter.getMaxSalePrice()));
             }
 
-            // Lọc theo danh sách loại sản phẩm
             if (filter.getTypeId() != null && !filter.getTypeId().isEmpty()) {
-                Join<Product, Type> typeJoin = root.join("listTypes");
+                if (typeJoin == null) {
+                    typeJoin = root.join("listTypes", jakarta.persistence.criteria.JoinType.LEFT);
+                }
                 predicate = criteriaBuilder.and(predicate,
                         typeJoin.get("typeId").in(filter.getTypeId()));
-                // Để tránh duplicate kết quả khi join với nhiều types
                 query.distinct(true);
             }
 

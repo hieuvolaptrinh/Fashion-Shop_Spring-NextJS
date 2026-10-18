@@ -128,7 +128,7 @@ private final ComboRepository comboRepo;
         return buildCartResponse(cart);
     }
     // Lấy cart theo user details
-    @Transactional(readOnly = true)
+    @Transactional(rollbackFor = Exception.class)
     public CartResponse getCartByUserDetails(UserDetails userDetails) {
         int userId = Integer.parseInt(userDetails.getUsername());
         User user = userRepo.findByUserId(userId)
@@ -136,11 +136,13 @@ private final ComboRepository comboRepo;
 
         Cart cart = user.getCart();
         if (cart == null) {
-            cart = new Cart();
-            cart.setUser(user);
-
-            cart.setListCartDetails(new ArrayList<>());
-            cart = cartRepo.save(cart);
+            cart = cartRepo.findByUser_UserId(userId);
+            if (cart == null) {
+                cart = new Cart();
+                cart.setUser(user);
+                cart.setListCartDetails(new ArrayList<>());
+                cart = cartRepo.save(cart);
+            }
             user.setCart(cart);
             userRepo.save(user);
         }

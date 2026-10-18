@@ -37,7 +37,6 @@ public class UserService {
         this.cartRepository = cartRepository;
     }
 
-    // Fetch user by phone number
     @Transactional(readOnly = true)
     public User fetchUserLogin(String identifier) {
         Optional<User> userOptional;
@@ -92,7 +91,6 @@ public class UserService {
                 .orElse(null);
     }
 
-    // get all users (for admin)
     @Transactional(readOnly = true)
     public List<UserResponse> getAllUser() {
         List<User> users = userRepository.findAll();
@@ -108,7 +106,6 @@ public class UserService {
 
         return userRepository.findByUserId(userId)
                 .map(user -> {
-                    // Update user fields
                     user.setPhoneNumber(userRequest.getPhoneNumber());
                     user.setFullName(userRequest.getFullName());
 
@@ -139,7 +136,6 @@ public class UserService {
     public String deleteAddress(UserDetails userDetails, Integer addressId) {
         Integer userId = Integer.parseInt(userDetails.getUsername());
 
-        // Verify user exists
         if (!userRepository.findByUserId(userId).isPresent()) {
             throw new RuntimeException("User not found with id: " + userId);
         }
@@ -155,7 +151,6 @@ public class UserService {
     public AddressResponse updateAddress(UserDetails userDetails, Integer addressId, AddressRequest addressRequest) {
         Integer userId = Integer.parseInt(userDetails.getUsername());
 
-        // Verify user exists
         if (!userRepository.findByUserId(userId).isPresent()) {
             return null;
         }
@@ -230,7 +225,6 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    // Convert list of User entities to list of UserResponse DTOs
     public static List<UserResponse> convertToUserResponseList(List<User> users) {
         if (users == null) {
             return null;

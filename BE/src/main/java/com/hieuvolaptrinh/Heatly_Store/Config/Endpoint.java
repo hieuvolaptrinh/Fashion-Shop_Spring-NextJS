@@ -14,6 +14,7 @@ public class Endpoint {
     };
 
     public static final String[] ADMIN_ENDPOINTS = {
+            "/api/v1/admin/dashboard/**",
             "/api/v1/bills/**",
             "/api/v1/products/**",
             "/api/v1/orders/**",

@@ -1,7 +1,5 @@
 package com.hieuvolaptrinh.Heatly_Store.Controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hieuvolaptrinh.Heatly_Store.Request.ListOrderRequest;
 import com.hieuvolaptrinh.Heatly_Store.Response.InvoiceResponse;
 import com.hieuvolaptrinh.Heatly_Store.Service.InvoiceService;
@@ -75,24 +73,8 @@ public class BillController {
      */
     @PostMapping("/export-multiple")
     public void exportMultipleInvoicesRaw(
-            @RequestBody String rawBody,
+            @RequestBody List<Integer> orderIds,
             HttpServletResponse response) {
-        List<Integer> orderIds;
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            orderIds = objectMapper.readValue(rawBody, new TypeReference<List<Integer>>() {
-            });
-        } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.setContentType("text/plain;charset=UTF-8");
-            try {
-                response.getWriter().write("Dữ liệu đầu vào không đúng định dạng JSON.");
-            } catch (IOException ex) {
-                throw new UncheckedIOException(ex);
-            }
-            return;
-        }
-
         if (orderIds == null || orderIds.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             try {

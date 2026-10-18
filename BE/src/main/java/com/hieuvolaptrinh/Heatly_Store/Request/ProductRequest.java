@@ -39,14 +39,15 @@ public class ProductRequest {
     @Min(value = 0, message = "Quantity must be greater than or equal to 0")
     private int quantity;
 
-    // ngày sản xuất
     private Date manufactureDate;
 
     private List<Integer> listTypes;
 
-    private List<Long> deletedImageIds; // Danh sách ID hình ảnh cần xóa
+    private List<Long> deletedImageIds;
+
+    private List<String> newImageUrls;
 
     private List<ComboResponse> listCombo;
 
-    private List<Long> deletedComboIds; // Danh sách ID hình ảnh cần xóa
+    private List<Long> deletedComboIds;
 }

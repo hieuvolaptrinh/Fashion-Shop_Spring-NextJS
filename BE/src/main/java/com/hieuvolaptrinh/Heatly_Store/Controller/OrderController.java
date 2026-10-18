@@ -63,6 +63,16 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(message);
     }
 
+    // Cập nhật trạng thái hàng loạt đơn hàng
+    @PutMapping("/admin/batch-status")
+    @ApiMessage("Update batch order status successfully")
+    public ResponseEntity<String> updateBatchOrderStatus(
+            @RequestBody List<Integer> orderIds,
+            @RequestParam(name = "status") String statusParam) {
+        String message = orderService.updateBatchOrderStatus(orderIds, statusParam);
+        return ResponseEntity.status(HttpStatus.OK).body(message);
+    }
+
     /*
      * e có code phân trang với lọc theo khoảng tổng tiền, trạng thái đơn hàng, =>
      * cái này là lấy tất cả đơn hàng cho admin

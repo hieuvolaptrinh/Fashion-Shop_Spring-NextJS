@@ -28,11 +28,9 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
         int status = servletResponse.getStatus();
 
-        // Nếu body đã là RestResponse, trả về nguyên bản
         if (body instanceof RestResponse || body instanceof String) {
             return body;
         }
-        // Bỏ qua các endpoint Swagger
         String path = request.getURI().getPath();
         if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui")) {
             return body;
@@ -41,7 +39,6 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
         RestResponse<Object> restResponse = new RestResponse<>();
         restResponse.setStatus(status);
 
-        // Xử lý lỗi
         if (status >= 400) {
             if (body instanceof String) {
                 restResponse.setError(new Notification((String) body));
@@ -52,7 +49,6 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
             return restResponse;
         }
 
-        // Xử lý thành công
         restResponse.setData(body);
         restResponse.setMessage("Success");
 

@@ -5,7 +5,7 @@ import com.hieuvolaptrinh.Heatly_Store.Repository.OrderRepository;
 import com.hieuvolaptrinh.Heatly_Store.Response.InvoiceItemResponse;
 import com.hieuvolaptrinh.Heatly_Store.Response.InvoiceResponse;
 import com.hieuvolaptrinh.Heatly_Store.Util.Enum.OrderStatusEnum;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,6 +29,8 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 public class InvoiceService {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InvoiceService.class);
+
     private final OrderRepository orderRepo;
 
     public InvoiceService(OrderRepository orderRepo) {
@@ -41,26 +44,36 @@ public class InvoiceService {
         Order o = orderRepo.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Order không tồn tại: " + orderId));
+        return convertOrderToInvoiceResponse(o);
+    }
+
+    /**
+     * Chuyển đổi Order entity sang InvoiceResponse (tái sử dụng, tránh query lặp lại)
+     */
+    public InvoiceResponse convertOrderToInvoiceResponse(Order o) {
         InvoiceResponse dto = new InvoiceResponse();
         dto.setOrderId(o.getOrderId());
         dto.setCreateAt(o.getCreateAt());
-        dto.setCustomerName(o.getUser().getFullName());
+        dto.setCustomerName(o.getUser() != null ? o.getUser().getFullName() : "Khách hàng");
         dto.setCustomerPhone(o.getPhoneNumber());
-        dto.setShippingAddress(o.getShippingAddress().toString());
-        List<InvoiceItemResponse> items = o.getOrderDetails().stream().map(d -> {
+        dto.setShippingAddress(o.getShippingAddress() != null ? o.getShippingAddress().toString() : "");
+        List<InvoiceItemResponse> items = o.getOrderDetails() != null ? o.getOrderDetails().stream().map(d -> {
             InvoiceItemResponse it = new InvoiceItemResponse();
-            it.setProductId(d.getProduct().getProductId());
-            // Nếu có combo thì lấy tên combo, nếu không thì lấy tên sản phẩm
+            if (d.getProduct() != null) {
+                it.setProductId(d.getProduct().getProductId());
+            }
             if (d.getCombo() != null) {
                 it.setProductName(d.getCombo().getComboDescription());
-            } else {
+            } else if (d.getProduct() != null) {
                 it.setProductName(d.getProduct().getProductName());
+            } else {
+                it.setProductName("Sản phẩm");
             }
             it.setQuantity(d.getQuantity());
             it.setUnitPrice(d.getPrice());
             it.setLineTotal(d.getQuantity() * d.getPrice());
             return it;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()) : new ArrayList<>();
         dto.setItems(items);
         dto.setTotalPrice(items.stream()
                 .mapToDouble(InvoiceItemResponse::getLineTotal)
@@ -68,14 +81,12 @@ public class InvoiceService {
         return dto;
     }
 
-    //  func lọc kí tự đặc biệt
     public String cleanText(String input, PDType0Font font) throws IOException {
         if (input == null) return "";
-        //  Loại ký tự đặc biệt bằng regex
         String result = input.replaceAll("[^\\p{L}\\p{Nd}\\p{P}\\p{Z}]", "");
         return result.toString();
     }
-    // random mã hoa đơn
+
     public String randomUpperLetters(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         StringBuilder sb = new StringBuilder();
@@ -155,11 +166,10 @@ public class InvoiceService {
                     y -= 8;
                 }
 
-                // Header bảng
-                cs.setNonStrokingColor(230, 230, 230);
+                cs.setNonStrokingColor(new Color(230, 230, 230));
                 cs.addRect(margin, y - 10, 142, 10);
                 cs.fill();
-                cs.setNonStrokingColor(0, 0, 0);
+                cs.setNonStrokingColor(Color.BLACK);
 
                 cs.beginText();
                 cs.setFont(fontBold, 6);
@@ -171,7 +181,6 @@ public class InvoiceService {
                 cs.endText();
                 y -= 16;
 
-                // Danh sách sản phẩm
                 while (itemIndex < items.size()) {
                     InvoiceItemResponse it = items.get(itemIndex);
                     String cleanedProductName = cleanText(it.getProductName(), fontRegular);
@@ -216,12 +225,10 @@ public class InvoiceService {
                     itemIndex++;
                 }
 
-                // Nếu in hết toàn bộ sản phẩm => in phần tổng kết
                 if (itemIndex >= items.size()) {
                     drawLine(cs, margin, y - 5, 142, 0.5f, 0.7f);
                     y -= 14;
 
-                    // Phí vận chuyển
                     double subtotal = inv.getTotalPrice();
                     double shippingFee = (subtotal > 500000 || subtotal == 0) ? 0 : 30000;
 
@@ -233,7 +240,6 @@ public class InvoiceService {
                     showTextRightAligned(cs, shippingFee == 0 ? "0 VND (Miễn phí)" : String.format("%,.0f VND", shippingFee), fontBold, 5, 10, y);
                     y -= 12;
 
-                    // Tổng cộng
                     cs.beginText();
                     cs.setFont(fontBold, 7);
                     cs.newLineAtOffset(margin, y);
@@ -261,263 +267,75 @@ public class InvoiceService {
         }
     }
 
-    // in 1 đơn
+    // in 1 đơn (truy vấn 1 lần duy nhất, tránh double findById)
     public byte[] generatePdfAndMark(Integer orderId) {
-        InvoiceResponse inv = getInvoiceData(orderId);
-        byte[] pdf = renderProductInvoicePdf(inv);
         Order o = orderRepo.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Order không tồn tại: " + orderId));
+        InvoiceResponse inv = convertOrderToInvoiceResponse(o);
+        byte[] pdf = renderProductInvoicePdf(inv);
         o.setBill(true);
         orderRepo.save(o);
         return pdf;
     }
 
-    // in nhiều đơn
     public byte[] generateMultipleInvoicesPdf(List<Integer> orderIds) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-
-            PDFMergerUtility merger = new PDFMergerUtility();
-            merger.setDestinationStream(baos);
-
-            for (Integer orderId : orderIds) {
-                try {
-                    System.out.println("Đang xử lý hóa đơn orderId = " + orderId);
-
-                    byte[] singlePdf = generatePdfAndMark(orderId);
-                    if (singlePdf == null || singlePdf.length == 0) {
-                        System.err.println("PDF rỗng cho orderId: " + orderId);
-                        continue;
-                    }
-
-                    // merge bằng stream
-                    merger.addSource(new java.io.ByteArrayInputStream(singlePdf));
-
-                } catch (Exception ex) {
-                    System.err.println("Lỗi orderId = " + orderId);
-                    ex.printStackTrace();
-                    // tiếp tục các hóa đơn còn lại
-                }
-            }
-
-            merger.mergeDocuments(null); // merge tất cả vào baos
-            return baos.toByteArray();
-
-        } catch (IOException e) {
-            System.err.println("Lỗi khi tạo PDF nhiều hóa đơn:");
-            e.printStackTrace();
-            throw new RuntimeException("Lỗi khi tạo PDF nhiều hóa đơn", e);
+        if (orderIds == null || orderIds.isEmpty()) {
+            return new byte[0];
         }
-    }
 
-    // in tất cả các đơn
-    public byte[] generateAllInvoicesPdf() {
-        List<Integer> orderIds = orderRepo.findAll().stream()
-                .map(Order::getOrderId)
-                .collect(Collectors.toList());
-
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-
-            PDFMergerUtility merger = new PDFMergerUtility();
-            merger.setDestinationStream(baos);
-
-            for (Integer orderId : orderIds) {
-                try {
-                    System.out.println("Đang xử lý hóa đơn orderId = " + orderId);
-
-                    byte[] singlePdf = generatePdfAndMark(orderId);
-                    if (singlePdf == null || singlePdf.length == 0) {
-                        System.err.println("PDF rỗng cho orderId: " + orderId);
-                        continue;
-                    }
-
-                    // merge bằng stream
-                    merger.addSource(new java.io.ByteArrayInputStream(singlePdf));
-
-                } catch (Exception ex) {
-                    System.err.println("Lỗi orderId = " + orderId);
-                    ex.printStackTrace();
-                    // tiếp tục các hóa đơn còn lại
-                }
-            }
-
-            merger.mergeDocuments(null); // merge tất cả vào baos
-            return baos.toByteArray();
-
-        } catch (IOException e) {
-            System.err.println("Lỗi khi tạo PDF nhiều hóa đơn:");
-            e.printStackTrace();
-            throw new RuntimeException("Lỗi khi tạo PDF nhiều hóa đơn", e);
-        }
-    }
-
-    // in đơn hàng trạng thái delivered
-    public byte[] generatebyDeliverInvoicesPdf() {
-        List<Integer> orderIds = orderRepo.findAll().stream()
-                .filter(o -> o.getStatus() == OrderStatusEnum.DELIVERED)
-                .map(Order::getOrderId)
-                .collect(Collectors.toList());
-
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-
-            PDFMergerUtility merger = new PDFMergerUtility();
-            merger.setDestinationStream(baos);
-
-            for (Integer orderId : orderIds) {
-                try {
-                    System.out.println("Đang xử lý hóa đơn orderId = " + orderId);
-
-                    byte[] singlePdf = generatePdfAndMark(orderId);
-                    if (singlePdf == null || singlePdf.length == 0) {
-                        System.err.println("PDF rỗng cho orderId: " + orderId);
-                        continue;
-                    }
-
-                    // merge bằng stream
-                    merger.addSource(new java.io.ByteArrayInputStream(singlePdf));
-
-                } catch (Exception ex) {
-                    System.err.println("Lỗi orderId = " + orderId);
-                    ex.printStackTrace();
-                    // tiếp tục các hóa đơn còn lại
-                }
-            }
-
-            merger.mergeDocuments(null); // merge tất cả vào baos
-            return baos.toByteArray();
-
-        } catch (IOException e) {
-            System.err.println("Lỗi khi tạo PDF nhiều hóa đơn:");
-            e.printStackTrace();
-            throw new RuntimeException("Lỗi khi tạo PDF nhiều hóa đơn", e);
-        }
-    }
-
-    // in đơn hàng trạng thái shipping
-    public byte[] generatebyShippingInvoicesPdf() {
-        List<Integer> orderIds = orderRepo.findAll().stream()
-                .filter(o -> o.getStatus() == OrderStatusEnum.SHIPPING)
-                .map(Order::getOrderId)
-                .collect(Collectors.toList());
-
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-
-            PDFMergerUtility merger = new PDFMergerUtility();
-            merger.setDestinationStream(baos);
-
-            for (Integer orderId : orderIds) {
-                try {
-                    System.out.println("⚙️ Đang xử lý hóa đơn orderId = " + orderId);
-
-                    byte[] singlePdf = generatePdfAndMark(orderId);
-                    if (singlePdf == null || singlePdf.length == 0) {
-                        System.err.println("PDF rỗng cho orderId: " + orderId);
-                        continue;
-                    }
-
-                    // merge bằng stream
-                    merger.addSource(new java.io.ByteArrayInputStream(singlePdf));
-
-                } catch (Exception ex) {
-                    System.err.println("Lỗi orderId = " + orderId);
-                    ex.printStackTrace();
-                    // tiếp tục các hóa đơn còn lại
-                }
-            }
-
-            merger.mergeDocuments(null); // merge tất cả vào baos
-            return baos.toByteArray();
-
-        } catch (IOException e) {
-            System.err.println(" Lỗi khi tạo PDF nhiều hóa đơn:");
-            e.printStackTrace();
-            throw new RuntimeException("Lỗi khi tạo PDF nhiều hóa đơn", e);
-        }
-    }
-
-    // in đơn hàng trạng thái cancelled
-    public byte[] generatebyCancleInvoicesPdf() {
-        List<Integer> orderIds = orderRepo.findAll().stream()
-                .filter(o -> o.getStatus() == OrderStatusEnum.CANCELLED)
-                .map(Order::getOrderId)
-                .collect(Collectors.toList());
-
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-
-            PDFMergerUtility merger = new PDFMergerUtility();
-            merger.setDestinationStream(baos);
-
-            for (Integer orderId : orderIds) {
-                try {
-                    System.out.println("⚙️ Đang xử lý hóa đơn orderId = " + orderId);
-
-                    byte[] singlePdf = generatePdfAndMark(orderId);
-                    if (singlePdf == null || singlePdf.length == 0) {
-                        System.err.println("PDF rỗng cho orderId: " + orderId);
-                        continue;
-                    }
-
-                    // merge bằng stream
-                    merger.addSource(new java.io.ByteArrayInputStream(singlePdf));
-
-                } catch (Exception ex) {
-                    System.err.println("Lỗi orderId = " + orderId);
-                    ex.printStackTrace();
-                    // tiếp tục các hóa đơn còn lại
-                }
-            }
-
-            merger.mergeDocuments(null); // merge tất cả vào baos
-            return baos.toByteArray();
-
-        } catch (IOException e) {
-            System.err.println(" Lỗi khi tạo PDF nhiều hóa đơn:");
-            e.printStackTrace();
-            throw new RuntimeException("Lỗi khi tạo PDF nhiều hóa đơn", e);
-        }
-    }
-
-    // In đơn theo trạng thái đã in hay chưa in
-
-    public byte[] generateInvoicesByPrintedStatus(boolean isbill) {
-        List<Integer> orderIds = orderRepo.findAll().stream()
-                .filter(o -> o.isBill() == isbill)
-                .map(Order::getOrderId)
-                .collect(Collectors.toList());
-        // orderIds.forEach(o -> {
-        // Order order = orderRepo.findById(o).get();
-        // order.setBill(true);
-        // orderRepo.save(order);
-        // });
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             PDFMergerUtility merger = new PDFMergerUtility();
             merger.setDestinationStream(baos);
 
             for (Integer orderId : orderIds) {
                 try {
-                    System.out.println("Đang xử lý hóa đơn orderId = " + orderId);
+                    log.info("Đang xử lý hóa đơn orderId = {}", orderId);
+
                     byte[] singlePdf = generatePdfAndMark(orderId);
                     if (singlePdf == null || singlePdf.length == 0) {
-                        System.err.println("PDF rỗng cho orderId: " + orderId);
+                        log.warn("PDF rỗng cho orderId: {}", orderId);
                         continue;
                     }
+
                     merger.addSource(new ByteArrayInputStream(singlePdf));
                 } catch (Exception ex) {
-                    System.err.println("Lỗi orderId = " + orderId);
-                    ex.printStackTrace();
+                    log.error("Lỗi khi tạo hóa đơn cho orderId = {}: {}", orderId, ex.getMessage(), ex);
                 }
             }
 
             merger.mergeDocuments(null);
             return baos.toByteArray();
         } catch (IOException e) {
-            System.err.println("Lỗi khi tạo PDF nhiều hóa đơn:");
-            e.printStackTrace();
+            log.error("Lỗi khi tạo PDF nhiều hóa đơn:", e);
             throw new RuntimeException("Lỗi khi tạo PDF nhiều hóa đơn", e);
         }
     }
 
-    // helper method
+    // in tất cả các đơn (truy vấn DB chỉ lấy ID, chống kéo cả bảng về RAM)
+    public byte[] generateAllInvoicesPdf() {
+        return generateMultipleInvoicesPdf(orderRepo.findAllOrderIds());
+    }
+
+    public byte[] generatebyDeliverInvoicesPdf() {
+        return generateMultipleInvoicesPdf(orderRepo.findOrderIdsByStatus(OrderStatusEnum.DELIVERED));
+    }
+
+    public byte[] generatebyShippingInvoicesPdf() {
+        return generateMultipleInvoicesPdf(orderRepo.findOrderIdsByStatus(OrderStatusEnum.SHIPPING));
+    }
+
+    public byte[] generatebyCancleInvoicesPdf() {
+        return generateMultipleInvoicesPdf(orderRepo.findOrderIdsByStatus(OrderStatusEnum.CANCELLED));
+    }
+
+    public byte[] generateInvoicesByPrintedStatus(boolean isbill) {
+        List<Integer> orderIds = isbill
+                ? orderRepo.findAll().stream().filter(o -> Boolean.TRUE.equals(o.isBill())).map(Order::getOrderId).collect(Collectors.toList())
+                : orderRepo.findUnprintedOrderIds();
+        return generateMultipleInvoicesPdf(orderIds);
+    }
+
     private float drawWrappedLabelValue(PDPageContentStream cs, String label, String value,
                                         float x, float y, PDType0Font labelFont, PDType0Font valueFont,
                                         float offsetX, float fontSize, float maxWidth) throws IOException {
@@ -620,7 +438,7 @@ public class InvoiceService {
         cs.moveTo(x, y);
         cs.lineTo(x + length, y);
         cs.stroke();
-        cs.setStrokingColor(0);
+        cs.setStrokingColor(0f);
     }
 
 }

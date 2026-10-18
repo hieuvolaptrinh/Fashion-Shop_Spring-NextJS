@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalException {
     @ExceptionHandler(value = {
-            Exception.class, // một mình cái này là lấy full lỗi r
+            Exception.class,
             BadRequestException.class })
     public ResponseEntity<RestResponse<Object>> handleMainException(Exception exception) {
         RestResponse<Object> restResponse = new RestResponse<>();
@@ -35,7 +35,6 @@ public class GlobalException {
         RestResponse<Object> res = new RestResponse<>();
         res.setStatus(HttpStatus.BAD_REQUEST.value());
 
-        // Lọc lỗi và lấy thông tin lỗi
         List<String> errors = fieldErrors.stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.toList());
@@ -51,12 +50,11 @@ public class GlobalException {
         RestResponse<Object> res = new RestResponse<>();
         res.setStatus(HttpStatus.BAD_REQUEST.value());
 
-        // Lọc lỗi và lấy thông tin lỗi
         List<String> errors = ex.getConstraintViolations().stream()
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.toList());
 
-        res.setMessage(errors.size() > 1 ? errors : errors.get(0)); // nếu có một lỗi thì String
+        res.setMessage(errors.size() > 1 ? errors : errors.get(0));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }

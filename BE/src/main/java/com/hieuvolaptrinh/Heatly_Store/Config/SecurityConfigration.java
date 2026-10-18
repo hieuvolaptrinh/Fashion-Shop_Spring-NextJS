@@ -52,7 +52,7 @@ public class SecurityConfigration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(Endpoint.PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers("/favicon.ico", "/static/**").permitAll() // Cho phép favicon và static files
-                        .requestMatchers(HttpMethod.GET, "/api/v1/products/**", "/api/v1/types").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products/**", "/api/v1/types/**").permitAll()
                         .requestMatchers(HttpMethod.GET, Endpoint.USER_GET_ENDPOINTS)
                         .hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, Endpoint.USER_POST_ENDPOINTS)

@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hieuvolaptrinh.Heatly_Store.Model.Cart;
 import com.hieuvolaptrinh.Heatly_Store.Model.Role;
 import com.hieuvolaptrinh.Heatly_Store.Model.User;
 import com.hieuvolaptrinh.Heatly_Store.Repository.RoleRepository;
@@ -123,6 +124,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             List<Role> roles = new ArrayList<>();
             roles.add(userRole);
             user.setListRoles(roles);
+
+            // Tự động khởi tạo giỏ hàng cho tài khoản OAuth2 mới
+            Cart cart = new Cart();
+            cart.setUser(user);
+            cart.setListCartDetails(new ArrayList<>());
+            user.setCart(cart);
 
             if (phoneNumber != null) {
                 System.out.println("Đã lưu số điện thoại từ " + provider + ": " + phoneNumber);

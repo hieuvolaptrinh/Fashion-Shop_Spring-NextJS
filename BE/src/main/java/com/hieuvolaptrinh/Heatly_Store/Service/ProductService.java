@@ -45,7 +45,6 @@ public class ProductService {
         this.comboRepository = comboRepository;
     }
 
-    // Product-> ProductResponse
     public ProductResponse convertToProductResponse(Product product) {
         if (product == null) {
             return null;
@@ -103,18 +102,22 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm với ID: " + id));
 
-        // Xóa images từ Cloudinary trước
         if (product.getListImages() != null) {
             for (Image image : product.getListImages()) {
-                try {
-                    cloudinaryService.deleteImageByUrl(image.getLink());
-                } catch (Exception e) {
-                    System.err.println("Lỗi khi xóa ảnh từ Cloudinary: " + e.getMessage());
-                    // Log error but continue
+                if (isCloudinaryUrl(image.getLink())) {
+                    try {
+                        cloudinaryService.deleteImageByUrl(image.getLink());
+                    } catch (Exception e) {
+                        System.err.println("Lỗi khi xóa ảnh từ Cloudinary: " + e.getMessage());
+                    }
                 }
             }
         }
         productRepository.delete(product);
+    }
+
+    private boolean isCloudinaryUrl(String url) {
+        return url != null && (url.contains("cloudinary.com") || url.contains("res.cloudinary.com"));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -143,7 +146,6 @@ public class ProductService {
             existingProduct.setListTypes(types);
         }
 
-        // Xử lý xóa hình ảnh
         if (productRequest.getDeletedImageIds() != null && !productRequest.getDeletedImageIds().isEmpty()) {
             System.out.println("Deleting image IDs: " + productRequest.getDeletedImageIds());
             debugProductImages(existingProduct, "BEFORE DELETION");
@@ -157,14 +159,16 @@ public class ProductService {
                 }
                 System.out.println("Found " + imagesToDelete.size() + " images to delete");
                 for (Image image : imagesToDelete) {
-                    try {
-                        cloudinaryService.deleteImageByUrl(image.getLink());
-                        System.out.println("Deleted from Cloudinary - Image ID: " + image.getImageId() + ", URL: "
-                                + image.getLink());
-                    } catch (Exception e) {
-                        System.err.println(
-                                "Error deleting image from Cloudinary - ID " + image.getImageId() + ": "
-                                        + e.getMessage());
+                    if (isCloudinaryUrl(image.getLink())) {
+                        try {
+                            cloudinaryService.deleteImageByUrl(image.getLink());
+                            System.out.println("Deleted from Cloudinary - Image ID: " + image.getImageId() + ", URL: "
+                                    + image.getLink());
+                        } catch (Exception e) {
+                            System.err.println(
+                                    "Error deleting image from Cloudinary - ID " + image.getImageId() + ": "
+                                            + e.getMessage());
+                        }
                     }
                     existingProduct.removeImage(image);
                     try {
@@ -184,7 +188,6 @@ public class ProductService {
             }
         }
 
-        // Xử lý xóa combo
         if (productRequest.getDeletedComboIds() != null && !productRequest.getDeletedComboIds().isEmpty()) {
             System.out.println("Deleting combo IDs: " + productRequest.getDeletedComboIds());
 
@@ -215,16 +218,13 @@ public class ProductService {
             }
         }
 
-        // Xử lý thêm hoặc cập nhật combo
         if (productRequest.getListCombo() != null && !productRequest.getListCombo().isEmpty()) {
             for (ComboResponse comboResponse : productRequest.getListCombo()) {
                 Combo combo;
                 if (comboResponse.getComboId() > 0) {
-                    // Cập nhật combo hiện có
                     combo = comboRepository.findById(comboResponse.getComboId())
                             .orElseThrow(() -> new IllegalArgumentException("Combo không tồn tại: " + comboResponse.getComboId()));
                 } else {
-                    // Tạo combo mới
                     combo = new Combo();
                     combo.setProduct(existingProduct);
                 }
@@ -236,7 +236,6 @@ public class ProductService {
             existingProduct = productRepository.save(existingProduct);
         }
 
-        // Xử lý thêm hình ảnh mới
         if (images != null && !images.isEmpty()) {
             for (MultipartFile file : images) {
                 if (file.isEmpty()) {
@@ -250,6 +249,17 @@ public class ProductService {
                     existingProduct.addImage(image);
                 } catch (Exception e) {
                     throw new Exception("Lỗi khi upload ảnh " + file.getOriginalFilename() + ": " + e.getMessage());
+                }
+            }
+        }
+
+        if (productRequest.getNewImageUrls() != null && !productRequest.getNewImageUrls().isEmpty()) {
+            for (String url : productRequest.getNewImageUrls()) {
+                if (url != null && !url.trim().isEmpty()) {
+                    Image image = new Image();
+                    image.setImageName(existingProduct.getProductName() + " image");
+                    image.setLink(url.trim());
+                    existingProduct.addImage(image);
                 }
             }
         }
@@ -293,7 +303,17 @@ public class ProductService {
                 }
             }
         }
-        // Xử lý danh sách combo
+
+        if (productRequest.getNewImageUrls() != null && !productRequest.getNewImageUrls().isEmpty()) {
+            for (String url : productRequest.getNewImageUrls()) {
+                if (url != null && !url.trim().isEmpty()) {
+                    Image image = new Image();
+                    image.setImageName(product.getProductName() + " image");
+                    image.setLink(url.trim());
+                    product.addImage(image);
+                }
+            }
+        }
         if (productRequest.getListCombo() != null && !productRequest.getListCombo().isEmpty()) {
             for (ComboResponse comboResponse : productRequest.getListCombo()) {
                 Combo combo = new Combo();
@@ -315,7 +335,6 @@ public class ProductService {
         return responses;
     }
 
-    // phân trang và lọc
     @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getAllProducts(int page, int size, ProductFilterRequest filter) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("productName").ascending());
@@ -332,7 +351,6 @@ public class ProductService {
                 productPage.getTotalPages());
     }
 
-    // chỉ phân trang (không có filter)
     @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getAllProducts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("productName").ascending());
@@ -357,7 +375,6 @@ public class ProductService {
         return convertToProductResponse(product);
     }
 
-    // Helper method để debug
     private void debugProductImages(Product product, String context) {
         System.out.println("=== DEBUG " + context + " ===");
         System.out.println("Product ID: " + product.getProductId());

@@ -8,7 +8,7 @@ import com.hieuvolaptrinh.Heatly_Store.Response.*;
 import com.hieuvolaptrinh.Heatly_Store.Service.Sepcification.OrderSpecification;
 import com.hieuvolaptrinh.Heatly_Store.Util.Enum.OrderStatusEnum;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +20,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
-
+import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class OrderService {
+    public static final double FREE_SHIPPING_THRESHOLD = 500_000.0;
+    public static final double STANDARD_SHIPPING_FEE = 30_000.0;
+
     private final OrderRepository orderRepo;
     private final UserRepository userRepo;
     private final CartDetailRepository cartDetailRepo;
@@ -51,9 +54,16 @@ public class OrderService {
         User user = userRepo.findByUserId(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + userId));
 
-        if (user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty()) {
-            user.setPhoneNumber(orderRequest.getPhoneNumber());
-            userRepo.save(user);
+        if (user.getPhoneNumber() == null || user.getPhoneNumber().trim().isEmpty()) {
+            String inputPhone = orderRequest.getPhoneNumber();
+            if (inputPhone != null && !inputPhone.trim().isEmpty()) {
+                String trimmedPhone = inputPhone.trim();
+                Optional<User> existingUserWithPhone = userRepo.findByPhoneNumber(trimmedPhone);
+                if (existingUserWithPhone.isEmpty()) {
+                    user.setPhoneNumber(trimmedPhone);
+                    userRepo.save(user);
+                }
+            }
         }
 
         List<CartDetail> selectedCartDetails = cartDetailRepo.findByCartDetailIdIn(orderRequest.getSelectedIds());
@@ -75,7 +85,7 @@ public class OrderService {
                 .mapToDouble(cd -> cd.getPrice() * cd.getQuantity())
                 .sum();
 
-        double shippingFee = (subtotal > 500000 || subtotal == 0) ? 0 : 30000;
+        double shippingFee = (subtotal > FREE_SHIPPING_THRESHOLD || subtotal == 0) ? 0 : STANDARD_SHIPPING_FEE;
         double totalPrice = subtotal + shippingFee;
 
         Order order = new Order();
@@ -100,17 +110,18 @@ public class OrderService {
 
         Order savedOrder = orderRepo.save(order);
 
+        List<Product> productsToUpdate = new ArrayList<>();
         for (CartDetail cartDetail : selectedCartDetails) {
             Product product = cartDetail.getProduct();
-            if(cartDetail.getCombo()!= null) {
+            if (cartDetail.getCombo() != null) {
                 Combo combo = cartDetail.getCombo();
-                product.setQuantity(product.getQuantity()- combo.getQuantityInCombo()* cartDetail.getQuantity());
-            }else{
+                product.setQuantity(product.getQuantity() - combo.getQuantityInCombo() * cartDetail.getQuantity());
+            } else {
                 product.setQuantity(product.getQuantity() - cartDetail.getQuantity());
-
             }
-            productRepo.save(product);
+            productsToUpdate.add(product);
         }
+        productRepo.saveAll(productsToUpdate);
 
         cartDetailRepo.deleteAll(selectedCartDetails);
 
@@ -150,13 +161,22 @@ public class OrderService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng: " + orderId));
 
         // Kiểm tra quyền sở hữu đơn hàng (Ngăn chặn lỗ hổng BOLA/IDOR)
+        boolean isAdmin = false;
         if (userDetails != null) {
             int currentUserId = Integer.parseInt(userDetails.getUsername());
-            boolean isAdmin = userDetails.getAuthorities().stream()
+            isAdmin = userDetails.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ADMIN"));
             if (!isAdmin && order.getUser().getUserId() != currentUserId) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền thao tác trên đơn hàng này!");
             }
+        }
+
+        // Khách hàng thông thường chỉ được phép tự hủy đơn khi trạng thái là PENDING
+        if (!isAdmin && order.getStatus() != OrderStatusEnum.PENDING) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Bạn chỉ có thể tự hủy đơn hàng khi đơn còn ở trạng thái Chờ xử lý (PENDING). Đơn hàng hiện tại đang " +
+                    (order.getStatus() != null ? order.getStatus().getLabel() : order.getStatus()) +
+                    ", vui lòng liên hệ hotline cửa hàng để được hỗ trợ!");
         }
 
         doCancelOrder(order);
@@ -207,6 +227,32 @@ public class OrderService {
         }
     }
 
+    /**
+     * Cập nhật trạng thái hàng loạt đơn hàng (dành cho admin)
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public String updateBatchOrderStatus(List<Integer> orderIds, String status) {
+        if (orderIds == null || orderIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Danh sách mã đơn hàng không được để trống");
+        }
+
+        try {
+            OrderStatusEnum newStatus = OrderStatusEnum.valueOf(status.toUpperCase());
+            List<Order> orders = orderRepo.findAllById(orderIds);
+            if (orders.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng nào phù hợp");
+            }
+
+            for (Order order : orders) {
+                order.setStatus(newStatus);
+            }
+            orderRepo.saveAll(orders);
+            return "Cập nhật thành công trạng thái " + newStatus.getLabel() + " cho " + orders.size() + " đơn hàng";
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trạng thái không hợp lệ: " + status);
+        }
+    }
+
     public PageResponse<OrderResponse> getAllOrders(int page, int size, OrderFilterRequest filter) {
         Sort sort = Sort.by(
                 Sort.Order.desc("createAt"),
@@ -237,7 +283,6 @@ public class OrderService {
         response.setShippingAddress(order.getShippingAddress());
         response.setPhoneNumber(order.getPhoneNumber());
         response.setBill(order.isBill());
-        // Convert OrderDetails với đầy đủ thông tin sản phẩm
         List<OrderDetailResponse> orderDetailResponses = order.getOrderDetails().stream()
                 .map(this::convertToOrderDetailResponse)
                 .collect(Collectors.toList());
