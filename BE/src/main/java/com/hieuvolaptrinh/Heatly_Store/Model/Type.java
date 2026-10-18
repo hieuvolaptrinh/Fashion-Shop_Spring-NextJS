@@ -23,6 +23,9 @@ public class Type {
     @Column(columnDefinition = "TEXT")
     private String typeName;
 
+    @Column(name = "image_url", columnDefinition = "TEXT")
+    private String imageUrl;
+
 
     @JsonIgnore
     @ManyToMany(mappedBy = "listTypes", fetch = FetchType.LAZY, cascade = {

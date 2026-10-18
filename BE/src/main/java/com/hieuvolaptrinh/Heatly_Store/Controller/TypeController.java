@@ -8,13 +8,16 @@ import com.hieuvolaptrinh.Heatly_Store.Response.TypeResponse;
 import com.hieuvolaptrinh.Heatly_Store.Service.TypeService;
 import com.hieuvolaptrinh.Heatly_Store.Util.ApiMessage;
 
+import java.util.Collections;
 import java.util.List;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -27,15 +30,12 @@ public class TypeController {
         this.typeService = typeService;
     }
 
-    // lấy tẩt cả các loại sản phẩm
+    // lấy tất cả các loại sản phẩm
     @GetMapping("")
     @ApiMessage("Lấy tất cả các loại sản phẩm thành công")
-    public ResponseEntity<List<TypeResponse>> getMethodName() {
+    public ResponseEntity<List<TypeResponse>> getAllTypes() {
         List<TypeResponse> listTypes = typeService.getAllTypes();
-        if (listTypes.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(listTypes);
+        return ResponseEntity.ok(listTypes != null ? listTypes : Collections.emptyList());
     }
 
     // lấy loại sản phẩm theo id
@@ -57,4 +57,21 @@ public class TypeController {
         return ResponseEntity.status(201).body(createdType);
     }
 
+    // Cập nhật loại sản phẩm (admin)
+    @PutMapping("/{typeId}")
+    @ApiMessage("Cập nhật loại sản phẩm thành công")
+    public ResponseEntity<TypeResponse> updateType(
+            @PathVariable int typeId,
+            @Valid @RequestBody TypeRequest typeRequest) {
+        TypeResponse updatedType = typeService.updateType(typeId, typeRequest);
+        return ResponseEntity.ok(updatedType);
+    }
+
+    // Xóa loại sản phẩm (admin)
+    @DeleteMapping("/{typeId}")
+    @ApiMessage("Xóa loại sản phẩm thành công")
+    public ResponseEntity<Void> deleteType(@PathVariable int typeId) {
+        typeService.deleteType(typeId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -1,16 +1,7 @@
 import { getCategories } from '@/core/apis/products';
-import { IMAGES } from '@/core/constants';
+import { getCategoryImage, getCategoryFallbackImage } from '@/core/lib/categoryUtils';
 import type { CategoryItem } from '@/core/lib/type';
 import { useEffect, useState } from 'react';
-
-const CATEGORY_IMAGES = [
-  IMAGES.DEMO_PRODUCTS.DEMO_1,
-  IMAGES.DEMO_PRODUCTS.DEMO_2,
-  IMAGES.DEMO_PRODUCTS.DEMO_3,
-  IMAGES.DEMO_PRODUCTS.DEMO_4,
-  IMAGES.DEMO_PRODUCTS.DEMO_5,
-  IMAGES.DEMO_PRODUCTS.DEMO_6,
-];
 
 export function useHomeCategories() {
   const [categories, setCategories] = useState<CategoryItem[]>([]);
@@ -40,15 +31,11 @@ export function useHomeCategories() {
     };
   }, []);
 
-  const getCategoryImage = (index: number): string => {
-    return (
-      CATEGORY_IMAGES[index % CATEGORY_IMAGES.length] || IMAGES.FALLBACK_PRODUCT
-    );
-  };
-
   return {
     categories,
     loading,
-    getCategoryImage,
+    getCategoryImage: (item: CategoryItem, index: number) => getCategoryImage(item, index),
+    getCategoryFallbackImage: (item: CategoryItem, index: number) =>
+      getCategoryFallbackImage(item.typeName, index),
   };
 }
