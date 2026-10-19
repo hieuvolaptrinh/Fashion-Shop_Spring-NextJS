@@ -12,9 +12,12 @@ import com.hieuvolaptrinh.Heatly_Store.Request.RegisterRequest;
 import com.hieuvolaptrinh.Heatly_Store.Request.UserRequest;
 import com.hieuvolaptrinh.Heatly_Store.Response.UserResponse;
 import com.hieuvolaptrinh.Heatly_Store.Response.UserResponse.AddressResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,20 +31,50 @@ public class UserService {
     private final AddressService addressService;
     private final RoleRepository roleRepository;
     private final CartRepository cartRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository, AddressService addressService,
-                       RoleRepository roleRepository, CartRepository cartRepository) {
+                       RoleRepository roleRepository, CartRepository cartRepository,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.addressService = addressService;
         this.roleRepository = roleRepository;
         this.cartRepository = cartRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public User authenticateUser(String phoneNumber, String rawPassword) {
+        User user = userRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số điện thoại hoặc mật khẩu không chính xác"));
+
+        if (!user.isActive()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tài khoản của bạn đã bị khóa hoặc chưa kích hoạt");
+        }
+
+        // Tương thích ngược: nếu tài khoản cũ trong DB chưa có password và nhập "123456", tự động tạo hash và cho qua
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            if ("123456".equals(rawPassword)) {
+                user.setPassword(passwordEncoder.encode("123456"));
+                userRepository.save(user);
+                return user;
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số điện thoại hoặc mật khẩu không chính xác");
+            }
+        }
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số điện thoại hoặc mật khẩu không chính xác");
+        }
+
+        return user;
     }
 
     @Transactional(readOnly = true)
     public User fetchUserLogin(String identifier) {
         Optional<User> userOptional;
         userOptional = userRepository.findByPhoneNumber(identifier);
-        return userOptional.orElseThrow(() -> new RuntimeException("User not found"));
+        return userOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -54,6 +87,7 @@ public class UserService {
         User newUser = new User();
         newUser.setPhoneNumber(registerRequest.getPhoneNumber());
         newUser.setFullName(registerRequest.getFullName());
+        newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         newUser.setActive(true);
 
         Role defaultRole = roleRepository.findByRoleName("USER")

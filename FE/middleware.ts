@@ -16,18 +16,18 @@ export function middleware(request: NextRequest) {
   }
 
   // If request is coming from API subdomain, redirect to main domain
-  if (hostname.includes("api.lanchuyenhangsale.com")) {
+  if (hostname.includes("api.halokaki.com")) {
     const url = new URL(request.nextUrl);
-    url.hostname = "lanchuyenhangsale.com";
+    url.hostname = "halokaki.com";
     url.protocol = "https:";
 
     return NextResponse.redirect(url, 301);
   }
 
   // Ensure all requests use HTTPS and www-less domain
-  if (hostname === "www.lanchuyenhangsale.com") {
+  if (hostname === "www.halokaki.com") {
     const url = new URL(request.nextUrl);
-    url.hostname = "lanchuyenhangsale.com";
+    url.hostname = "halokaki.com";
 
     return NextResponse.redirect(url, 301);
   }

@@ -48,10 +48,10 @@ const nextConfig: NextConfig = {
         has: [
           {
             type: "host",
-            value: "api.lanchuyenhangsale.com",
+            value: "api.halokaki.com",
           },
         ],
-        destination: "https://lanchuyenhangsale.com/:path*",
+        destination: "https://halokaki.com/:path*",
         permanent: true,
       },
       // Redirect /oauth2/error to /oauth2/redirect phòng ngừa trường hợp có request cũ

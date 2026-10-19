@@ -20,6 +20,7 @@ export interface RegisterAddressPayload {
 export interface RegisterPayload {
   phoneNumber: string;
   fullName: string;
+  password?: string;
   addressRequest: RegisterAddressPayload;
 }
 
@@ -28,12 +29,15 @@ export interface RegisterResponse {
 }
 
 /**
- * Gọi API đăng nhập bằng số điện thoại
+ * Gọi API đăng nhập bằng số điện thoại và mật khẩu
  */
-export const loginApi = async (phoneNumber: string): Promise<LoginResponse> => {
+export const loginApi = async (
+  phoneNumber: string,
+  password?: string
+): Promise<LoginResponse> => {
   const res = await http.post<LoginResponse | { data: LoginResponse }>(
     API_ENDPOINTS.AUTH.LOGIN,
-    { phoneNumber }
+    { phoneNumber, password }
   );
   return (res as any)?.data ?? res;
 };

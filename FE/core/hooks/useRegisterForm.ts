@@ -22,6 +22,8 @@ export const useRegisterForm = () => {
 
   const [districtName, setDistrictName] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     provinces,
@@ -47,6 +49,8 @@ export const useRegisterForm = () => {
     defaultValues: {
       phoneNumber: "",
       fullName: "",
+      password: "",
+      confirmPassword: "",
       addressName: "",
       provinceCode: "",
       provinceName: "",
@@ -109,6 +113,7 @@ export const useRegisterForm = () => {
       const message = await registerApi({
         phoneNumber: values.phoneNumber,
         fullName: values.fullName,
+        password: values.password,
         addressRequest: {
           addressName: values.addressName,
           provinceName: values.provinceName,
@@ -148,6 +153,10 @@ export const useRegisterForm = () => {
     isLoadingLocation,
     handleProvinceChange,
     handleWardChange,
+    showPassword,
+    setShowPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
   };
 };
 

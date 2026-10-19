@@ -21,6 +21,8 @@ public class User {
     @Column(unique = true)
     private String phoneNumber;
 
+    private String password;
+
     @Column(columnDefinition = "NVARCHAR(256)")
     private String fullName;
 

@@ -33,14 +33,8 @@ public class AuthController {
 
     @PostMapping("/login")
     @ApiMessage("Login successfully")
-    public ResponseEntity<?> login(@Valid @RequestBody AuthRequest authRequest) throws Exception {
-
-        // Tìm user để kiểm tra tồn tại
-        User user = this.userService.fetchUserLogin(authRequest.getPhoneNumber());
-        if (user == null || !user.isActive()) {
-            return ResponseEntity.badRequest()
-                    .body("Người dùng không tồn tại");
-        }
+    public ResponseEntity<?> login(@Valid @RequestBody AuthRequest authRequest) {
+        User user = this.userService.authenticateUser(authRequest.getPhoneNumber(), authRequest.getPassword());
 
         List<String> roles = user.getListRoles().stream()
                 .map(role -> role.getRoleName())

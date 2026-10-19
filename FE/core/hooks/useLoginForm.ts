@@ -19,6 +19,7 @@ export const useLoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const loginToStore = useAuthStore((state) => state.login);
 
   // Ngăn chặn người dùng đã đăng nhập vào lại màn hình login
@@ -32,13 +33,14 @@ export const useLoginForm = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       phoneNumber: "",
+      password: "",
     },
   });
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
       setIsLoading(true);
-      const data = await loginApi(values.phoneNumber);
+      const data = await loginApi(values.phoneNumber, values.password);
 
       if (data?.token) {
         const isAdmin = (data.roles || []).includes("ADMIN");
@@ -66,7 +68,7 @@ export const useLoginForm = () => {
       toast.error(
         error?.response?.data?.message ||
           error?.message ||
-          "Số điện thoại không hợp lệ hoặc chưa đăng ký"
+          "Số điện thoại hoặc mật khẩu không chính xác"
       );
     } finally {
       setIsLoading(false);
@@ -79,5 +81,7 @@ export const useLoginForm = () => {
     errors,
     isLoading,
     isCheckingAuth,
+    showPassword,
+    setShowPassword,
   };
 };
