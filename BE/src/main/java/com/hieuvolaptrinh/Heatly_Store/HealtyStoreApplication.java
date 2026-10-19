@@ -9,35 +9,29 @@ public class HealtyStoreApplication {
 
         public static void main(String[] args) {
                 // Load environment variables before starting Spring Boot
-
                 Dotenv dotenv = Dotenv.configure()
                                 .directory("./")
+                                .ignoreIfMissing()
                                 .load();
 
-                System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
-                System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
-                System.setProperty("GOOGLE_CLIENT_ID", dotenv.get("GOOGLE_CLIENT_ID"));
-                System.setProperty("GOOGLE_CLIENT_SECRET",
-                                dotenv.get("GOOGLE_CLIENT_SECRET"));
-
-                System.setProperty("FACEBOOK_CLIENT_ID", dotenv.get("FACEBOOK_CLIENT_ID"));
-                System.setProperty("FACEBOOK_CLIENT_SECRET",
-                                dotenv.get("FACEBOOK_CLIENT_SECRET"));
-
-                System.setProperty("BASE_API", dotenv.get("BASE_API"));
-                String urlFe = dotenv.get("URL_FE");
-                System.setProperty("URL_FE", urlFe != null ? urlFe : "http://localhost:3000");
-                System.setProperty("CLOUDINARY_API_KEY", dotenv.get("CLOUDINARY_API_KEY"));
-                System.setProperty("CLOUDINARY_API_SECRET",
-                                dotenv.get("CLOUDINARY_API_SECRET"));
-                System.setProperty("CLOUDINARY_CLOUD_NAME",
-                                dotenv.get("CLOUDINARY_CLOUD_NAME"));
+                setEnvProperty(dotenv, "DB_USERNAME", "root");
+                setEnvProperty(dotenv, "DB_PASSWORD", "");
+                setEnvProperty(dotenv, "DB_URL", "jdbc:mysql://localhost:3306/healthy_store?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh");
+                setEnvProperty(dotenv, "GOOGLE_CLIENT_ID", "");
+                setEnvProperty(dotenv, "GOOGLE_CLIENT_SECRET", "");
+                setEnvProperty(dotenv, "FACEBOOK_CLIENT_ID", "");
+                setEnvProperty(dotenv, "FACEBOOK_CLIENT_SECRET", "");
+                setEnvProperty(dotenv, "BASE_API", "http://localhost:8081");
+                setEnvProperty(dotenv, "URL_FE", "http://localhost:3000");
+                setEnvProperty(dotenv, "CLOUDINARY_API_KEY", "");
+                setEnvProperty(dotenv, "CLOUDINARY_API_SECRET", "");
+                setEnvProperty(dotenv, "CLOUDINARY_CLOUD_NAME", "");
 
                 // Gemini AI Chatbot Key Pool
-                String geminiKeys = dotenv.get("GEMINI_API_KEYS");
+                String geminiKeys = getEnvValue(dotenv, "GEMINI_API_KEYS");
                 if (geminiKeys == null || geminiKeys.isBlank()) {
-                    String k1 = dotenv.get("GEMINI_KEY_1");
-                    String k2 = dotenv.get("GEMINI_KEY_2");
+                    String k1 = getEnvValue(dotenv, "GEMINI_KEY_1");
+                    String k2 = getEnvValue(dotenv, "GEMINI_KEY_2");
                     java.util.List<String> list = new java.util.ArrayList<>();
                     if (k1 != null && !k1.isBlank()) list.add(k1.trim());
                     if (k2 != null && !k2.isBlank()) list.add(k2.trim());
@@ -50,5 +44,23 @@ public class HealtyStoreApplication {
                 }
 
                 SpringApplication.run(HealtyStoreApplication.class, args);
+        }
+
+        private static String getEnvValue(Dotenv dotenv, String key) {
+                String val = dotenv != null ? dotenv.get(key) : null;
+                if (val == null || val.isBlank()) {
+                        val = System.getenv(key);
+                }
+                return val;
+        }
+
+        private static void setEnvProperty(Dotenv dotenv, String key, String defaultValue) {
+                String val = getEnvValue(dotenv, key);
+                if (val == null || val.isBlank()) {
+                        val = defaultValue;
+                }
+                if (val != null) {
+                        System.setProperty(key, val);
+                }
         }
 }

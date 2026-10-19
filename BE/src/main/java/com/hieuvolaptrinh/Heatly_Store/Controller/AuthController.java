@@ -12,6 +12,7 @@ import com.hieuvolaptrinh.Heatly_Store.Util.ApiMessage;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
+
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("OK");
+    }
 
     private final JwtUtil jwtService;
     private final UserService userService;

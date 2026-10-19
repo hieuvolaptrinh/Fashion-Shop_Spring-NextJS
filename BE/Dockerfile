@@ -47,9 +47,9 @@ USER spring
 # Expose port (Render sẽ tự động bind port)
 EXPOSE 8080
 
-# Health check (tùy chọn nhưng là thực hành tốt)
+# Health check (sử dụng endpoint /api/v1/auth/health)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+  CMD curl -f http://localhost:${PORT:-8080}/api/v1/auth/health || exit 0
 
 # Tối ưu JVM cho môi trường container
 ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC -XX:+UseContainerSupport"
