@@ -16,8 +16,16 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 const BANNERS = [
-  { id: 1, image: IMAGES.BANNERS.BANNER_2, alt: 'Banner khuyến mãi 1' },
-  { id: 2, image: IMAGES.BANNERS.BANNER_1, alt: 'Banner khuyến mãi 2' },
+  {
+    id: 1,
+    image: IMAGES.BANNERS.BANNER_1,
+    alt: 'HALOKAKI - Women\'s Chic Collection - New Arrivals',
+  },
+  {
+    id: 2,
+    image: IMAGES.BANNERS.BANNER_2,
+    alt: 'HALOKAKI - Men\'s Modern Essentials - Elevate Your Style',
+  },
 ]
 
 export default function SlideShow() {
@@ -58,13 +66,13 @@ export default function SlideShow() {
             <CarouselItem key={banner.id} className="pl-0">
               <Link
                 href={ROUTES.USER.PRODUCTS}
-                className="relative block w-full aspect-[3780/1222] overflow-hidden"
+                className="relative block w-full aspect-[1376/768] overflow-hidden"
               >
                 <Image
                   src={banner.image}
                   fill
                   priority={index === 0}
-                  className="object-contain"
+                  className="object-cover object-center"
                   alt={banner.alt}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1200px"
                 />
