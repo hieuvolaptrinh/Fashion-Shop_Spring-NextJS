@@ -9,7 +9,6 @@ import {
   ShoppingBag,
   Phone,
   Mail,
-  CreditCard,
   LogIn,
   PackageCheck,
   LayoutDashboard,
@@ -26,7 +25,7 @@ import {
 import { Separator } from "@/core/components/ui/separator";
 import { useAuthStore } from "@/core/store/authStore";
 import { useCartStore } from "@/core/store/cartStore";
-import { IMAGES, ROUTES } from "@/core/constants";
+import { BRAND, IMAGES, ROUTES } from "@/core/constants";
 import { NAVIGATION_ITEMS } from "./HeaderDesktopNav";
 
 export const HeaderMobileNav: React.FC = () => {
@@ -93,9 +92,9 @@ export const HeaderMobileNav: React.FC = () => {
               </div>
               <div>
                 <p className="text-base font-bold text-foreground leading-tight">
-                  LanChuyenHangSale
+                  {BRAND.name}
                 </p>
-                <p className="text-[11px] text-muted-foreground">Uy tín - Chất lượng</p>
+                <p className="text-[11px] text-muted-foreground">{BRAND.tagline}</p>
               </div>
             </Link>
 
@@ -203,17 +202,12 @@ export const HeaderMobileNav: React.FC = () => {
           <div className="p-6 border-t border-border/60 bg-muted/30 space-y-2 text-xs text-muted-foreground">
             <div className="flex items-center space-x-2">
               <Phone className="h-3.5 w-3.5 text-primary shrink-0" />
-              <span>093.1133.128 - 08.193.148.93</span>
+              <span>{BRAND.hotlines.join(" - ")}</span>
             </div>
 
             <div className="flex items-center space-x-2">
               <Mail className="h-3.5 w-3.5 text-primary shrink-0" />
-              <span className="truncate">lanchuyenhangsale@gmail.com</span>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <CreditCard className="h-3.5 w-3.5 text-primary shrink-0" />
-              <span>MB: 0937429455</span>
+              <span className="truncate">{BRAND.email}</span>
             </div>
           </div>
         </SheetContent>

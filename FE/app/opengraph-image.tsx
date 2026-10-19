@@ -1,8 +1,8 @@
 import { ImageResponse } from "next/og";
+import { BRAND } from "@/core/constants";
 
 // Image metadata
-export const alt =
-  "Lan Chuyên Hàng Sale - Sản phẩm chính hãng cho sức khỏe & sắc đẹp";
+export const alt = `${BRAND.name} - ${BRAND.slogan}`;
 export const size = {
   width: 1200,
   height: 630,
@@ -16,7 +16,7 @@ export default async function Image() {
     (
       <div
         style={{
-          background: "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)",
+          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -43,12 +43,13 @@ export default async function Image() {
             style={{
               fontSize: "64px",
               fontWeight: "bold",
-              color: "#dc2626",
-              margin: "0 0 20px 0",
+              letterSpacing: "4px",
+              color: "#0f172a",
+              margin: "0 0 16px 0",
               lineHeight: "1.1",
             }}
           >
-            Lan Chuyên Hàng Sale
+            {BRAND.name}
           </h1>
           <p
             style={{
@@ -59,17 +60,17 @@ export default async function Image() {
               lineHeight: "1.3",
             }}
           >
-            10+ năm kinh nghiệm cung cấp sản phẩm sale chính hãng
+            {BRAND.slogan}
           </p>
           <p
             style={{
-              fontSize: "24px",
+              fontSize: "22px",
               color: "#6b7280",
-              margin: "20px 0 0 0",
+              margin: "16px 0 0 0",
               lineHeight: "1.3",
             }}
           >
-            Sức khỏe • Làm đẹp • Gia dụng • Giá ưu đãi nhất
+            Thời Trang Nam Nữ • Xu Hướng Mới • Giao Hàng Toàn Quốc
           </p>
         </div>
       </div>

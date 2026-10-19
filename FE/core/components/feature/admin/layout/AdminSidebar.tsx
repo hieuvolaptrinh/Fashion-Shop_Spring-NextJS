@@ -20,7 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/core/components/ui/tooltip";
-import { ROUTES, IMAGES } from "@/core/constants";
+import { ROUTES, IMAGES, BRAND } from "@/core/constants";
 
 const menuItems = [
   {
@@ -140,7 +140,7 @@ export default function AdminSidebar() {
           >
             <Image
               src={IMAGES.LOGO}
-              alt="Logo Lan Chuyên Hàng Sales"
+              alt={`Logo ${BRAND.name}`}
               width={32}
               height={32}
               className="h-8 w-8 shrink-0 rounded-lg object-cover border border-border/60"
@@ -149,7 +149,7 @@ export default function AdminSidebar() {
             {!isCollapsed && (
               <div className="flex flex-col leading-none truncate">
                 <span className="font-bold tracking-tight text-foreground text-sm truncate">
-                  Lan Chuyên Hàng Sales
+                  {BRAND.name}
                 </span>
               </div>
             )}

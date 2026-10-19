@@ -78,7 +78,7 @@ export const UserOrderDetailDialog: React.FC<UserOrderDetailDialogProps> = ({
           <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
           <div className="space-y-0.5">
             <p className="font-semibold text-foreground">Đơn hàng đã được giao thành công</p>
-            <p className="text-muted-foreground">Cảm ơn bạn đã tin tưởng mua sắm tại Lan Chuyên Hàng Sale!</p>
+            <p className="text-muted-foreground">Cảm ơn bạn đã tin tưởng mua sắm tại HALOKAKI!</p>
           </div>
         </div>
       );

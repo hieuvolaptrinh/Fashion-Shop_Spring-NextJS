@@ -1,8 +1,9 @@
 import { getProducts } from "@/core/apis/products";
 import type { MetadataRoute } from "next";
+import { BRAND } from "@/core/constants";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://lanchuyenhangsale.com";
+  const baseUrl = BRAND.siteUrl;
   const currentDate = new Date("2025-08-04T00:00:00.000Z"); // Fixed date to prevent hydration mismatch
 
   // Static pages sitemap

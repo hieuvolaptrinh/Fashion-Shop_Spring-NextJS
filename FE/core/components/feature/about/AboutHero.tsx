@@ -1,11 +1,8 @@
-import { Button } from "@/core/components/ui/button";
 import { IMAGES } from "@/core/constants/images";
 import {
   Award,
   CheckCircle2,
   Headphones,
-  MessageCircle,
-  Phone,
   ShieldCheck,
   Users,
 } from "lucide-react";
@@ -42,35 +39,8 @@ export const AboutHero = () => {
               {hero.description}
             </p>
 
-            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:gap-4">
-              <Button
-                className="h-11 rounded-xl bg-gradient-to-r from-primary to-blue-600 px-6 text-sm font-semibold text-primary-foreground shadow-md shadow-primary/25 transition-all duration-300 hover:brightness-105 hover:shadow-lg hover:shadow-primary/35 active:scale-[0.98] sm:text-base"
-                asChild
-              >
-                <a href={hero.hotline.href}>
-                  <Phone className="mr-2 h-4 w-4" />
-                  {hero.hotline.label}
-                </a>
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-11 rounded-xl border-border/80 bg-card px-6 text-sm font-semibold text-foreground shadow-sm transition-all hover:border-primary/40 hover:bg-muted sm:text-base"
-                asChild
-              >
-                <a
-                  href={hero.zalo.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <MessageCircle className="mr-2 h-4 w-4 text-primary" />
-                  {hero.zalo.label}
-                </a>
-              </Button>
-            </div>
-
             {/* Mini Trust Indicators */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4 border-t border-border/50 pt-6 text-xs text-muted-foreground sm:gap-6 sm:text-sm lg:justify-start">
+            <div className="flex flex-wrap items-center justify-center gap-4 border-t border-border/50 pt-6 text-xs text-muted-foreground sm:gap-6 sm:text-sm lg:justify-start">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                 <span>Ship COD toàn quốc</span>
@@ -93,7 +63,7 @@ export const AboutHero = () => {
               <div className="relative flex h-48 w-48 items-center justify-center overflow-hidden rounded-3xl border-2 border-primary/20 bg-muted/20 p-3 shadow-inner transition-transform duration-300 hover:scale-105 sm:h-56 sm:w-56 md:h-60 md:w-60">
                 <Image
                   src={IMAGES.LOGO}
-                  alt="Lan Chuyên Hàng Sale"
+                  alt="HALOKAKI"
                   width={260}
                   height={260}
                   className="rounded-2xl object-contain"

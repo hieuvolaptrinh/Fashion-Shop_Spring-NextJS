@@ -1,6 +1,6 @@
 import { getProductById } from "@/core/apis/products";
 import ProductDetailPage from "@/core/components/feature/products/detail/ProductDetailPage";
-import { IMAGES } from "@/core/constants";
+import { IMAGES, BRAND } from "@/core/constants";
 import { convertToSlugWithId } from "@/core/lib/convert";
 import type { ListTypes } from "@/core/lib/type";
 import { Metadata } from "next";
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!id) {
     return {
-      title: "Sản phẩm không tồn tại - Lan Chuyên Hàng Sale",
+      title: `Sản phẩm không tồn tại - ${BRAND.name}`,
       description:
         "Sản phẩm bạn tìm kiếm không tồn tại hoặc đã ngừng kinh doanh.",
     };
@@ -28,30 +28,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     if (!product) {
       return {
-        title: "Sản phẩm không tồn tại - Lan Chuyên Hàng Sale",
+        title: `Sản phẩm không tồn tại - ${BRAND.name}`,
         description:
           "Sản phẩm bạn tìm kiếm không tồn tại hoặc đã ngừng kinh doanh.",
       };
     }
     return {
-      title: `${product.productName} - Lan Chuyên Hàng Sale`,
+      title: `${product.productName} - ${BRAND.name}`,
       description:
         product.description ||
-        `Mua ${product.productName} chính hãng với giá ưu đãi tại Lan Chuyên Hàng Sale. ${product.usageInstructions || "Sản phẩm chất lượng cao, an toàn cho sức khỏe."}`,
+        `Mua ${product.productName} thời trang cao cấp tại ${BRAND.name}. ${product.usageInstructions || "Sản phẩm thiết kế đẹp, chất liệu cao cấp."}`,
       keywords: [
         product.productName,
-        "hàng sale",
-        "giá rẻ",
-        "chính hãng",
-        "Lan chuyên hàng sale",
+        "thời trang",
+        BRAND.name,
         ...(product.listTypes?.map((type: ListTypes) => type.typeName) || []),
       ],
       openGraph: {
-        title: `${product.productName} - Lan Chuyên Hàng Sale`,
+        title: `${product.productName} - ${BRAND.name}`,
         description:
           product.description ||
-          `Mua ${product.productName} chính hãng với giá ưu đãi tại Lan Chuyên Hàng Sale.`,
-        url: `https://lanchuyenhangsale.com/products/${url}`,
+          `Mua ${product.productName} thời trang cao cấp tại ${BRAND.name}.`,
+        url: `${BRAND.siteUrl}/products/${url}`,
         type: "website",
         images: [
           {
@@ -61,23 +59,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             alt: product.productName,
           },
         ],
-        siteName: "Lan Chuyên Hàng Sale",
+        siteName: BRAND.name,
       },
       twitter: {
         card: "summary_large_image",
-        title: `${product.productName} - Lan Chuyên Hàng Sale`,
+        title: `${product.productName} - ${BRAND.name}`,
         description:
           product.description ||
-          `Mua ${product.productName} chính hãng với giá ưu đãi.`,
+          `Mua ${product.productName} thời trang chất lượng tại ${BRAND.name}.`,
         images: [product.listImages?.[0]?.link || IMAGES.DEMO_PRODUCTS.DEMO_1],
       },
       alternates: {
-        canonical: `https://lanchuyenhangsale.com/products/${url}`,
+        canonical: `${BRAND.siteUrl}/products/${url}`,
       },
     };
   } catch (error) {
     return {
-      title: "Lỗi tải sản phẩm - Lan Chuyên Hàng Sale",
+      title: `Lỗi tải sản phẩm - ${BRAND.name}`,
       description:
         "Có lỗi xảy ra khi tải thông tin sản phẩm. Vui lòng thử lại sau.",
     };

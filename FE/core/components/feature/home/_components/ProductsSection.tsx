@@ -15,7 +15,7 @@ export default function ProductsSection() {
       <ScrollReveal direction="up" distance={16} duration={500}>
         <div className="flex flex-col items-center justify-center space-y-2 text-center">
           <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Hàng Mới Về
+            Sản Phẩm Vừa Ra Mắt
           </h2>
         </div>
       </ScrollReveal>

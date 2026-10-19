@@ -22,7 +22,7 @@ export const ContactFaq = () => {
             Câu Hỏi Thường Gặp
           </h2>
           <p className="mx-auto mt-2 max-w-xl text-xs text-muted-foreground sm:text-sm">
-            Những thông tin cần biết về quy trình mua sắm, nhận hàng và chính sách đổi trả tại Lan Chuyên Hàng Sale
+            Những thông tin cần biết về quy trình mua sắm, nhận hàng và chính sách đổi trả tại HALOKAKI
           </p>
         </div>
       </ScrollReveal>

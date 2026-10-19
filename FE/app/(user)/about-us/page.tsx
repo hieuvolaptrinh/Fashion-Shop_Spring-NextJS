@@ -1,42 +1,41 @@
 import {
   AboutBento,
-  AboutCta,
   AboutHero,
   AboutInfo,
   AboutTeam,
 } from "@/core/components/feature/about";
 import { Metadata } from "next";
+import { BRAND } from "@/core/constants";
 
 export const metadata: Metadata = {
-  title: "Về Chúng Tôi - Lan Chuyên Hàng Sale Là Ai?",
+  title: `Về Chúng Tôi - ${BRAND.name}`,
   description:
-    "Khám phá câu chuyện và sứ mệnh của Lan Chuyên Hàng Sale - 10+ năm kinh nghiệm cung cấp sản phẩm sale chính hãng, chất lượng cao với giá ưu đãi nhất. 50,000+ khách hàng tin tưởng.",
+    `Khám phá câu chuyện và sứ mệnh của ${BRAND.name} - ${BRAND.slogan}. Hơn 10 năm phát triển mang đến các sản phẩm thời trang cao cấp, phong cách và chất lượng.`,
   keywords: [
     "về chúng tôi",
-    "Lan chuyên hàng sale",
+    BRAND.name,
     "câu chuyện thương hiệu",
-    "kinh nghiệm",
+    "thời trang phong cách",
     "uy tín",
     "chất lượng",
-    "sứ mệnh",
   ],
   openGraph: {
-    title: "Về Chúng Tôi - Lan Chuyên Hàng Sale",
+    title: `Về Chúng Tôi - ${BRAND.name}`,
     description:
-      "10+ năm kinh nghiệm trong lĩnh vực cung cấp sản phẩm sale chính hãng. 50,000+ khách hàng hài lòng, cam kết chất lượng 100%.",
-    url: "https://lanchuyenhangsale.com/about-us",
+      `Khám phá thương hiệu thời trang ${BRAND.name} - Cam kết chất lượng và phong cách thời thượng.`,
+    url: `${BRAND.siteUrl}/about-us`,
     type: "website",
     images: [
       {
-        url: "/logo.jpg",
+        url: "/logo-1.jpg",
         width: 1200,
         height: 630,
-        alt: "Lan Chuyên Hàng Sale - Về chúng tôi",
+        alt: `${BRAND.name} - Về chúng tôi`,
       },
     ],
   },
   alternates: {
-    canonical: "https://lanchuyenhangsale.com/about-us",
+    canonical: `${BRAND.siteUrl}/about-us`,
   },
 };
 
@@ -51,8 +50,6 @@ const AboutUsPage = () => {
         <AboutTeam />
 
         <AboutInfo />
-
-        <AboutCta />
       </main>
     </div>
   );

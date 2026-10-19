@@ -1,5 +1,8 @@
 'use client';
 
+import { useState } from 'react';
+import Link from 'next/link';
+import { Button } from '@/core/components/ui/button';
 import { Card, CardContent } from '@/core/components/ui/card';
 import {
   Tabs,
@@ -7,22 +10,66 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/core/components/ui/tabs';
+import { Textarea } from '@/core/components/ui/textarea';
+import ConfirmDialog from '@/core/components/ui/confirm-dialog';
+import { ROUTES } from '@/core/constants';
 import type { CommentResponse, Product } from '@/core/lib/type';
 import { formatDate } from '@/core/lib/utils';
-import { Calendar, CheckCircle, FileText, MessageSquare, PackageCheck, Star } from 'lucide-react';
+import { useAuthStore } from '@/core/store/authStore';
+import {
+  Calendar,
+  CheckCircle,
+  FileText,
+  Loader2,
+  LogIn,
+  MessageSquare,
+  MessageSquarePlus,
+  PackageCheck,
+  Send,
+  Star,
+  Trash2,
+} from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ProductTabsProps {
   product: Product;
   comments?: CommentResponse[];
   loadingComments?: boolean;
   onRefreshComments?: () => void;
+  onSubmitComment?: (
+    content: string,
+    rating: number
+  ) => Promise<{ success: boolean; message?: string }>;
+  onDeleteComment?: (
+    commentId: number
+  ) => Promise<{ success: boolean; message?: string }>;
 }
+
+const RATING_LABELS: Record<number, string> = {
+  1: 'Rất không hài lòng',
+  2: 'Chưa ưng ý',
+  3: 'Bình thường',
+  4: 'Hài lòng',
+  5: 'Rất hài lòng & Tuyệt vời',
+};
 
 export function ProductTabs({
   product,
   comments = [],
   loadingComments = false,
+  onSubmitComment,
+  onDeleteComment,
 }: ProductTabsProps) {
+  const { isAuthenticated, isAdmin, user, profile } = useAuthStore();
+
+  const [newRating, setNewRating] = useState<number>(5);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [newContent, setNewContent] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
   // Lấy 2 chữ cái đầu làm avatar
   const getInitials = (name: string) => {
     const parts = name.trim().split(' ').filter(Boolean);
@@ -34,7 +81,11 @@ export function ProductTabs({
   const totalCount = comments.length;
   const hasComments = totalCount > 0;
   const avgScore = hasComments
-    ? Number((comments.reduce((acc, c) => acc + (c.rating || 5), 0) / totalCount).toFixed(1))
+    ? Number(
+        (
+          comments.reduce((acc, c) => acc + (c.rating || 5), 0) / totalCount
+        ).toFixed(1)
+      )
     : 5.0;
 
   const count5 = comments.filter((c) => c.rating === 5).length;
@@ -44,14 +95,63 @@ export function ProductTabs({
   const percent4 = hasComments ? Math.round((count4 / totalCount) * 100) : 0;
   const percent3 = hasComments ? Math.round((count3 / totalCount) * 100) : 0;
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      toast.error('Vui lòng đăng nhập để gửi đánh giá sản phẩm');
+      return;
+    }
+    const trimmed = newContent.trim();
+    if (!trimmed) {
+      toast.error('Vui lòng nhập nội dung đánh giá của bạn');
+      return;
+    }
+    if (trimmed.length > 1000) {
+      toast.error('Nội dung đánh giá không được vượt quá 1000 ký tự');
+      return;
+    }
+    if (!onSubmitComment) return;
+
+    setIsSubmitting(true);
+    try {
+      const result = await onSubmitComment(trimmed, newRating);
+      if (result.success) {
+        setNewContent('');
+        setNewRating(5);
+        setHoverRating(0);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!commentToDelete || !onDeleteComment) return;
+    setIsDeleting(true);
+    try {
+      await onDeleteComment(commentToDelete);
+      setCommentToDelete(null);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const currentDisplayRating = hoverRating || newRating;
+
   return (
     <div className="mt-12 sm:mt-16">
       <Tabs defaultValue="description" className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-2 rounded-xl">
-          <TabsTrigger value="description" className="rounded-lg font-bold text-xs sm:text-sm">
+          <TabsTrigger
+            value="description"
+            className="rounded-lg font-bold text-xs sm:text-sm"
+          >
             Mô tả chi tiết
           </TabsTrigger>
-          <TabsTrigger value="reviews" className="rounded-lg font-bold text-xs sm:text-sm">
+          <TabsTrigger
+            value="reviews"
+            className="rounded-lg font-bold text-xs sm:text-sm"
+          >
             Đánh giá ({totalCount})
           </TabsTrigger>
         </TabsList>
@@ -75,27 +175,35 @@ export function ProductTabs({
                 <div className="space-y-2 rounded-2xl border border-border/60 bg-muted/20 p-4.5">
                   <div className="flex items-center gap-2 text-primary">
                     <PackageCheck className="size-4" />
-                    <h4 className="text-sm font-bold text-foreground">Thành phần chính</h4>
+                    <h4 className="text-sm font-bold text-foreground">
+                      Thành phần chính
+                    </h4>
                   </div>
                   <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                    {product.ingredients || 'Thành phần chọn lọc tự nhiên, đạt tiêu chuẩn chất lượng cao.'}
+                    {product.ingredients ||
+                      'Thành phần chọn lọc tự nhiên, đạt tiêu chuẩn chất lượng cao.'}
                   </p>
                 </div>
 
                 <div className="space-y-2 rounded-2xl border border-border/60 bg-muted/20 p-4.5">
                   <div className="flex items-center gap-2 text-primary">
                     <FileText className="size-4" />
-                    <h4 className="text-sm font-bold text-foreground">Hướng dẫn sử dụng</h4>
+                    <h4 className="text-sm font-bold text-foreground">
+                      Hướng dẫn sử dụng
+                    </h4>
                   </div>
                   <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                    {product.usageInstructions || 'Sử dụng đều đặn theo chỉ dẫn ghi trên bao bì sản phẩm.'}
+                    {product.usageInstructions ||
+                      'Sử dụng đều đặn theo chỉ dẫn ghi trên bao bì sản phẩm.'}
                   </p>
                 </div>
 
                 <div className="space-y-2 rounded-2xl border border-border/60 bg-muted/20 p-4.5">
                   <div className="flex items-center gap-2 text-primary">
                     <Calendar className="size-4" />
-                    <h4 className="text-sm font-bold text-foreground">Hạn dùng & Bảo quản</h4>
+                    <h4 className="text-sm font-bold text-foreground">
+                      Hạn dùng & Bảo quản
+                    </h4>
                   </div>
                   <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
                     {product.manufactureDate
@@ -111,6 +219,7 @@ export function ProductTabs({
         <TabsContent value="reviews" className="mt-6">
           <Card className="rounded-2xl border-border/70 shadow-xs">
             <CardContent className="space-y-8 pt-6">
+              {/* Thống kê đánh giá */}
               <div className="flex flex-col gap-6 rounded-2xl border border-border/60 bg-muted/20 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
                 <div>
                   <div className="flex items-baseline gap-2">
@@ -133,7 +242,7 @@ export function ProductTabs({
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {hasComments
-                      ? `Dựa trên ${totalCount} đánh giá từ người mua thực tế`
+                      ? `Dựa trên ${totalCount} đánh giá từ người dùng`
                       : 'Chưa có đánh giá nào được gửi'}
                   </p>
                 </div>
@@ -178,6 +287,120 @@ export function ProductTabs({
                 </div>
               </div>
 
+              {/* Form gửi bình luận / đánh giá mới */}
+              {isAuthenticated ? (
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-6 transition-all shadow-2xs">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex size-7 items-center justify-center rounded-full bg-primary/15 text-primary">
+                        <MessageSquarePlus className="size-4" />
+                      </div>
+                      <h4 className="text-sm font-bold text-foreground sm:text-base">
+                        Viết đánh giá của bạn
+                      </h4>
+                    </div>
+                    <span className="text-xs text-muted-foreground font-medium">
+                      Đăng nhận xét với tên: <span className="font-semibold text-foreground">{profile?.fullName || user || 'Tài khoản của bạn'}</span>
+                    </span>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Chọn số sao */}
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-xs font-semibold text-muted-foreground">
+                        Chất lượng sản phẩm:
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setNewRating(star)}
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            className="p-1 text-muted-foreground/30 transition-transform hover:scale-110 focus:outline-none"
+                            aria-label={`${star} sao`}
+                          >
+                            <Star
+                              className={`size-6 transition-colors ${
+                                star <= currentDisplayRating
+                                  ? 'fill-warning text-warning'
+                                  : 'text-muted-foreground/25 hover:text-warning/50'
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      <span className="text-xs font-medium text-warning transition-all">
+                        {RATING_LABELS[currentDisplayRating]}
+                      </span>
+                    </div>
+
+                    {/* Textarea nhập nhận xét */}
+                    <div className="space-y-1.5">
+                      <Textarea
+                        value={newContent}
+                        onChange={(e) => setNewContent(e.target.value)}
+                        placeholder="Hãy chia sẻ trải nghiệm chân thực của bạn về chất liệu, form dáng, đường may và độ vừa vặn khi mặc sản phẩm này nhé..."
+                        rows={3}
+                        maxLength={1000}
+                        className="rounded-xl border-border/80 bg-background resize-none focus-visible:ring-primary/40 text-sm"
+                        disabled={isSubmitting}
+                      />
+                      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                        <span>Nhận xét chi tiết sẽ giúp những người mua khác lựa chọn kích cỡ phù hợp hơn.</span>
+                        <span>{newContent.length} / 1000 ký tự</span>
+                      </div>
+                    </div>
+
+                    {/* Nút gửi */}
+                    <div className="flex justify-end">
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting || !newContent.trim()}
+                        className="rounded-xl px-5 h-9 text-xs font-semibold gap-1.5 shadow-xs"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="size-3.5 animate-spin" />
+                            <span>Đang gửi đánh giá...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="size-3.5" />
+                            <span>Gửi đánh giá</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-dashed border-border/80 bg-muted/20 p-5 text-center sm:text-left">
+                  <div className="flex items-center gap-3.5">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <LogIn className="size-5" />
+                    </div>
+                    <div className="text-left space-y-0.5">
+                      <p className="text-sm font-semibold text-foreground">
+                        Bạn đã trải nghiệm sản phẩm này?
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Đăng nhập tài khoản để chia sẻ nhận xét và đánh giá trải nghiệm thực tế nhé!
+                      </p>
+                    </div>
+                  </div>
+
+                  <Link href={ROUTES.AUTH.LOGIN}>
+                    <Button variant="default" size="sm" className="rounded-xl gap-1.5 text-xs font-medium h-9 shrink-0">
+                      <LogIn className="size-3.5" />
+                      <span>Đăng nhập để đánh giá</span>
+                    </Button>
+                  </Link>
+                </div>
+              )}
+
+              {/* Danh sách bình luận */}
               {loadingComments ? (
                 <div className="space-y-4 py-4">
                   {[1, 2].map((i) => (
@@ -189,50 +412,85 @@ export function ProductTabs({
                 </div>
               ) : hasComments ? (
                 <div className="divide-y divide-border/60">
-                  {comments.map((comment) => (
-                    <div key={comment.commentId} className="py-5 first:pt-0 last:pb-0">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-black text-primary">
-                            {getInitials(comment.userName || 'Khách')}
+                  {comments.map((comment) => {
+                    const isVerifiedBuyer = Boolean(
+                      comment.isPurchased ||
+                        comment.purchased ||
+                        (comment.orderDetailId && comment.orderDetailId > 0)
+                    );
+                    const canDelete = Boolean(
+                      isAdmin ||
+                        (profile?.userId && comment.userId === profile.userId)
+                    );
+
+                    return (
+                      <div
+                        key={comment.commentId}
+                        className="py-5 first:pt-0 last:pb-0 transition-colors"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-black text-primary">
+                              {getInitials(comment.userName || 'Khách')}
+                            </div>
+
+                            <div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-sm font-bold text-foreground">
+                                  {comment.userName || 'Khách hàng'}
+                                </span>
+                                {isVerifiedBuyer ? (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success">
+                                    <CheckCircle className="size-3" />
+                                    Đã mua hàng
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                                    Thành viên
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="mt-0.5 flex items-center gap-0.5">
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                  <Star
+                                    key={i}
+                                    className={`size-3.5 ${
+                                      i <= (comment.rating || 5)
+                                        ? 'fill-warning text-warning'
+                                        : 'text-muted-foreground/30'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
                           </div>
 
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-bold text-foreground">
-                                {comment.userName || 'Khách hàng'}
-                              </span>
-                              <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success">
-                                <CheckCircle className="size-3" />
-                                Đã mua hàng
-                              </span>
-                            </div>
-
-                            <div className="mt-0.5 flex items-center gap-0.5">
-                              {[1, 2, 3, 4, 5].map((i) => (
-                                <Star
-                                  key={i}
-                                  className={`size-3.5 ${
-                                    i <= (comment.rating || 5)
-                                      ? 'fill-warning text-warning'
-                                      : 'text-muted-foreground/30'
-                                  }`}
-                                />
-                              ))}
-                            </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              {formatDate(comment.createdAt)}
+                            </span>
+                            {canDelete && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setCommentToDelete(comment.commentId)}
+                                className="size-7 text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                                title="Xóa bình luận"
+                              >
+                                <Trash2 className="size-3.5" />
+                              </Button>
+                            )}
                           </div>
                         </div>
 
-                        <span className="text-xs text-muted-foreground">
-                          {formatDate(comment.createdAt)}
-                        </span>
+                        <p className="mt-3 pl-12 text-xs leading-relaxed text-muted-foreground sm:text-sm whitespace-pre-line">
+                          {comment.content}
+                        </p>
                       </div>
-
-                      <p className="mt-3 pl-12 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                        {comment.content}
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="py-10 text-center">
@@ -243,7 +501,7 @@ export function ProductTabs({
                     Chưa có đánh giá nào cho sản phẩm này
                   </h4>
                   <p className="mx-auto mt-1 max-w-sm text-xs text-muted-foreground">
-                    Đánh giá được ghi nhận từ những khách hàng đã nhận hàng thành công. Hãy là người đầu tiên trải nghiệm nhé!
+                    Hãy là người đầu tiên trải nghiệm và chia sẻ cảm nhận về sản phẩm này nhé!
                   </p>
                 </div>
               )}
@@ -251,6 +509,19 @@ export function ProductTabs({
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Hộp thoại xác nhận xóa bình luận */}
+      <ConfirmDialog
+        open={commentToDelete !== null}
+        variant="destructive"
+        title="Xác nhận xóa bình luận"
+        description="Bình luận này sẽ bị xóa vĩnh viễn khỏi sản phẩm. Bạn có chắc chắn muốn xóa không?"
+        confirmText="Xóa bình luận"
+        cancelText="Hủy"
+        loading={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setCommentToDelete(null)}
+      />
     </div>
   );
 }

@@ -1,5 +1,3 @@
-import { Phone } from "lucide-react";
-
 const ShoppingGuide = () => {
   return (
     <div className="mt-16 rounded-2xl border border-border/70 bg-card p-4 shadow-sm sm:p-6 md:p-8">
@@ -44,16 +42,6 @@ const ShoppingGuide = () => {
             </p>
           </div>
         ))}
-      </div>
-
-      <div className="mt-8 text-center">
-        <a
-          href="tel:0931133128"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-xs transition-all duration-200 hover:bg-primary/90 active:scale-[0.98] sm:px-8 sm:text-base"
-        >
-          <Phone className="size-4 shrink-0" />
-          <span>Cần Hỗ Trợ? Gọi Ngay: 093.1133.128 - 08.193.148.93</span>
-        </a>
       </div>
     </div>
   );

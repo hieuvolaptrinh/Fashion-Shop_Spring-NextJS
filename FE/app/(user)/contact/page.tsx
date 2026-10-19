@@ -1,6 +1,5 @@
 import {
   ContactChannels,
-  ContactCta,
   ContactFaq,
   ContactForm,
   ContactHero,
@@ -8,28 +7,29 @@ import {
 } from "@/core/components/feature/contact";
 import { ScrollReveal } from "@/core/components/ui/scroll-reveal";
 import { Metadata } from "next";
+import { BRAND } from "@/core/constants";
 
 export const metadata: Metadata = {
-  title: "Liên Hệ - Lan Chuyên Hàng Sale",
+  title: `Liên Hệ - ${BRAND.name}`,
   description:
-    "Liên hệ với Lan Chuyên Hàng Sale để được tư vấn và hỗ trợ nhanh chóng. Hotline: 093.1133.128 - Zalo: 0819.314.893. Chúng tôi luôn sẵn sàng phục vụ bạn 24/7.",
+    `Liên hệ với ${BRAND.name} để được tư vấn chọn size và hỗ trợ nhanh chóng. Hotline: ${BRAND.hotlines.join(" - ")}. Chúng tôi luôn sẵn sàng phục vụ bạn 24/7.`,
   keywords: [
     "liên hệ",
     "hỗ trợ khách hàng",
-    "tư vấn sản phẩm",
+    "tư vấn thời trang",
     "hotline",
-    "Lan chuyên hàng sale",
+    BRAND.name,
     "chăm sóc khách hàng",
   ],
   openGraph: {
-    title: "Liên Hệ - Lan Chuyên Hàng Sale",
+    title: `Liên Hệ - ${BRAND.name}`,
     description:
-      "Liên hệ với chúng tôi để được tư vấn và hỗ trợ về sản phẩm sale chất lượng. Hotline: 093.1133.128, hỗ trợ 24/7.",
-    url: "https://lanchuyenhangsale.com/contact",
+      `Liên hệ với chúng tôi để được tư vấn và hỗ trợ về sản phẩm thời trang. Hotline: ${BRAND.primaryPhone}, hỗ trợ 24/7.`,
+    url: `${BRAND.siteUrl}/contact`,
     type: "website",
   },
   alternates: {
-    canonical: "https://lanchuyenhangsale.com/contact",
+    canonical: `${BRAND.siteUrl}/contact`,
   },
 };
 
@@ -57,8 +57,6 @@ export default function ContactPage() {
       </section>
 
       <ContactFaq />
-
-      <ContactCta />
     </div>
   );
 }

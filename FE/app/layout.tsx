@@ -24,119 +24,104 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/core/components/ui/sonner";
 import { Suspense, type ReactNode } from "react";
+import { BRAND } from "@/core/constants";
 
 export const metadata: Metadata = {
   // TITLE: Tiêu đề trang web - quan trọng nhất cho SEO
   title: {
-    default: "Lan Chuyên Hàng Sale", // Tiêu đề mặc định cho trang chủ
-    template: "%s | Lan Chuyên Hàng Sale", // Template cho các trang con (ví dụ: "Sản phẩm | Lan Chuyên Hàng Sale")
+    default: `${BRAND.name} - ${BRAND.slogan}`,
+    template: `%s | ${BRAND.name}`,
   },
-  // DESCRIPTION: Mô tả ngắn gọn về website (hiển thị trong kết quả tìm kiếm Google)
-  // Nên dài 150-160 ký tự, chứa từ khóa chính
-  description:
-    "Lan Chuyên Hàng Sale – Cửa hàng uy tín chuyên cung cấp sản phẩm sale chính hãng: sức khỏe, thực phẩm chức năng, mỹ phẩm làm đẹp, hàng gia dụng với giá ưu đãi nhất. 10+ năm kinh nghiệm, 50,000+ khách hàng tin tưởng. Giao hàng nhanh, hỗ trợ 24/7.",
+  // DESCRIPTION: Mô tả ngắn gọn về website
+  description: BRAND.description,
 
-  // URL gốc của website - giúp Next.js tạo URL tuyệt đối cho các meta tag
-  metadataBase: new URL("https://lanchuyenhangsale.com"),
+  // URL gốc của website
+  metadataBase: new URL(BRAND.siteUrl),
 
   // Tên ứng dụng
-  applicationName: "Lan Chuyên Hàng Sale",
+  applicationName: BRAND.name,
 
-  // Framework được sử dụng (Next.js)
+  // Framework được sử dụng
   generator: "Next.js",
 
-  // Chính sách referrer - bảo mật khi chuyển hướng
+  // Chính sách referrer
   referrer: "origin-when-cross-origin",
-  // KEYWORDS: Từ khóa giúp Google hiểu nội dung website
-  // Chọn từ khóa liên quan đến sản phẩm và dịch vụ của bạn
+  // KEYWORDS: Từ khóa thời trang
   keywords: [
-    "hàng sale", // Từ khóa chính
-    "hàng giá rẻ", // Từ khóa phụ
-    "sản phẩm sức khỏe", // Danh mục sản phẩm
-    "thực phẩm chức năng",
-    "mỹ phẩm làm đẹp",
-    "hàng sale chính hãng",
-    "Lan chuyên hàng sale", // Tên thương hiệu
-    "collagen", // Sản phẩm cụ thể
-    "vitamin",
-    "giảm cân",
-    "trẻ hóa da",
-    "hàng gia dụng",
-    "mua sắm online", // Hành vi mua sắm
-    "giao hàng nhanh", // Dịch vụ
-    "COD", // Phương thức thanh toán
-    "freeship", // Ưu đãi
-    "sản phẩm chất lượng cao",
-    "uy tín", // Tính chất thương hiệu
-    "an toàn",
-    "hàng sale chính hãng",
-    "giá ưu đãi", // Ưu điểm cạnh tranh
-    "khuyến mãi",
-    "giảm giá",
-    "mua sắm tiết kiệm",
-    "sản phẩm hot", // Trending
+    "thời trang",
+    "thời trang nam",
+    "thời trang nữ",
+    "quần áo phong cách",
+    "váy đầm",
+    "phụ kiện thời trang",
+    BRAND.name,
+    "HALOKAKI fashion",
+    "shop thời trang",
+    "mua sắm online",
+    "giao hàng nhanh",
+    "COD",
+    "freeship",
+    "chất lượng cao",
+    "uy tín",
   ],
-  // THÔNG TIN TÁC GIỢ: Giúp Google hiểu ai là chủ sở hữu website
+  // THÔNG TIN TÁC GIẢ
   authors: [
-    { name: "Lan Chuyên Hàng Sale", url: "https://lanchuyenhangsale.com" },
+    { name: BRAND.name, url: BRAND.siteUrl },
   ],
-  creator: "Lan Chuyên Hàng Sale Team", // Người tạo nội dung
-  publisher: "Lan Chuyên Hàng Sale", // Nhà xuất bản
+  creator: `${BRAND.name} Team`,
+  publisher: BRAND.name,
 
   // OPEN GRAPH: Meta tags cho Facebook, Zalo khi chia sẻ link
   openGraph: {
-    title: "Lan Chuyên Hàng Sale", // Tiêu đề khi chia sẻ
-    description:
-      "Lan Chuyên Hàng Sale - 10+ năm kinh nghiệm cung cấp sản phẩm sale chính hãng: sức khỏe, làm đẹp, gia dụng với giá ưu đãi nhất. 50,000+ khách hàng hài lòng, cam kết chất lượng 100%.",
-    url: "https://lanchuyenhangsale.com", // URL trang web
-    siteName: "Lan Chuyên Hàng Sale", // Tên website
+    title: `${BRAND.name} - ${BRAND.slogan}`,
+    description: BRAND.description,
+    url: BRAND.siteUrl,
+    siteName: BRAND.name,
     images: [
-      // Hình ảnh hiển thị khi chia sẻ (tỷ lệ 1200x630 px là tối ưu)
       {
-        url: "https://lanchuyenhangsale.com/banner2.png",
+        url: `${BRAND.siteUrl}/banner2.png`,
         width: 1200,
         height: 630,
-        alt: "Lan Chuyên Hàng Sale - Sản phẩm chính hãng cho sức khỏe & sắc đẹp",
+        alt: `${BRAND.name} - ${BRAND.slogan}`,
       },
     ],
-    locale: "vi_VN", // Ngôn ngữ (Tiếng Việt)
-    type: "website", // Loại nội dung
+    locale: "vi_VN",
+    type: "website",
   },
-  // ROBOTS: Hướng dẫn cho các bot tìm kiếm (Google, Bing, etc.)
+  // ROBOTS
   robots: {
-    index: true, // Cho phép lập chỉ mục (hiển thị trong kết quả tìm kiếm)
-    follow: true, // Cho phép theo dõi các link trên trang
-    nocache: false, // Cho phép cache trang
+    index: true,
+    follow: true,
+    nocache: false,
     googleBot: {
-      // Cài đặt riêng cho Google Bot
       index: true,
       follow: true,
-      "max-video-preview": -1, // Cho phép xem trước video không giới hạn
-      "max-image-preview": "large", // Cho phép xem trước ảnh kích thước lớn
-      "max-snippet": -1, // Cho phép đoạn trích không giới hạn
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 
-  // CATEGORY: Danh mục website
-  category: "health and beauty",
+  // CATEGORY
+  category: "fashion and apparel",
 
-  // CANONICAL URL: URL chính thức (tránh duplicate content)
+  // CANONICAL URL
   alternates: {
-    canonical: "https://lanchuyenhangsale.com",
+    canonical: BRAND.siteUrl,
   },
-  // ICONS: Các icon hiển thị trên trình duyệt và thiết bị
+  // ICONS: Trỏ favicon và logo-1.jpg
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "16x16 32x32" }, // Icon nhỏ trên tab trình duyệt
-      { url: "/logo.jpg", sizes: "192x192", type: "image/jpeg" }, // Icon lớn hơn
+      { url: "/favicon.ico", sizes: "16x16 32x32" },
+      { url: "/logo-1.jpg", sizes: "192x192", type: "image/jpeg" },
     ],
-    shortcut: "/favicon.ico", // Icon shortcut
-    apple: "/logo.jpg", // Icon cho thiết bị Apple (iPhone, iPad)
+    shortcut: "/favicon.ico",
+    apple: "/logo-1.jpg",
   },
 
-  // VERIFICATION: Mã xác thực với Google Search Console
+  // VERIFICATION
   verification: {
-    google: "your-google-verification-code", // Thay bằng mã thực tế từ Google Search Console
+    google: "your-google-verification-code",
   },
 };
 
@@ -150,45 +135,40 @@ export default function RootLayout({
       {/* Khai báo ngôn ngữ tiếng Việt cho website */}
       <head>
         <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Lan Chuyên Hàng Sale" />
+        <meta property="og:title" content={`${BRAND.name} - ${BRAND.slogan}`} />
         <meta
           property="og:description"
-          content="Lan Chuyên Hàng Sale - 10+ năm kinh nghiệm cung cấp sản phẩm sale chính hãng: sức khỏe, làm đẹp, gia dụng với giá ưu đãi nhất. 50,000+ khách hàng hài lòng, cam kết chất lượng 100%."
+          content={BRAND.description}
         />
-        <meta property="og:url" content="https://lanchuyenhangsale.com" />
-        <meta property="og:site_name" content="Lan Chuyên Hàng Sale" />
+        <meta property="og:url" content={BRAND.siteUrl} />
+        <meta property="og:site_name" content={BRAND.name} />
         <meta
           property="og:image"
-          content="https://lanchuyenhangsale.com/banner2.png"
+          content={`${BRAND.siteUrl}/banner2.png`}
         />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta
           property="og:image:alt"
-          content="Lan Chuyên Hàng Sale - Sản phẩm chính hãng cho sức khỏe & sắc đẹp"
+          content={`${BRAND.name} - ${BRAND.slogan}`}
         />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="vi_VN" />
-        <meta property="fb:app_id" content="your-facebook-app-id" />
-        <meta
-          property="article:publisher"
-          content="https://www.facebook.com/shopmonglan"
-        />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Lan Chuyên Hàng Sale" />
+        <meta name="twitter:title" content={BRAND.name} />
         <meta
           name="twitter:description"
-          content="Lan Chuyên Hàng Sale - 10+ năm kinh nghiệm cung cấp sản phẩm sale chính hãng: sức khỏe, làm đẹp, gia dụng với giá ưu đãi nhất."
+          content={BRAND.description}
         />
         <meta
           name="twitter:image"
-          content="https://lanchuyenhangsale.com/banner2.png"
+          content={`${BRAND.siteUrl}/banner2.png`}
         />
-        <link rel="canonical" href="https://lanchuyenhangsale.com" />
-        <link rel="dns-prefetch" href="//lanchuyenhangsale.com" />
+        <link rel="canonical" href={BRAND.siteUrl} />
+        <link rel="dns-prefetch" href={`//${BRAND.domain}`} />
         <link
           rel="preconnect"
-          href="https://lanchuyenhangsale.com"
+          href={BRAND.siteUrl}
           crossOrigin=""
         />
         <meta name="googlebot" content="index, follow" />
@@ -200,19 +180,18 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "Lan Chuyên Hàng Sale",
-              url: "https://lanchuyenhangsale.com",
-              logo: "https://lanchuyenhangsale.com/logo.jpg",
+              name: BRAND.name,
+              url: BRAND.siteUrl,
+              logo: `${BRAND.siteUrl}/logo-1.jpg`,
               contactPoint: {
                 "@type": "ContactPoint",
-                telephone: "+84-931-133-128",
+                telephone: BRAND.primaryPhone,
                 contactType: "customer service",
                 areaServed: "VN",
                 availableLanguage: "Vietnamese",
               },
               sameAs: [
-                "https://facebook.com/lanchuyenhangsale",
-                "https://zalo.me/0931133128",
+                `https://zalo.me/${BRAND.zalo.replace(/\./g, "")}`,
               ],
               address: {
                 "@type": "PostalAddress",
@@ -227,16 +206,15 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              name: "Lan Chuyên Hàng Sale",
-              url: "https://lanchuyenhangsale.com",
-              description:
-                "Chuyên cung cấp sản phẩm sale, giá rẻ, uy tín, chất lượng cao. Hàng gia dụng, sức khỏe, làm đẹp với giá ưu đãi nhất.",
+              name: BRAND.name,
+              url: BRAND.siteUrl,
+              description: BRAND.description,
               potentialAction: {
                 "@type": "SearchAction",
                 target: {
                   "@type": "EntryPoint",
                   urlTemplate:
-                    "https://lanchuyenhangsale.com/products?search={search_term_string}",
+                    `${BRAND.siteUrl}/products?search={search_term_string}`,
                 },
                 "query-input": "required name=search_term_string",
               },

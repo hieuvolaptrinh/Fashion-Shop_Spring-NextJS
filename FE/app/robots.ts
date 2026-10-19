@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { BRAND } from "@/core/constants";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -14,7 +15,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/*", "/api/*", "/oauth2/*", "/_next/*", "/private/*"],
       },
     ],
-    sitemap: "https://lanchuyenhangsale.com/sitemap.xml",
-    host: "https://lanchuyenhangsale.com",
+    sitemap: `${BRAND.siteUrl}/sitemap.xml`,
+    host: BRAND.siteUrl,
   };
 }

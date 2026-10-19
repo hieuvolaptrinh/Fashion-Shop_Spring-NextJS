@@ -1,26 +1,27 @@
 import RegisterPage from "@/core/components/feature/auth/RegisterPage";
 import { Metadata } from "next";
+import { BRAND } from "@/core/constants";
 
 export const metadata: Metadata = {
   title: "Đăng Ký Tài Khoản",
   description:
-    "Tạo tài khoản miễn phí tại Lan Chuyên Hàng Sale để theo dõi đơn hàng, nhận thông báo ưu đãi và trải nghiệm mua sắm cá nhân hóa. Đăng ký nhanh chóng, bảo mật cao.",
+    `Tạo tài khoản miễn phí tại ${BRAND.name} để theo dõi đơn hàng, nhận thông báo ưu đãi và trải nghiệm mua sắm tiện lợi. Đăng ký nhanh chóng, bảo mật cao.`,
   keywords: [
     "đăng ký",
     "tạo tài khoản",
     "thành viên mới",
     "miễn phí",
-    "Lan chuyên hàng sale",
+    BRAND.name,
   ],
   openGraph: {
-    title: "Đăng Ký Tài Khoản - Lan Chuyên Hàng Sale",
+    title: `Đăng Ký Tài Khoản - ${BRAND.name}`,
     description:
       "Tạo tài khoản miễn phí để nhận ưu đãi và theo dõi đơn hàng dễ dàng.",
-    url: "https://lanchuyenhangsale.com/register",
+    url: `${BRAND.siteUrl}/register`,
     type: "website",
   },
   alternates: {
-    canonical: "https://lanchuyenhangsale.com/register",
+    canonical: `${BRAND.siteUrl}/register`,
   },
 };
 export default function page() {

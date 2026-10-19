@@ -1,46 +1,42 @@
 import HomePage from "@/core/components/feature/home/HomePage";
-import { IMAGES } from "@/core/constants";
+import { IMAGES, BRAND } from "@/core/constants";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Trang Chủ",
   description:
-    "Chào mừng đến với Lan Chuyên Hàng Sale - nơi cung cấp sản phẩm sức khỏe, làm đẹp, gia dụng chính hãng với giá ưu đãi nhất. Hàng sale chất lượng cao, giao hàng nhanh chóng.",
+    `Chào mừng đến với ${BRAND.name} - ${BRAND.slogan}. Khám phá bộ sưu tập thời trang nam nữ phong cách, bắt kịp xu hướng và chất lượng cao.`,
   keywords: [
-    "hàng sale",
-    "sản phẩm giá rẻ",
-    "hàng chính hãng",
-    "sức khỏe",
-    "làm đẹp",
-    "gia dụng",
-    "Lan chuyên hàng sale",
+    "thời trang",
+    "thời trang nam",
+    "thời trang nữ",
+    BRAND.name,
+    "quần áo phong cách",
     "mua sắm online",
   ],
   openGraph: {
-    title: "Lan Chuyên Hàng Sale - Hàng Sale Chất Lượng Giá Rẻ",
-    description:
-      "Chuyên cung cấp sản phẩm sale chính hãng: sức khỏe, làm đẹp, gia dụng với giá ưu đãi nhất. Cam kết chất lượng, giao hàng nhanh.",
-    url: "https://lanchuyenhangsale.com",
+    title: `${BRAND.name} - ${BRAND.slogan}`,
+    description: BRAND.description,
+    url: BRAND.siteUrl,
     type: "website",
     images: [
       {
         url: IMAGES.BANNERS.BANNER_2,
         width: 1200,
         height: 630,
-        alt: "Lan Chuyên Hàng Sale - Sản phẩm chính hãng giá rẻ",
+        alt: `${BRAND.name} - ${BRAND.slogan}`,
       },
     ],
-    siteName: "Lan Chuyên Hàng Sale",
+    siteName: BRAND.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lan Chuyên Hàng Sale - Hàng Sale Chất Lượng Giá Rẻ",
-    description:
-      "Chuyên cung cấp sản phẩm sale chính hãng với giá ưu đãi nhất. Sức khỏe, làm đẹp, gia dụng chất lượng cao.",
+    title: `${BRAND.name} - ${BRAND.slogan}`,
+    description: BRAND.description,
     images: [IMAGES.BANNERS.BANNER_2],
   },
   alternates: {
-    canonical: "https://lanchuyenhangsale.com",
+    canonical: BRAND.siteUrl,
   },
 };
 export default function Home() {

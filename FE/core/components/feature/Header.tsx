@@ -1,9 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { IMAGES, ROUTES } from "@/core/constants";
+import { BRAND, IMAGES, ROUTES } from "@/core/constants";
 import {
-  HeaderTopBar,
   HeaderDesktopNav,
   HeaderActions,
   HeaderMobileNav,
@@ -18,7 +17,6 @@ import {
 export default function Header() {
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/85 sticky top-0 z-50 w-full border-b border-border/60 backdrop-blur-md shadow-xs">
-      <HeaderTopBar />
 
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between gap-4">
@@ -29,7 +27,7 @@ export default function Header() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden shadow-xs border border-border/40 group-hover:scale-105 transition-transform duration-200">
               <Image
                 src={IMAGES.LOGO}
-                alt="Logo Lan Chuyên Hàng Sales"
+                alt={`Logo ${BRAND.name}`}
                 width={36}
                 height={36}
                 className="h-full w-full object-cover"
@@ -38,10 +36,10 @@ export default function Header() {
             </div>
             <div className="hidden sm:block">
               <span className="text-base font-bold text-foreground leading-tight tracking-tight block">
-                LanChuyenHangSale
+                {BRAND.name}
               </span>
               <span className="text-[11px] text-muted-foreground block -mt-0.5">
-                Uy tín - Chất lượng
+                {BRAND.tagline}
               </span>
             </div>
           </Link>

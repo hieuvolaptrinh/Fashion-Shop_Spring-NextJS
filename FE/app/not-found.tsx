@@ -1,25 +1,27 @@
+import { BRAND } from "@/core/constants";
+
 export default function NotFound() {
   return (
     <html lang="vi">
       <head>
-        <title>Trang không tìm thấy - Lan Chuyên Hàng Sale</title>
+        <title>{`Trang không tìm thấy - ${BRAND.name}`}</title>
         <meta
           name="description"
-          content="Trang bạn tìm kiếm không tồn tại trên Lan Chuyên Hàng Sale"
+          content={`Trang bạn tìm kiếm không tồn tại trên ${BRAND.name}`}
         />
 
         <meta
           property="og:title"
-          content="Trang không tìm thấy - Lan Chuyên Hàng Sale"
+          content={`Trang không tìm thấy - ${BRAND.name}`}
         />
         <meta
           property="og:description"
-          content="Trang bạn tìm kiếm không tồn tại. Hãy quay về trang chủ để khám phá sản phẩm sale tốt nhất."
+          content="Trang bạn tìm kiếm không tồn tại. Hãy quay về trang chủ để khám phá các bộ sưu tập thời trang mới nhất."
         />
-        <meta property="og:url" content="https://lanchuyenhangsale.com" />
+        <meta property="og:url" content={BRAND.siteUrl} />
         <meta
           property="og:image"
-          content="https://lanchuyenhangsale.com/banner2.png"
+          content={`${BRAND.siteUrl}/banner2.png`}
         />
         <meta property="og:type" content="website" />
 
@@ -38,7 +40,7 @@ export default function NotFound() {
             padding: "20px",
           }}
         >
-          <h1 style={{ fontSize: "4rem", color: "#dc2626", margin: "0" }}>
+          <h1 style={{ fontSize: "4rem", color: "#0f172a", margin: "0" }}>
             404
           </h1>
           <h2
@@ -55,12 +57,12 @@ export default function NotFound() {
             }}
           >
             Trang bạn tìm kiếm không tồn tại hoặc đã được di chuyển. Hãy quay về
-            trang chủ để khám phá các sản phẩm sale tốt nhất.
+            trang chủ để khám phá các bộ sưu tập thời trang mới nhất.
           </p>
           <a
-            href="https://lanchuyenhangsale.com"
+            href="/"
             style={{
-              backgroundColor: "#dc2626",
+              backgroundColor: "#0f172a",
               color: "white",
               padding: "12px 24px",
               borderRadius: "6px",

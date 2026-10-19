@@ -27,11 +27,13 @@ export interface SupportCategory {
   label: string;
 }
 
+import { BRAND } from "./brand";
+
 export const CONTACT_DATA = {
   hero: {
     title: "Liên Hệ Với Chúng Tôi",
     description:
-      "Chúng tôi luôn sẵn sàng hỗ trợ bạn tìm được những sản phẩm sale chất lượng với giá tốt nhất. Đừng ngần ngại để lại lời nhắn hoặc kết nối trực tiếp với đội ngũ tư vấn.",
+      "Chúng tôi luôn sẵn sàng hỗ trợ bạn tìm được những sản phẩm thời trang phong cách và ưng ý nhất. Đừng ngần ngại để lại lời nhắn hoặc kết nối trực tiếp với đội ngũ tư vấn của HALOKAKI.",
   },
 
   channels: [
@@ -39,41 +41,41 @@ export const CONTACT_DATA = {
       id: "phone",
       icon: Phone,
       title: "Hotline Tư Vấn",
-      value: "093.1133.128",
+      value: BRAND.primaryPhone,
       description: "Gọi ngay để được hỗ trợ tức thì",
-      href: "tel:0931133128",
+      href: `tel:${BRAND.primaryPhone.replace(/\./g, "")}`,
       actionText: "Gọi ngay",
     },
     {
       id: "zalo",
       icon: MessageCircle,
       title: "Zalo Chat Trực Tuyến",
-      value: "0819.314.893",
+      value: BRAND.zalo,
       description: "Nhắn tin phản hồi nhanh trong 5 phút",
-      href: "https://zalo.me/0819314893",
+      href: `https://zalo.me/${BRAND.zalo.replace(/\./g, "")}`,
       actionText: "Chat Zalo",
     },
     {
       id: "email",
       icon: Mail,
       title: "Hòm Thư Hỗ Trợ",
-      value: "lanchuyenhangsale@gmail.com",
-      description: "Phản hồi thắc mắc & hợp tác sỉ",
-      href: "mailto:lanchuyenhangsale@gmail.com",
+      value: BRAND.email,
+      description: "Phản hồi thắc mắc & hỗ trợ khách hàng",
+      href: `mailto:${BRAND.email}`,
       actionText: "Gửi Email",
     },
     {
       id: "working-hours",
       icon: Clock,
       title: "Giờ Phục Vụ",
-      value: "7:00 - 21:00 (T2 - CN)",
-      description: "Bán hàng online & tiếp nhận đơn 24/7",
+      value: BRAND.workingHours,
+      description: BRAND.onlineStatus,
       actionText: "Online 24/7",
     },
   ] as ContactChannel[],
 
   supportCategories: [
-    { value: "tu-van", label: "Tư vấn sản phẩm & Săn deal giá tốt" },
+    { value: "tu-van", label: "Tư vấn chọn size & phối đồ" },
     { value: "tra-cuu-don", label: "Tra cứu tiến độ đơn hàng" },
     { value: "doi-tra", label: "Hỗ trợ đổi trả & Bảo hành sản phẩm" },
     { value: "khieu-nai", label: "Góp ý chất lượng dịch vụ" },
@@ -81,29 +83,24 @@ export const CONTACT_DATA = {
   ] as SupportCategory[],
 
   storeInfo: {
-    name: "Lan Chuyên Hàng Sale",
-    slogan: "Hàng Sale - Giá Rẻ - Chất Lượng",
-    description:
-      "Chuyên thanh lý, săn deal sale với giá cực ưu đãi. Đa dạng mặt hàng từ đời sống, đồ gia dụng thông minh đến thời trang và phụ kiện khuyến mãi hot.",
-    hotlines: ["093.1133.128", "0819.314.893"],
-    zalo: "0819.314.893",
-    email: "lanchuyenhangsale@gmail.com",
-    website: "lanchuyenhangsale.com",
-    fanpage: "Lan Chuyên Hàng Sale",
-    workingHours: "7:00 - 21:00 (T2 - CN)",
-    onlineStatus: "Tiếp nhận đơn hàng online 24/7",
+    name: BRAND.name,
+    slogan: BRAND.slogan,
+    description: BRAND.description,
+    hotlines: BRAND.hotlines,
+    zalo: BRAND.zalo,
+    email: BRAND.email,
+    website: BRAND.domain,
+    fanpage: BRAND.name,
+    workingHours: BRAND.workingHours,
+    onlineStatus: BRAND.onlineStatus,
     productHighlights: [
-      "Hàng gia dụng sale giá sốc",
-      "Thời trang thanh lý tuyển chọn",
-      "Đồ dùng sinh hoạt tiện ích",
-      "Điện tử & Phụ kiện thông minh",
-      "Flash Sale & Khuyến mãi hot",
+      "Bộ sưu tập thời trang nam nữ xu hướng",
+      "Chất liệu cao cấp, form dáng chuẩn",
+      "Thiết kế trẻ trung, hiện đại & thanh lịch",
+      "Phụ kiện thời trang đa dạng phong cách",
+      "Ưu đãi thành viên & quà tặng hấp dẫn",
     ],
-    commitments: [
-      "Được kiểm tra hàng kỹ trước khi thanh toán (Ship COD toàn quốc)",
-      "Đổi trả trong 7 ngày nếu lỗi do nhà sản xuất hoặc sai lệch mô tả",
-      "Tư vấn viên thân thiện, hỗ trợ nhiệt tình qua Zalo và Hotline",
-    ],
+    commitments: BRAND.commitments,
   },
 
   faqs: [
@@ -117,13 +114,13 @@ export const CONTACT_DATA = {
       id: "faq-2",
       question: "Tôi có được kiểm tra hàng trước khi thanh toán không?",
       answer:
-        "Hoàn toàn có! Lan Chuyên Hàng Sale luôn khuyến khích quý khách đồng kiểm sản phẩm cùng nhân viên giao hàng trước khi thanh toán tiền mặt (Ship COD).",
+        "Hoàn toàn có! HALOKAKI luôn khuyến khích quý khách đồng kiểm sản phẩm cùng nhân viên giao hàng trước khi thanh toán tiền mặt (Ship COD).",
     },
     {
       id: "faq-3",
       question: "Chính sách đổi trả sản phẩm được áp dụng ra sao?",
       answer:
-        "Chúng tôi hỗ trợ đổi trả miễn phí trong vòng 7 ngày kể từ khi nhận hàng nếu sản phẩm có lỗi từ nhà sản xuất, hư hại trong quá trình vận chuyển hoặc không đúng mẫu mã đã đặt.",
+        "Chúng tôi hỗ trợ đổi trả miễn phí trong vòng 7 ngày kể từ khi nhận hàng nếu sản phẩm có lỗi từ nhà sản xuất, hư hại trong quá trình vận chuyển hoặc không vừa size.",
     },
     {
       id: "faq-4",
@@ -135,21 +132,23 @@ export const CONTACT_DATA = {
       id: "faq-5",
       question: "Làm thế nào để theo dõi tình trạng đơn hàng của tôi?",
       answer:
-        "Sau khi gửi hàng, chúng tôi sẽ cập nhật mã vận đơn cho bạn qua số điện thoại/Zalo. Bạn có thể tra cứu trực tiếp hoặc nhắn tin vào hotline Zalo 0819.314.893 để được kiểm tra ngay.",
+        "Sau khi gửi hàng, chúng tôi sẽ cập nhật mã vận đơn cho bạn qua số điện thoại/Zalo. Bạn có thể tra cứu trực tiếp hoặc nhắn tin vào hotline Zalo " +
+        BRAND.zalo +
+        " để được kiểm tra ngay.",
     },
   ] as FaqItem[],
 
   cta: {
     title: "Cần Hỗ Trợ Khẩn Cấp?",
     description:
-      "Đội ngũ CSKH luôn túc trực để giải đáp mọi thắc mắc và giúp bạn chọn được deal sale ưng ý nhất!",
+      "Đội ngũ CSKH luôn túc trực để giải đáp mọi thắc mắc và giúp bạn chọn được trang phục ưng ý nhất!",
     hotline: {
-      label: "Gọi Ngay: 093.1133.128",
-      href: "tel:0931133128",
+      label: `Gọi Ngay: ${BRAND.primaryPhone}`,
+      href: `tel:${BRAND.primaryPhone.replace(/\./g, "")}`,
     },
     zalo: {
-      label: "Chat Zalo: 0819.314.893",
-      href: "https://zalo.me/0819314893",
+      label: `Chat Zalo: ${BRAND.zalo}`,
+      href: `https://zalo.me/${BRAND.zalo.replace(/\./g, "")}`,
     },
   },
 } as const;

@@ -1,30 +1,30 @@
 import type { MetadataRoute } from "next";
+import { BRAND } from "@/core/constants";
 
 // tăng trải nghiệm người dùng với manifest
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Lan Chuyên Hàng Sale",
-    short_name: "LanSale",
-    description:
-      "Chuyên cung cấp sản phẩm sale, giá rẻ, uy tín, chất lượng cao. Hàng gia dụng, sức khỏe, làm đẹp với giá ưu đãi nhất.",
+    name: BRAND.name,
+    short_name: BRAND.shortName,
+    description: BRAND.description,
     icons: [
       {
-        src: "/logo.jpg",
+        src: "/logo-1.jpg",
         sizes: "192x192",
         type: "image/jpeg",
       },
       {
-        src: "/logo.jpg",
+        src: "/logo-1.jpg",
         sizes: "512x512",
         type: "image/jpeg",
       },
     ],
-    theme_color: "#dc2626",
+    theme_color: "#0f172a",
     background_color: "#ffffff",
     start_url: "/",
     display: "standalone",
     orientation: "portrait",
     scope: "/",
-    categories: ["shopping", "lifestyle", "health"],
+    categories: ["shopping", "lifestyle", "fashion"],
   };
 }

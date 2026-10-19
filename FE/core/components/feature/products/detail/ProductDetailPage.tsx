@@ -83,6 +83,8 @@ export default function ProductDetailPage({ productId }: ProductDetailPageProps)
         comments={p.comments}
         loadingComments={p.loadingComments}
         onRefreshComments={p.refreshComments}
+        onSubmitComment={p.handleSubmitComment}
+        onDeleteComment={p.handleDeleteComment}
       />
 
       <ProductRelated

@@ -1,3 +1,4 @@
+import { BRAND } from "./brand";
 import { IMAGES } from "@/core/constants/images";
 import {
   Award,
@@ -30,17 +31,17 @@ export interface TeamMember {
 
 export const ABOUT_DATA = {
   hero: {
-    badge: "Shop Lan Chuyên Hàng Sale",
+    badge: `Thời trang ${BRAND.name}`,
     title: "Về Chúng Tôi",
     description:
-      "Chuyên cung cấp hàng sale, thanh lý với giá cực ưu đãi - Đa dạng mặt hàng từ đời sống, gia dụng đến điện tử",
+      "Chuyên cung cấp các sản phẩm thời trang chất lượng cao, bắt kịp xu hướng với mức giá hợp lý nhất",
     hotline: {
-      label: "Gọi ngay: 093.1133.128",
-      href: "tel:0931133128",
+      label: `Gọi ngay: ${BRAND.primaryPhone}`,
+      href: `tel:${BRAND.primaryPhone.replace(/\./g, "")}`,
     },
     zalo: {
-      label: "Zalo: 0819.314.893",
-      href: "https://zalo.me/0819314893",
+      label: `Zalo: ${BRAND.zalo}`,
+      href: `https://zalo.me/${BRAND.zalo.replace(/\./g, "")}`,
     },
   },
 
@@ -71,28 +72,28 @@ export const ABOUT_DATA = {
     title: "Câu Chuyện Của Chúng Tôi",
     paragraphs: [
       {
-        highlight: "Shop Lan Chuyên Hàng Sale",
-        text: " khởi nguồn từ đam mê tìm kiếm và chia sẻ những sản phẩm chất lượng với giá cả phải chăng cho mọi người. Chúng tôi tin rằng ",
-        boldHighlight: "ai cũng xứng đáng có được những món đồ tốt",
-        ending: " mà không cần phải chi quá nhiều tiền.",
+        highlight: `Thời trang ${BRAND.name}`,
+        text: " khởi nguồn từ đam mê mang đến phong cách thời trang hiện đại, thanh lịch và chất lượng cho mọi người. Chúng tôi tin rằng ",
+        boldHighlight: "ai cũng xứng đáng tỏa sáng trong những bộ trang phục đẹp",
+        ending: " với chi phí hợp lý nhất.",
       },
       {
         lead: "Hành trình ",
         boldLead: "hơn 10 năm",
-        text: " kinh doanh đã giúp chúng tôi xây dựng được mạng lưới nhà cung cấp uy tín, luôn cập nhật những ",
-        highlight: "deal HOT, hàng sale chất lượng",
+        text: " phát triển đã giúp chúng tôi xây dựng được chuỗi cung ứng uy tín, luôn cập nhật những ",
+        highlight: "xu hướng mới nhất, chất liệu chọn lọc",
         ending:
-          " từ nhiều nguồn khác nhau. Từ đồ gia dụng, điện tử, thời trang đến các sản phẩm đời sống - tất cả đều được tuyển chọn kỹ lưỡng để đảm bảo chất lượng tốt với giá cực ưu đãi.",
+          " từ các nhà sản xuất hàng đầu. Từ trang phục thường ngày, công sở đến dạ tiệc và phụ kiện - tất cả đều được tuyển chọn kỹ lưỡng để đảm bảo phom dáng và độ bền tối ưu.",
       },
       {
         lead: "Với phương châm ",
-        highlight: '"Hàng Sale - Giá Rẻ - Chất Lượng"',
-        text: ', chúng tôi tự hào đã mang đến niềm vui mua sắm cho hàng nghìn khách hàng trên toàn quốc. Mỗi sản phẩm đều được kiểm tra kỹ càng trước khi đến tay khách hàng, đảm bảo ',
-        boldEnding: '"Giá rẻ nhưng chất lượng không rẻ".',
+        highlight: `"${BRAND.slogan}"`,
+        text: ', chúng tôi tự hào đã đồng hành cùng hàng nghìn khách hàng trên khắp cả nước định hình phong cách cá nhân, đảm bảo ',
+        boldEnding: '"Chất lượng cao cấp - Trải nghiệm hoàn hảo".',
       },
       {
         isCallout: true,
-        text: "Chúng tôi không chỉ bán hàng, mà còn là người bạn đồng hành giúp bạn tiết kiệm chi phí mà vẫn sở hữu được những sản phẩm ưng ý!",
+        text: "Chúng tôi không chỉ cung cấp trang phục, mà còn là người bạn đồng hành giúp bạn luôn tự tin và phong cách trong mọi khoảnh khắc!",
       },
     ],
   },
@@ -100,15 +101,15 @@ export const ABOUT_DATA = {
   coreValues: [
     {
       icon: CheckCircle,
-      title: "Giá rẻ - Chất lượng",
+      title: "Chất lượng hàng đầu",
       description:
-        "Cam kết mang đến sản phẩm chất lượng với giá cả hợp lý nhất thị trường",
+        "Cam kết mang đến sản phẩm thời trang chất lượng với mức giá hợp lý nhất",
     },
     {
       icon: Heart,
       title: "Phục vụ tận tình",
       description:
-        "Đội ngũ nhiệt tình, luôn sẵn sàng tư vấn và hỗ trợ khách hàng mọi lúc",
+        "Đội ngũ nhiệt tình, luôn sẵn sàng tư vấn phối đồ và hỗ trợ khách hàng mọi lúc",
     },
     {
       icon: Truck,
@@ -133,46 +134,32 @@ export const ABOUT_DATA = {
     },
     {
       name: "Đội ngũ tư vấn",
-      role: "Chuyên viên bán hàng",
-      description: "Nhiệt tình tư vấn, giúp khách hàng tìm được sản phẩm ưng ý",
+      role: "Chuyên viên thời trang",
+      description: "Nhiệt tình tư vấn size và phong cách, giúp khách hàng tìm được trang phục ưng ý",
       image: IMAGES.SUPPORT.TUVAN,
     },
     {
       name: "Bộ phận CSKH",
       role: "Hỗ trợ 24/7",
       description:
-        "Luôn sẵn sàng giải đáp thắc mắc và xử lý đơn hàng nhanh chóng",
+        "Luôn sẵn sàng giải đáp thắc mắc và hỗ trợ khách hàng nhanh chóng",
       image: IMAGES.SUPPORT.HOTRO,
     },
   ] as TeamMember[],
 
   contactInfo: {
     company: {
-      name: "Shop Lan Chuyên Hàng Sale",
-      website: "lanchuyenhangsale.com",
-      hotline: "093.1133.128",
-      orderPhone: "0819.314.893",
-      zalo: "093.1133.128",
+      name: BRAND.name,
+      website: BRAND.domain,
+      hotline: BRAND.primaryPhone,
+      orderPhone: BRAND.zalo,
+      zalo: BRAND.primaryPhone,
     },
-    policies: {
-      businessHours: "7:00 - 21:00 (T2 - CN)",
-      onlineHours: "Online 24/7",
-      returns: "7 ngày đổi trả miễn phí",
-      shipping: "COD toàn quốc",
-      freeship: "Freeship đơn từ 200k",
-    },
+    policies: BRAND.policies,
     payments: ["COD", "Chuyển khoản", "Ví điện tử"],
     commitments: [
       "Hàng chất lượng - Giá tốt nhất",
       "Dịch vụ tận tâm - Uy tín lâu dài",
     ],
-  },
-
-  cta: {
-    title: "Sẵn Sàng Phục Vụ Bạn!",
-    description:
-      "Hãy để chúng tôi giúp bạn tìm được những sản phẩm chất lượng với giá cả hợp lý nhất!",
-    primaryButton: "Xem Hàng Sale",
-    secondaryButton: "Liên Hệ Ngay",
   },
 } as const;

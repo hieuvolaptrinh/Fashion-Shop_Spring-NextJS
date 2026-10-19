@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import RedirectPageOAuth from "./_components/redirectPageOAuth";
 
+import { BRAND } from "@/core/constants";
+
 export const metadata = {
-  title: "Xác thực Đăng nhập - Lan Chuyên Hàng Sale",
+  title: `Xác thực Đăng nhập - ${BRAND.name}`,
   description:
     "Đang xác thực thông tin tài khoản và chuyển hướng về trang chủ...",
 };
