@@ -4,10 +4,10 @@ import type { CategoryItem } from "@/core/lib/type";
 export const CATEGORY_FALLBACK_IMAGES = [
   IMAGES.CATEGORIES.MEN,
   IMAGES.CATEGORIES.WOMEN,
+  IMAGES.CATEGORIES.OUTERWEAR,
+  IMAGES.CATEGORIES.JEANS,
   IMAGES.CATEGORIES.ACCESSORIES,
-  IMAGES.CATEGORIES.WELLNESS,
-  IMAGES.CATEGORIES.COSMETICS,
-  IMAGES.CATEGORIES.HOMEWARE,
+  IMAGES.CATEGORIES.SHOES,
 ];
 
 /**
@@ -19,45 +19,60 @@ export function getCategoryFallbackImage(
 ): string {
   const name = (typeName || "").toLowerCase().trim();
 
-  if (name.includes("nam")) return IMAGES.CATEGORIES.MEN;
-  if (name.includes("nữ") || name.includes("váy") || name.includes("đầm")) {
-    return IMAGES.CATEGORIES.WOMEN;
+  // 1. Áo khoác & Blazer
+  if (
+    name.includes("khoác") ||
+    name.includes("blazer") ||
+    name.includes("jacket") ||
+    name.includes("vest") ||
+    name.includes("bomber") ||
+    name.includes("cardigan")
+  ) {
+    return IMAGES.CATEGORIES.OUTERWEAR;
   }
+
+  // 2. Quần & Jeans
+  if (
+    name.includes("quần") ||
+    name.includes("jean") ||
+    name.includes("kaki") ||
+    name.includes("trousers") ||
+    name.includes("short")
+  ) {
+    return IMAGES.CATEGORIES.JEANS;
+  }
+
+  // 3. Giày dép & Sneaker
+  if (
+    name.includes("giày") ||
+    name.includes("sneaker") ||
+    name.includes("dép") ||
+    name.includes("sandal") ||
+    name.includes("boot") ||
+    name.includes("guốc")
+  ) {
+    return IMAGES.CATEGORIES.SHOES;
+  }
+
+  // 4. Phụ kiện thời trang
   if (
     name.includes("phụ kiện") ||
-    name.includes("giày") ||
     name.includes("túi") ||
-    name.includes("dép") ||
-    name.includes("sneaker") ||
+    name.includes("ví") ||
     name.includes("nón") ||
-    name.includes("thắt lưng")
+    name.includes("mũ") ||
+    name.includes("thắt lưng") ||
+    name.includes("kính")
   ) {
     return IMAGES.CATEGORIES.ACCESSORIES;
   }
-  if (
-    name.includes("sức khỏe") ||
-    name.includes("trà") ||
-    name.includes("dưỡng nhan") ||
-    name.includes("thảo mộc")
-  ) {
-    return IMAGES.CATEGORIES.WELLNESS;
-  }
-  if (
-    name.includes("mỹ phẩm") ||
-    name.includes("làm đẹp") ||
-    name.includes("skincare") ||
-    name.includes("son") ||
-    name.includes("kem")
-  ) {
-    return IMAGES.CATEGORIES.COSMETICS;
-  }
-  if (
-    name.includes("gia dụng") ||
-    name.includes("bình") ||
-    name.includes("nhà cửa") ||
-    name.includes("tiện ích")
-  ) {
-    return IMAGES.CATEGORIES.HOMEWARE;
+
+  // 5. Thời trang Nam
+  if (name.includes("nam")) return IMAGES.CATEGORIES.MEN;
+
+  // 6. Thời trang Nữ
+  if (name.includes("nữ") || name.includes("váy") || name.includes("đầm")) {
+    return IMAGES.CATEGORIES.WOMEN;
   }
 
   // Fallback luân phiên theo danh sách ảnh thời trang cao cấp

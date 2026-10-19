@@ -19,10 +19,10 @@ import { toast } from "sonner";
 const PRESET_TEMPLATES = [
   { label: "Nam", url: IMAGES.CATEGORIES.MEN },
   { label: "Nữ", url: IMAGES.CATEGORIES.WOMEN },
+  { label: "Áo khoác", url: IMAGES.CATEGORIES.OUTERWEAR },
+  { label: "Quần & Jeans", url: IMAGES.CATEGORIES.JEANS },
   { label: "Phụ kiện", url: IMAGES.CATEGORIES.ACCESSORIES },
-  { label: "Sức khỏe", url: IMAGES.CATEGORIES.WELLNESS },
-  { label: "Mỹ phẩm", url: IMAGES.CATEGORIES.COSMETICS },
-  { label: "Gia dụng", url: IMAGES.CATEGORIES.HOMEWARE },
+  { label: "Giày dép", url: IMAGES.CATEGORIES.SHOES },
 ];
 
 interface CategoryImagePickerProps {

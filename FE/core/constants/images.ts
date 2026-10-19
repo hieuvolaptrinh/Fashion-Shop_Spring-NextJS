@@ -4,7 +4,7 @@
  */
 export const IMAGES = {
   // Logo & Nhận diện thương hiệu
-  LOGO: "/logo.jpg",
+  LOGO: "/logo-1.jpg",
 
   // Ảnh mặc định & Giữ chỗ (Fallback / Placeholder)
   FALLBACK_PRODUCT: "/older.png",
@@ -35,14 +35,14 @@ export const IMAGES = {
     DEMO_8: "/productDemo8.jpg",
   },
 
-  // Ảnh danh mục sản phẩm (Boutique Fashion & Lifestyle)
+  // Ảnh danh mục sản phẩm (Boutique Fashion Store)
   CATEGORIES: {
     MEN: "/categories/men.jpg",
     WOMEN: "/categories/women.jpg",
+    OUTERWEAR: "/categories/outerwear.jpg",
+    JEANS: "/categories/jeans.jpg",
     ACCESSORIES: "/categories/accessories.jpg",
-    WELLNESS: "/categories/wellness.jpg",
-    COSMETICS: "/categories/cosmetics.jpg",
-    HOMEWARE: "/categories/homeware.jpg",
+    SHOES: "/categories/shoes.jpg",
     DEFAULT: "/categories/women.jpg",
   },
 } as const;
