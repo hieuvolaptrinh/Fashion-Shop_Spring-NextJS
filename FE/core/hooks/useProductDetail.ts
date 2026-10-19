@@ -1,7 +1,12 @@
-import { getCommentsByProduct } from '@/core/apis/comments';
+import {
+  createComment,
+  deleteComment,
+  getCommentsByProduct,
+} from '@/core/apis/comments';
 import { getProductById } from '@/core/apis/products';
 import { ROUTES } from '@/core/constants';
 import type { Combo, CommentResponse, Product } from '@/core/lib/type';
+import { useAuthStore } from '@/core/store/authStore';
 import { useCartStore } from '@/core/store/cartStore';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -67,6 +72,59 @@ export function useProductDetail(productId: string) {
   useEffect(() => {
     refreshComments();
   }, [refreshComments]);
+
+  const handleSubmitComment = useCallback(
+    async (content: string, rating: number) => {
+      if (!productId) return { success: false, message: 'Thiếu mã sản phẩm' };
+      try {
+        const profile = useAuthStore.getState().profile;
+        const updatedList = await createComment({
+          productId: Number(productId),
+          content,
+          rating,
+          userId: profile?.userId,
+        });
+        if (Array.isArray(updatedList) && updatedList.length > 0) {
+          setComments(updatedList);
+        } else {
+          await refreshComments();
+        }
+        toast.success('Gửi đánh giá thành công! Cảm ơn nhận xét của bạn.');
+        return { success: true };
+      } catch (error: any) {
+        const msg =
+          error?.response?.data?.message ||
+          error?.message ||
+          'Không thể gửi đánh giá. Vui lòng thử lại sau.';
+        toast.error(msg);
+        return { success: false, message: msg };
+      }
+    },
+    [productId, refreshComments]
+  );
+
+  // Xóa bình luận
+  const handleDeleteComment = useCallback(
+    async (commentId: number) => {
+      try {
+        const updatedList = await deleteComment(commentId);
+        if (Array.isArray(updatedList)) {
+          setComments(updatedList);
+        } else {
+          await refreshComments();
+        }
+        toast.success('Đã xóa đánh giá thành công');
+        return { success: true };
+      } catch (error: any) {
+        const msg =
+          error?.response?.data?.message ||
+          'Không thể xóa đánh giá';
+        toast.error(msg);
+        return { success: false, message: msg };
+      }
+    },
+    [refreshComments]
+  );
 
   // Đặt lại số lượng về 1 trực tiếp khi người dùng chọn combo / mua lẻ (tránh re-render kép bằng useEffect)
   const handleSelectOption = useCallback((option: PurchaseOption) => {
@@ -203,5 +261,7 @@ export function useProductDetail(productId: string) {
     averageRating,
     totalReviews: comments.length,
     refreshComments,
+    handleSubmitComment,
+    handleDeleteComment,
   };
 }

@@ -197,7 +197,9 @@ export interface CommentResponse {
   userName: string;
   productId: number;
   productName: string;
-  orderDetailId: number;
+  orderDetailId?: number;
+  isPurchased?: boolean;
+  purchased?: boolean;
   content: string;
   rating: number;
   createdAt: string;
@@ -205,11 +207,11 @@ export interface CommentResponse {
 }
 
 export interface CreateCommentRequest {
-  userId: number;
   productId: number;
-  orderDetailId: number;
   content: string;
   rating: number;
+  orderDetailId?: number;
+  userId?: number;
 }
 
 /**

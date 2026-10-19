@@ -13,6 +13,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.server.ResponseStatusException;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 
@@ -30,6 +31,15 @@ import java.util.stream.Collectors;
 @Service
 public class InvoiceService {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InvoiceService.class);
+
+    @Value("${app.store.name:HALOKAKI}")
+    private String storeName;
+
+    @Value("${app.store.hotline:0931133128}")
+    private String storeHotline;
+
+    @Value("${app.store.order-phones:0931133128 - 0819314893}")
+    private String storeOrderPhones;
 
     private final OrderRepository orderRepo;
 
@@ -131,13 +141,11 @@ public class InvoiceService {
 
                 if (isFirstPage) {
                     y -= 5;
-                    showTextCentered(cs, "LAN CHUYÊN HÀNG SALE", fontBold, 8, y, centerX);
+                    showTextCentered(cs, storeName, fontBold, 8, y, centerX);
                     y -= 10;
-                    showTextCentered(cs, "Fapage: https://www.facebook.com/shopmonglan", fontRegular, 6, y, centerX);
+                    showTextCentered(cs, "Hotline: " + storeHotline, fontRegular, 6, y, centerX);
                     y -= 8;
-                    showTextCentered(cs, "Hotline: 0931133128", fontRegular, 6, y, centerX);
-                    y -= 11;
-                    showTextCentered(cs, "XỬ LÝ ĐƠN 0931133128 - 0819314893", fontRegular, 6, y, centerX);
+                    showTextCentered(cs, "XỬ LÝ ĐƠN: " + storeOrderPhones, fontRegular, 6, y, centerX);
                     y -= 8;
                     drawLine(cs, margin, y, 142, 0.5f, 0.7f);
                     y -= 12;

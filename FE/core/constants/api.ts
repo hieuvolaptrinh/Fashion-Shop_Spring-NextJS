@@ -74,6 +74,7 @@ export const API_ENDPOINTS = {
     BASE: "/api/v1/comments",
     BY_PRODUCT: (productId: number | string) =>
       `/api/v1/comments/by-product/${productId}`,
+    BY_ID: (commentId: number | string) => `/api/v1/comments/${commentId}`,
   },
 
   // Tải lên & Quản lý Hình ảnh (Cloudinary Upload)

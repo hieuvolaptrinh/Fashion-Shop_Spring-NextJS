@@ -21,7 +21,7 @@ export const getCommentsByProduct = async (
 };
 
 /**
- * Gửi đánh giá/bình luận mới cho sản phẩm đã mua thành công
+ * Gửi đánh giá/bình luận mới cho sản phẩm
  */
 export const createComment = async (
   data: CreateCommentRequest
@@ -35,6 +35,24 @@ export const createComment = async (
     return Array.isArray(result) ? result : [];
   } catch (error) {
     console.error('Lỗi khi gửi bình luận:', error);
+    throw error;
+  }
+};
+
+/**
+ * Xóa bình luận của chính người dùng hoặc Admin
+ */
+export const deleteComment = async (
+  commentId: number | string
+): Promise<CommentResponse[]> => {
+  try {
+    const res = await apiClient.delete<any>(
+      API_ENDPOINTS.COMMENTS.BY_ID(commentId)
+    );
+    const result = res?.data?.data ?? res?.data ?? res;
+    return Array.isArray(result) ? result : [];
+  } catch (error) {
+    console.error('Lỗi khi xóa bình luận:', error);
     throw error;
   }
 };

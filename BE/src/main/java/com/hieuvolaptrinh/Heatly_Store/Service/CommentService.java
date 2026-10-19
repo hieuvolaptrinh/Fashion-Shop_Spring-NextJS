@@ -35,9 +35,9 @@ public class CommentService {
                 this.orderRepository = orderRepository;
         }
 
-        /** 1. Tạo comment mới - Xác thực người dùng từ UserDetails và kiểm tra sở hữu đơn hàng */
+        /** 1. Tạo comment mới - Xác thực người dùng từ UserDetails, tự động kiểm tra đã mua hàng (DELIVERED) */
         @Transactional(rollbackFor = Exception.class)
-        public List<CommentResponse> createComment(UserDetails userDetails, int productId, int orderDetailId,
+        public List<CommentResponse> createComment(UserDetails userDetails, int productId, Integer orderDetailId,
                         String content, Integer rating) {
                 int userId = Integer.parseInt(userDetails.getUsername());
                 User u = userRepo.findById(userId)
@@ -48,35 +48,43 @@ public class CommentService {
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND, "Product không tồn tại: " + productId));
 
-                OrderDetail od = orderDetailRepo.findById(orderDetailId)
-                                .orElseThrow(() -> new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND,
-                                                "Không tìm thấy chi tiết đơn hàng: " + orderDetailId));
+                OrderDetail matchedOd = null;
 
-                Order order = orderRepository.findById(od.getOrder().getOrderId())
-                                .orElseThrow(() -> new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND,
-                                                "Không tìm thấy đơn hàng tương ứng"));
+                // Nếu client truyền orderDetailId, kiểm tra tính hợp lệ và quyền sở hữu
+                if (orderDetailId != null && orderDetailId > 0) {
+                        OrderDetail od = orderDetailRepo.findById(orderDetailId)
+                                        .orElseThrow(() -> new ResponseStatusException(
+                                                        HttpStatus.NOT_FOUND,
+                                                        "Không tìm thấy chi tiết đơn hàng: " + orderDetailId));
 
-                // CHỐNG IDOR: Kiểm tra người dùng có đúng là người đã mua đơn hàng này không
-                if (order.getUser().getUserId() != userId) {
-                        throw new ResponseStatusException(
-                                        HttpStatus.FORBIDDEN,
-                                        "Bạn chỉ có thể đánh giá sản phẩm trong đơn hàng của chính mình.");
-                }
+                        Order order = od.getOrder();
+                        if (order == null || order.getUser() == null || order.getUser().getUserId() != userId) {
+                                throw new ResponseStatusException(
+                                                HttpStatus.FORBIDDEN,
+                                                "Bạn chỉ có thể đánh giá sản phẩm trong đơn hàng của chính mình.");
+                        }
 
-                if (order.getStatus() != OrderStatusEnum.DELIVERED) {
-                        throw new ResponseStatusException(
-                                        HttpStatus.BAD_REQUEST,
-                                        "Chỉ được bình luận khi đơn hàng đã được giao hoặc hoàn thành.");
+                        if (order.getStatus() != OrderStatusEnum.DELIVERED) {
+                                throw new ResponseStatusException(
+                                                HttpStatus.BAD_REQUEST,
+                                                "Chỉ được gắn đánh giá cho đơn hàng đã được giao thành công.");
+                        }
+                        matchedOd = od;
+                } else {
+                        // Tự động kiểm tra xem user này đã từng mua và nhận hàng thành công (DELIVERED) sản phẩm này chưa
+                        List<OrderDetail> deliveredDetails = orderDetailRepo.findDeliveredOrderDetails(
+                                        userId, productId, OrderStatusEnum.DELIVERED);
+                        if (deliveredDetails != null && !deliveredDetails.isEmpty()) {
+                                matchedOd = deliveredDetails.get(0);
+                        }
                 }
 
                 Comment c = new Comment();
                 c.setUser(u);
                 c.setProduct(p);
-                c.setOrderDetail(od);
+                c.setOrderDetail(matchedOd);
                 c.setContent(content);
-                c.setRating(rating);
+                c.setRating(rating != null ? rating : 5);
                 c.setCreatedAt(LocalDateTime.now());
                 c.setUpdatedAt(LocalDateTime.now());
 
@@ -105,7 +113,7 @@ public class CommentService {
 
                 int currentUserId = Integer.parseInt(userDetails.getUsername());
                 boolean isAdmin = userDetails.getAuthorities().stream()
-                                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+                                .anyMatch(a -> a.getAuthority().equals("ADMIN") || a.getAuthority().equals("ROLE_ADMIN"));
 
                 if (c.getUser().getUserId() != currentUserId && !isAdmin) {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền chỉnh sửa bình luận này");
@@ -136,7 +144,7 @@ public class CommentService {
 
                 int currentUserId = Integer.parseInt(userDetails.getUsername());
                 boolean isAdmin = userDetails.getAuthorities().stream()
-                                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+                                .anyMatch(a -> a.getAuthority().equals("ADMIN") || a.getAuthority().equals("ROLE_ADMIN"));
 
                 if (c.getUser().getUserId() != currentUserId && !isAdmin) {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền xóa bình luận này");
@@ -170,16 +178,26 @@ public class CommentService {
         private CommentResponse toDto(Comment c) {
                 CommentResponse dto = new CommentResponse();
                 dto.setCommentId(c.getCommentId());
-                dto.setUserId(c.getUser().getUserId());
-                dto.setUserName(c.getUser().getFullName());
-                dto.setProductId(c.getProduct().getProductId());
-                dto.setProductName(c.getProduct().getProductName());
-                dto.setOrderDetailId(c.getOrderDetail().getOrderDetailId());
+                if (c.getUser() != null) {
+                        dto.setUserId(c.getUser().getUserId());
+                        String name = c.getUser().getFullName();
+                        dto.setUserName(name != null && !name.isBlank() ? name : c.getUser().getPhoneNumber());
+                }
+                if (c.getProduct() != null) {
+                        dto.setProductId(c.getProduct().getProductId());
+                        dto.setProductName(c.getProduct().getProductName());
+                }
+                if (c.getOrderDetail() != null) {
+                        dto.setOrderDetailId(c.getOrderDetail().getOrderDetailId());
+                        dto.setPurchased(true);
+                } else {
+                        dto.setOrderDetailId(0);
+                        dto.setPurchased(false);
+                }
                 dto.setContent(c.getContent());
                 dto.setRating(c.getRating());
                 dto.setCreatedAt(c.getCreatedAt());
                 dto.setUpdatedAt(c.getUpdatedAt());
                 return dto;
         }
-
 }
