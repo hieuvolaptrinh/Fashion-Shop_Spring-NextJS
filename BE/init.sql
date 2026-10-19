@@ -37,16 +37,16 @@ SET @role_admin_id = (SELECT `role_id` FROM `role` WHERE `role_name` = 'ADMIN' L
 INSERT INTO `type` (`type_id`, `type_name`, `image_url`) VALUES
 (1, 'Thời Trang Nam', '/categories/men.jpg'),
 (2, 'Thời Trang Nữ', '/categories/women.jpg'),
-(3, 'Phụ Kiện & Giày Dép', '/categories/accessories.jpg'),
-(4, 'Sản Phẩm Sức Khỏe', '/categories/wellness.jpg'),
-(5, 'Mỹ Phẩm & Làm Đẹp', '/categories/cosmetics.jpg'),
-(6, 'Đồ Gia Dụng Tiện Ích', '/categories/homeware.jpg')
+(3, 'Áo Khoác & Blazer', '/categories/outerwear.jpg'),
+(4, 'Quần & Jeans', '/categories/jeans.jpg'),
+(5, 'Phụ Kiện Thời Trang', '/categories/accessories.jpg'),
+(6, 'Giày Dép & Sneaker', '/categories/shoes.jpg')
 ON DUPLICATE KEY UPDATE 
     `type_name` = VALUES(`type_name`), 
     `image_url` = VALUES(`image_url`);
 
 -- ------------------------------------------------------------------------------
--- 4. TẠO SẢN PHẨM MẪU (PRODUCTS - TỔNG CỘNG 8 SẢN PHẨM ĐA DẠNG)
+-- 4. TẠO SẢN PHẨM MẪU (PRODUCTS - TỔNG CỘNG 8 SẢN PHẨM THỜI TRANG ĐA DẠNG)
 -- ------------------------------------------------------------------------------
 INSERT INTO `product` (`product_id`, `product_name`, `original_price`, `sale_price`, `quantity`, `description`, `ingredients`, `usage_instructions`, `manufacture_date`) VALUES
 (1, 'Áo Thun Cotton Unisex Form Rộng Thoáng Khí', 250000, 149000, 100, 
@@ -67,10 +67,10 @@ INSERT INTO `product` (`product_id`, `product_name`, `original_price`, `sale_pri
     'Lau sạch bằng khăn ẩm mềm, tránh phơi nắng gắt trực tiếp.', 
     '2026-02-01'),
 
-(4, 'Combo Trà Thảo Mộc Thanh Nhiệt Dưỡng Nhan', 190000, 125000, 120, 
-    'Trà thảo mộc tự nhiên giúp thanh lọc cơ thể, ngủ ngon và hỗ trợ làm đẹp da hiệu quả.', 
-    'Hoa cúc, táo đỏ, kỷ tử, hoa nhài', 
-    'Hãm với 300ml nước sôi trong 5-7 phút rồi thưởng thức.', 
+(4, 'Áo Khoác Blazer Nam Nữ Phong Cách Hàn Quốc', 550000, 389000, 80, 
+    'Áo khoác blazer form suông hiện đại, chất vải tuyết mưa cao cấp đứng form, dễ phối đồ đi làm hoặc đi chơi.', 
+    'Vải tuyết mưa dệt cao cấp 2 lớp chống nhăn', 
+    'Giặt hấp hoặc giặt tay nhẹ nhàng, ủi ở nhiệt độ trung bình.', 
     '2026-03-01'),
 
 (5, 'Giày Sneaker Thể Thao Năng Động Êm Chân', 550000, 349000, 60, 
@@ -79,16 +79,16 @@ INSERT INTO `product` (`product_id`, `product_name`, `original_price`, `sale_pri
     'Vệ sinh bằng bàn chải mềm và dung dịch vệ sinh giày chuyên dụng.', 
     '2026-02-20'),
 
-(6, 'Bình Giữ Nhiệt Inox 304 Cao Cấp 500ml', 210000, 135000, 85, 
-    'Giữ nóng 8 tiếng, giữ lạnh lên đến 12 tiếng. Lớp sơn nhám mờ sang trọng không bám vân tay.', 
-    'Inox 304 không gỉ an toàn cho thực phẩm', 
-    'Rửa sạch trước khi dùng lần đầu, đậy chặt nắp sau khi rót nước.', 
+(6, 'Quần Jean Slimfit Co Giãn Cao Cấp HALOKAKI', 450000, 299000, 85, 
+    'Quần jean nam nữ dáng slimfit ôm vừa vặn, chất liệu denim co giãn 4 chiều mềm mại, bền màu sau nhiều lần giặt.', 
+    '98% Cotton Denim dệt chéo, 2% Spandex co giãn', 
+    'Giặt mặt trái bằng nước lạnh, phơi trong bóng râm tránh ánh nắng gắt.', 
     '2026-03-10'),
 
-(7, 'Serum Tinh Chất Aurora Cấp Ẩm & Sáng Da 30ml', 360000, 259000, 80, 
-    'Serum tinh chất dưỡng da cao cấp chứa Hyaluronic Acid và Vitamin B5 giúp cấp ẩm sâu, phục hồi hàng rào bảo vệ da và làm da căng bóng rạng rỡ.', 
-    'Nước tinh khiết, Niacinamide 5%, Panthenol (Vitamin B5), Hyaluronic Acid, Chiết xuất rau má Centella Asiatica', 
-    'Sau bước làm sạch da mặt, lấy 3-4 giọt thoa đều và massage nhẹ nhàng để tinh chất thẩm thấu.', 
+(7, 'Áo Khoác Gió Thể Thao Chống Nước Bomber HALOKAKI', 390000, 269000, 80, 
+    'Áo khoác dù gió phong cách thể thao năng động, cản gió và trượt nước tốt, lót lưới thoáng khí mặc siêu nhẹ.', 
+    'Vải dù Polyester tráng PU trượt nước, lót lưới thoáng khí', 
+    'Giặt tay hoặc giặt máy chế độ nhẹ, không dùng chất tẩy clo.', 
     '2026-02-15'),
 
 (8, 'Áo Sơ Mi Nam Oxford Trắng Dài Tay Cao Cấp', 420000, 289000, 70, 
@@ -112,11 +112,11 @@ ON DUPLICATE KEY UPDATE
 INSERT IGNORE INTO `product_product_type` (`product_id`, `type_id`) VALUES
 (1, 1), -- Áo Thun Cotton -> Thời Trang Nam
 (2, 2), -- Váy Hoa Nhí -> Thời Trang Nữ
-(3, 3), -- Túi Xách Da -> Phụ Kiện & Giày Dép
-(4, 4), -- Combo Trà Thảo Mộc -> Sản Phẩm Sức Khỏe
-(5, 3), -- Giày Sneaker -> Phụ Kiện & Giày Dép
-(6, 6), -- Bình Giữ Nhiệt -> Đồ Gia Dụng Tiện Ích
-(7, 5), -- Serum Aurora -> Mỹ Phẩm & Làm Đẹp
+(3, 5), -- Túi Xách Da -> Phụ Kiện Thời Trang
+(4, 3), -- Áo Khoác Blazer -> Áo Khoác & Blazer
+(5, 6), -- Giày Sneaker -> Giày Dép & Sneaker
+(6, 4), -- Quần Jean -> Quần & Jeans
+(7, 3), -- Áo Khoác Gió Bomber -> Áo Khoác & Blazer
 (8, 1); -- Áo Sơ Mi Oxford -> Thời Trang Nam
 
 -- ------------------------------------------------------------------------------
@@ -148,11 +148,12 @@ WHERE NOT EXISTS (SELECT 1 FROM `users` WHERE `phone_number` = '0999999999');
 SET @admin_cart_id = (SELECT `cart_id` FROM `users` WHERE `phone_number` = '0999999999');
 SET @admin_cart_id = COALESCE(@admin_cart_id, LAST_INSERT_ID());
 
--- 7.3 Tạo hoặc cập nhật thông tin Admin
-INSERT INTO `users` (`phone_number`, `full_name`, `is_active`, `cart_id`) 
-VALUES ('0999999999', 'Quản Trị Viên (Admin)', 1, @admin_cart_id)
+-- 7.3 Tạo hoặc cập nhật thông tin Admin (Mật khẩu mặc định: 123456)
+INSERT INTO `users` (`phone_number`, `full_name`, `password`, `is_active`, `cart_id`) 
+VALUES ('0999999999', 'Quản Trị Viên (Admin)', '$2a$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGPEWiSGQ8PQxCV.e', 1, @admin_cart_id)
 ON DUPLICATE KEY UPDATE 
     `full_name` = VALUES(`full_name`),
+    `password` = VALUES(`password`),
     `is_active` = VALUES(`is_active`);
 
 SET @admin_user_id = (SELECT `user_id` FROM `users` WHERE `phone_number` = '0999999999' LIMIT 1);
@@ -164,7 +165,7 @@ INSERT IGNORE INTO `user_role` (`user_id`, `role_id`) VALUES
 (@admin_user_id, @role_admin_id);
 
 -- ------------------------------------------------------------------------------
--- 8. TẠO TÀI KHOẢN KHÁCH HÀNG (0988888888)
+-- 8. TẠO TÀI KHOẢN KHÁCH HÀNG (0988888888 - Mật khẩu mặc định: 123456)
 -- ------------------------------------------------------------------------------
 -- 8.1 Tạo Cart trước nếu User chưa tồn tại
 INSERT INTO `cart` (`user_id`) 
@@ -176,10 +177,11 @@ SET @user_cart_id = (SELECT `cart_id` FROM `users` WHERE `phone_number` = '09888
 SET @user_cart_id = COALESCE(@user_cart_id, LAST_INSERT_ID());
 
 -- 8.3 Tạo hoặc cập nhật thông tin Khách hàng
-INSERT INTO `users` (`phone_number`, `full_name`, `is_active`, `cart_id`) 
-VALUES ('0988888888', 'Khách Hàng Mẫu (User)', 1, @user_cart_id)
+INSERT INTO `users` (`phone_number`, `full_name`, `password`, `is_active`, `cart_id`) 
+VALUES ('0988888888', 'Khách Hàng Mẫu (User)', '$2a$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGPEWiSGQ8PQxCV.e', 1, @user_cart_id)
 ON DUPLICATE KEY UPDATE 
     `full_name` = VALUES(`full_name`),
+    `password` = VALUES(`password`),
     `is_active` = VALUES(`is_active`);
 
 SET @normal_user_id = (SELECT `user_id` FROM `users` WHERE `phone_number` = '0988888888' LIMIT 1);
