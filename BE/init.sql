@@ -9,12 +9,30 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- ------------------------------------------------------------------------------
 -- 1. TẠO DATABASE NẾU CHƯA CÓ
--- ------------------------------------------------------------------------------
-CREATE DATABASE IF NOT EXISTS `healthy_store` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `healthy_store`;
+-- (Tùy chọn cho local) CREATE DATABASE IF NOT EXISTS `healthy_store` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- USE `healthy_store`;
 
 -- Lưu ý: Sau khi bật Backend lần đầu tiên, Hibernate sẽ tự tạo các bảng (product, type, role, image,...).
 -- Sau khi bảng đã được tạo, bạn hãy chạy toàn bộ các lệnh bên dưới trong HeidiSQL / DBeaver / MySQL CLI.
+
+-- Đảm bảo các bảng liên kết ManyToMany tồn tại
+CREATE TABLE IF NOT EXISTS `user_role` (
+  `user_id` INT NOT NULL,
+  `role_id` INT NOT NULL,
+  PRIMARY KEY (`user_id`, `role_id`),
+  KEY `fk_ur_role` (`role_id`),
+  CONSTRAINT `fk_ur_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ur_role` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `product_product_type` (
+  `product_id` INT NOT NULL,
+  `type_id` INT NOT NULL,
+  PRIMARY KEY (`product_id`, `type_id`),
+  KEY `fk_ppt_type` (`type_id`),
+  CONSTRAINT `fk_ppt_product` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ppt_type` FOREIGN KEY (`type_id`) REFERENCES `type` (`type_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------------------------
 -- 2. TẠO ROLE MẶC ĐỊNH (Bắt buộc cho hệ thống Auth Spring Security)
@@ -274,13 +292,13 @@ INSERT INTO `comment` (`user_id`, `product_id`, `rating`, `content`, `created_at
 -- ------------------------------------------------------------------------------
 -- 12. ĐÁNH INDEX TỐI ƯU HÓA TRUY VẤN (QUERY PERFORMANCE TUNING)
 -- ------------------------------------------------------------------------------
-CREATE INDEX IF NOT EXISTS `idx_orders_status` ON `orders` (`status`);
-CREATE INDEX IF NOT EXISTS `idx_orders_user_created` ON `orders` (`user_id`, `create_at`);
-CREATE INDEX IF NOT EXISTS `idx_order_detail_order` ON `order_detail` (`order_id`);
-CREATE INDEX IF NOT EXISTS `idx_cart_detail_cart` ON `cart_detail` (`cart_id`);
+CREATE INDEX `idx_orders_status` ON `orders` (`status`);
+CREATE INDEX `idx_orders_user_created` ON `orders` (`user_id`, `create_at`);
+CREATE INDEX `idx_order_detail_order` ON `order_detail` (`order_id`);
+CREATE INDEX `idx_cart_detail_cart` ON `cart_detail` (`cart_id`);
 -- Với cột kiểu TEXT (product_name), bắt buộc chỉ định prefix length (191) để tương thích triệt để MySQL utf8mb4
-CREATE INDEX IF NOT EXISTS `idx_product_name` ON `product` (`product_name`(191));
-CREATE INDEX IF NOT EXISTS `idx_comment_product` ON `comment` (`product_id`);
+CREATE INDEX `idx_product_name` ON `product` (`product_name`(191));
+CREATE INDEX `idx_comment_product` ON `comment` (`product_id`);
 
 -- Bật lại kiểm tra khóa ngoại sau khi hoàn tất
 SET FOREIGN_KEY_CHECKS = 1;
