@@ -168,7 +168,7 @@ SET @admin_cart_id = COALESCE(@admin_cart_id, LAST_INSERT_ID());
 
 -- 7.3 Tạo hoặc cập nhật thông tin Admin (Mật khẩu mặc định: 123456)
 INSERT INTO `users` (`phone_number`, `full_name`, `password`, `is_active`, `cart_id`) 
-VALUES ('0999999999', 'Quản Trị Viên (Admin)', '$2a$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGPEWiSGQ8PQxCV.e', 1, @admin_cart_id)
+VALUES ('0999999999', 'Quản Trị Viên (Admin)', '$2a$10$KxuEmoWqmqCa4nOFnEepQeYA5ZbsxwjbrEpnMQCa.hY0xVYoh3Zoe', 1, @admin_cart_id)
 ON DUPLICATE KEY UPDATE 
     `full_name` = VALUES(`full_name`),
     `password` = VALUES(`password`),
@@ -196,7 +196,7 @@ SET @user_cart_id = COALESCE(@user_cart_id, LAST_INSERT_ID());
 
 -- 8.3 Tạo hoặc cập nhật thông tin Khách hàng
 INSERT INTO `users` (`phone_number`, `full_name`, `password`, `is_active`, `cart_id`) 
-VALUES ('0988888888', 'Khách Hàng Mẫu (User)', '$2a$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGPEWiSGQ8PQxCV.e', 1, @user_cart_id)
+VALUES ('0988888888', 'Khách Hàng Mẫu (User)', '$2a$10$KxuEmoWqmqCa4nOFnEepQeYA5ZbsxwjbrEpnMQCa.hY0xVYoh3Zoe', 1, @user_cart_id)
 ON DUPLICATE KEY UPDATE 
     `full_name` = VALUES(`full_name`),
     `password` = VALUES(`password`),
